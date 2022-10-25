@@ -9,14 +9,14 @@
 	health = 2100
 	pixel_x = -8
 	base_pixel_x = -8
-	damage_coeff = list(BRUTE = 0.7, OXY = 1.2, BURN = 0.4, CLONE = 1.5)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.7, WHITE_DAMAGE = 1.2, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1.5)
 
 	speed = 4
 	move_to_delay = 5
 	melee_damage_lower = 38
 	melee_damage_upper = 38
-	melee_damage_type = BURN
-	armortype = BURN
+	melee_damage_type = BLACK_DAMAGE
+	armortype = BLACK_DAMAGE
 	stat_attack = HARD_CRIT
 	attack_sound = 'sound/weapons/slashmiss.ogg'
 	attack_verb_continuous = "claws"
@@ -33,7 +33,7 @@
 						ABNORMALITY_WORK_REPRESSION = 50
 						)
 	work_damage_amount = 8
-	work_damage_type = BURN
+	work_damage_type = BLACK_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/correctional,

@@ -14,7 +14,7 @@
 		"Clear Solitude" = -100)
 	start_qliphoth = 4
 	work_damage_amount = 6
-	work_damage_type = OXY
+	work_damage_type = WHITE_DAMAGE
 	ego_list = list(
 		/datum/ego_datum/weapon/solitude,
 		/datum/ego_datum/armor/solitude

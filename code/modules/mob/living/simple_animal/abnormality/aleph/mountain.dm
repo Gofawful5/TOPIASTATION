@@ -9,11 +9,11 @@
 	health = 1000
 	pixel_x = -16
 	base_pixel_x = -16
-	damage_coeff = list(BRUTE = 1.2, OXY = 0.8, BURN = 0.8, CLONE = 0.5)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.2, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 0.5)
 	melee_damage_lower = 20
 	melee_damage_upper = 30
-	melee_damage_type = BRUTE
-	armortype = BRUTE
+	melee_damage_type = RED_DAMAGE
+	armortype = RED_DAMAGE
 	rapid_melee = 2
 	stat_attack = DEAD
 	ranged = TRUE
@@ -33,7 +33,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(0, 0, 0, 50, 55)
 						)
 	work_damage_amount = 16
-	work_damage_type = BURN
+	work_damage_type = BLACK_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/smile,
@@ -229,7 +229,7 @@
 			continue
 		if(L.stat == DEAD)
 			continue
-		L.apply_damage(scream_damage, BURN, null, L.run_armor_check(null, BURN), spread_damage = TRUE)
+		L.apply_damage(scream_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 
 /mob/living/simple_animal/hostile/abnormality/mountain/proc/Slam(range)
 	if(slam_cooldown > world.time)
@@ -242,7 +242,7 @@
 		for(var/mob/living/L in T)
 			if(faction_check_mob(L))
 				continue
-			L.apply_damage(slam_damage, BURN, null, L.run_armor_check(null, BURN), spread_damage = TRUE)
+			L.apply_damage(slam_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 
 /mob/living/simple_animal/hostile/abnormality/mountain/proc/Spit(atom/target)
 	if(spit_cooldown > world.time)

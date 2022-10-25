@@ -13,7 +13,7 @@
 		ABNORMALITY_WORK_REPRESSION = list(30, 20, 10, 0, 0)
 	)
 	work_damage_amount = 8
-	work_damage_type = OXY
+	work_damage_type = WHITE_DAMAGE
 	max_boxes = 14
 
 	ego_list = list(

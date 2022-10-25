@@ -16,7 +16,7 @@
 
 	maxHealth = 2000
 	health = 2000
-	damage_coeff = list(BRUTE = 0.7, OXY = 1.2, BURN = 0.3, CLONE = 1.5)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.7, WHITE_DAMAGE = 1.2, BLACK_DAMAGE = 0.3, PALE_DAMAGE = 1.5)
 	stat_attack = HARD_CRIT
 	ranged_cooldown_time = 12
 	projectiletype = /obj/projectile/hatred
@@ -36,7 +36,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(20, 20, 20, 0, 0)
 						)
 	work_damage_amount = 7
-	work_damage_type = BURN
+	work_damage_type = BLACK_DAMAGE
 
 	can_breach = TRUE
 	start_qliphoth = 2
@@ -280,7 +280,7 @@
 			if(faction_check_mob(L))
 				continue
 			beats_hit += L
-			L.apply_damage(beats_damage, BURN, null, L.run_armor_check(null, BURN))
+			L.apply_damage(beats_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE))
 
 /mob/living/simple_animal/hostile/abnormality/hatred_queen/proc/BeamAttack(target)
 	if(beam_cooldown > world.time)
@@ -382,7 +382,7 @@
 						H.adjustSanityLoss(beam_damage_final * 0.5)
 					continue
 				var/damage_before = L.get_damage_amount(BRUTE)
-				L.apply_damage(beam_damage_final, BURN, null, L.run_armor_check(null, BURN))
+				L.apply_damage(beam_damage_final, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE))
 				var/damage_dealt = abs(L.get_damage_amount(BRUTE)-damage_before)
 				if(datum_reference?.qliphoth_meter != 2)
 					if(ishuman(L))
@@ -454,7 +454,7 @@
 				continue
 			if(L.stat == DEAD)
 				continue
-			L.apply_damage(explode_damage, BURN, null, L.run_armor_check(null, BURN), spread_damage = TRUE)
+			L.apply_damage(explode_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 
 /mob/living/simple_animal/hostile/abnormality/hatred_queen/work_chance(mob/living/carbon/human/user, chance)
 	return chance * chance_modifier

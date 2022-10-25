@@ -20,7 +20,7 @@
 		ABNORMALITY_WORK_REPRESSION = 65
 		)
 	work_damage_amount = 5
-	work_damage_type = OXY
+	work_damage_type = WHITE_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/horn,

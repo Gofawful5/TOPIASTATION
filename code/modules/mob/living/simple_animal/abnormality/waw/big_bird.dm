@@ -14,7 +14,7 @@
 	ranged = TRUE
 	maxHealth = 2000
 	health = 2000
-	damage_coeff = list(BRUTE = 0.8, OXY = 1.2, BURN = 0.5, CLONE = 1.5)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 1.2, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 1.5)
 	see_in_dark = 10
 	stat_attack = HARD_CRIT
 
@@ -30,15 +30,15 @@
 						ABNORMALITY_WORK_REPRESSION = list(25, 20, 15, 10, 0)
 						)
 	work_damage_amount = 10
-	work_damage_type = BURN
+	work_damage_type = BLACK_DAMAGE
 
 	light_color = COLOR_ORANGE
 	light_range = 5
 	light_power = 7
 
 	// This stuff is only done to non-humans and objects
-	melee_damage_type = BURN
-	armortype = BURN
+	melee_damage_type = BLACK_DAMAGE
+	armortype = BLACK_DAMAGE
 	melee_damage_lower = 100
 	melee_damage_upper = 100
 

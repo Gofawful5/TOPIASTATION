@@ -18,11 +18,11 @@
 						)
 	melee_damage_lower = 3
 	melee_damage_upper = 5
-	melee_damage_type = CLONE
+	melee_damage_type = PALE_DAMAGE
 
 	work_damage_amount = 4
-	work_damage_type = CLONE
-	damage_coeff = list(BRUTE = 1.5, OXY = 1, BURN = 1, CLONE = 0.5)
+	work_damage_type = PALE_DAMAGE
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.5, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 0.5)
 	can_breach = TRUE
 	start_qliphoth = 1
 	can_spawn = FALSE // Normally doesn't appear

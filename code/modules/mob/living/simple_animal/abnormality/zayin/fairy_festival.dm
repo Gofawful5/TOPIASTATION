@@ -15,7 +15,7 @@
 		ABNORMALITY_WORK_REPRESSION = list(50, 40, 30, 30, 30)
 		)
 	work_damage_amount = 6
-	work_damage_type = BRUTE
+	work_damage_type = RED_DAMAGE
 	max_boxes = 10
 
 	ego_list = list(

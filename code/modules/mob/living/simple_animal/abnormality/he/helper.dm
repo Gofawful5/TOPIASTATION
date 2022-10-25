@@ -15,7 +15,7 @@
 	stat_attack = HARD_CRIT
 	melee_damage_lower = 20
 	melee_damage_upper = 25
-	damage_coeff = list(BRUTE = 0.5, OXY = 1, BURN = 2, CLONE = 2)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1, BLACK_DAMAGE = 2, PALE_DAMAGE = 2)
 	speak_emote = list("states")
 	vision_range = 14
 	aggro_vision_range = 20
@@ -31,7 +31,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(50, 55, 55, 50, 45)
 						)
 	work_damage_amount = 10
-	work_damage_type = BRUTE
+	work_damage_type = RED_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/grinder,

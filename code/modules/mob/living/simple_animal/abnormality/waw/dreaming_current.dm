@@ -11,7 +11,7 @@
 	ranged = TRUE
 	maxHealth = 2000
 	health = 2000
-	damage_coeff = list(BRUTE = 1.5, OXY = 0.5, BURN = 1, CLONE = 2)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
 	stat_attack = HARD_CRIT
 	deathsound = 'sound/abnormalities/dreamingcurrent/dead.ogg'
 
@@ -24,7 +24,7 @@
 						ABNORMALITY_WORK_REPRESSION = 45
 						)
 	work_damage_amount = 10
-	work_damage_type = OXY
+	work_damage_type = WHITE_DAMAGE
 
 	can_breach = TRUE
 	start_qliphoth = 2
@@ -138,7 +138,7 @@
 				if(L in been_hit)
 					continue
 				visible_message("<span class='boldwarning'>[src] bites [L]!</span>")
-				L.apply_damage(dash_damage, BRUTE, null, L.run_armor_check(null, BRUTE), spread_damage = TRUE)
+				L.apply_damage(dash_damage, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
 				new /obj/effect/temp_visual/cleave(get_turf(L))
 				playsound(L, "sound/abnormalities/dreamingcurrent/bite.ogg", 50, TRUE)
 				if(L.health < 0)

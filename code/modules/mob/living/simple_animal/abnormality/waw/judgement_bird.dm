@@ -15,7 +15,7 @@
 
 	maxHealth = 2000
 	health = 2000
-	damage_coeff = list(BRUTE = 0.8, OXY = 0.8, BURN = 0.8, CLONE = 2)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 2)
 	see_in_dark = 10
 	stat_attack = HARD_CRIT
 
@@ -31,7 +31,7 @@
 						ABNORMALITY_WORK_REPRESSION = 0
 						)
 	work_damage_amount = 10
-	work_damage_type = CLONE
+	work_damage_type = PALE_DAMAGE
 
 	attack_action_types = list(/datum/action/innate/abnormality_attack/judgement)
 
@@ -79,7 +79,7 @@
 		if(L.stat == DEAD)
 			continue
 		new /obj/effect/temp_visual/judgement(get_turf(L))
-		L.apply_damage(judgement_damage, CLONE, null, L.run_armor_check(null, CLONE), spread_damage = TRUE)
+		L.apply_damage(judgement_damage, PALE_DAMAGE, null, L.run_armor_check(null, PALE_DAMAGE), spread_damage = TRUE)
 	icon_state = icon_living
 
 /mob/living/simple_animal/hostile/abnormality/judgement_bird/neutral_effect(mob/living/carbon/human/user, work_type, pe)

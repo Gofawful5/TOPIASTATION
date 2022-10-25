@@ -20,8 +20,8 @@
 		ABNORMALITY_WORK_REPRESSION = list(50, 50, 40, 40, 40)
 		)
 	work_damage_amount = 6
-	work_damage_type = BRUTE
-	damage_coeff = list(BRUTE = 0.5, OXY = 2, BURN = 1, CLONE = 2)
+	work_damage_type = RED_DAMAGE
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 2, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
 	faction = list("hostile")
 	can_breach = TRUE
 	start_qliphoth = 2
@@ -98,7 +98,7 @@
 	// Ka-boom
 	playsound(get_turf(src), 'sound/abnormalities/scorchedgirl/explosion.ogg', 125, 0, 8)
 	for(var/mob/living/carbon/human/H in view(7, src))
-		H.apply_damage(boom_damage, BRUTE, null, H.run_armor_check(null, BRUTE), spread_damage = TRUE)
+		H.apply_damage(boom_damage, RED_DAMAGE, null, H.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
 		if(H.health < 0)
 			H.gib()
 	new /obj/effect/temp_visual/explosion(get_turf(src))

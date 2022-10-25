@@ -7,7 +7,7 @@
 	layer = LARGE_MOB_LAYER
 	a_intent = INTENT_HARM
 	del_on_death = TRUE
-	damage_coeff = list(BRUTE = 1, OXY = 1, BURN = 1, CLONE = 1)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
 	atmos_requirements = list("min_oxy" = 0, "max_oxy" = 0, "min_tox" = 0, "max_tox" = 0, "min_co2" = 0, "max_co2" = 0, "min_n2" = 0, "max_n2" = 0)
 	minbodytemp = 0
 	see_in_dark = 7
@@ -49,7 +49,7 @@
 	/// How much damage is dealt to user on each work failure
 	var/work_damage_amount = 2
 	/// What damage type is used for work failures
-	var/work_damage_type = BRUTE
+	var/work_damage_type = RED_DAMAGE
 	/// Maximum amount of PE someone can obtain per work procedure, if not null or 0.
 	var/max_boxes = null
 	/// List of ego equipment datums

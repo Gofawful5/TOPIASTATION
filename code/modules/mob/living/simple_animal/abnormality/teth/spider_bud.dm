@@ -16,7 +16,7 @@
 	base_pixel_x = -8
 
 	work_damage_amount = 7
-	work_damage_type = BRUTE
+	work_damage_type = RED_DAMAGE
 	ego_list = list(
 		/datum/ego_datum/weapon/eyes,
 		/datum/ego_datum/armor/eyes

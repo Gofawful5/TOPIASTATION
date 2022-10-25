@@ -11,7 +11,7 @@
 	health = 1200
 	pixel_x = -16
 	base_pixel_x = -16
-	damage_coeff = list(BRUTE = 1.5, OXY = 0.5, BURN = 1, CLONE = 2)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 2)
 	stat_attack = HARD_CRIT
 	can_breach = TRUE
 	threat_level = HE_LEVEL
@@ -26,7 +26,7 @@
 						ABNORMALITY_WORK_REPRESSION = 0
 						)
 	work_damage_amount = 10
-	work_damage_type = OXY
+	work_damage_type = WHITE_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/christmas,
@@ -63,6 +63,6 @@
 	for(var/mob/living/L in livinginview(8, src))
 		if(faction_check_mob(L))
 			continue
-		L.apply_damage(pulse_damage, OXY, null, L.run_armor_check(null, OXY), spread_damage = TRUE)
+		L.apply_damage(pulse_damage, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
 		new /obj/effect/temp_visual/dir_setting/bloodsplatter(get_turf(L), pick(GLOB.alldirs))
 

@@ -12,11 +12,14 @@
 	attack_verb_simple = "attack"
 	attack_sound = 'sound/abnormalities/censored/attack.ogg'
 	/* Stats */
+	threat_level = ALEPH_LEVEL
+	fear_level = ALEPH_LEVEL + 3
 	health = 4000
 	maxHealth = 4000
 	obj_damage = 600
-	damage_coeff = list(BRUTE = 0.6, BURN = 0.8, BURN = 0.4, CLONE = 1)
-	melee_damage_type = TOX
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.6, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1)
+	armortype = BLACK_DAMAGE
+	melee_damage_type = BLACK_DAMAGE
 	melee_damage_lower = 75
 	melee_damage_upper = 80
 	speed = 4
@@ -32,7 +35,7 @@
 						"Sacrifice" = 999,
 						)
 	work_damage_amount = 14
-	work_damage_type = BURN
+	work_damage_type = BLACK_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/censored,
@@ -90,7 +93,7 @@
 		return
 	can_act = FALSE
 	forceMove(get_turf(H))
-	damage_coeff = list(BRUTE = 0, OXY = 0, BURN = 0, CLONE = 0)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 0)
 	playsound(src, 'sound/abnormalities/censored/convert.ogg', 45, FALSE, 5)
 	SLEEP_CHECK_DEATH(3)
 	new /obj/effect/temp_visual/censored(get_turf(src))
@@ -101,7 +104,7 @@
 	if(!QDELETED(H))
 		C.desc = "What the hell is this? It shouldn't exist... On the second thought, it reminds you of [H.real_name]..."
 		H.gib()
-	damage_coeff = list(BRUTE = 0.6, OXY = 0.8, BURN = 0.4, CLONE = 1)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.6, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 1)
 	adjustBruteLoss(-(maxHealth*0.1))
 	can_act = TRUE
 
@@ -160,8 +163,8 @@
 	health = 600
 	maxHealth = 600
 	obj_damage = 300
-	damage_coeff = list(BRUTE = 0.8, OXY = 1.2, BURN = 0.5, CLONE = 1)
-	melee_damage_type = BURN
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 1.2, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 1)
+	melee_damage_type = BLACK_DAMAGE
 	melee_damage_lower = 14
 	melee_damage_upper = 20
 	speed = 3

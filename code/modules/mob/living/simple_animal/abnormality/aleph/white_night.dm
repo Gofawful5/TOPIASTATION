@@ -13,7 +13,7 @@ GLOBAL_LIST_EMPTY(apostles)
 	friendly_verb_continuous = "stares down"
 	friendly_verb_simple = "stare down"
 	speak_emote = list("proclaims")
-	damage_coeff = list(BRUTE = 0.5, OXY = -2, BURN = 0.5, CLONE = 0.2)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = -2, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 0.2)
 	is_flying_animal = TRUE
 	pixel_x = -16
 	base_pixel_x = -16
@@ -33,7 +33,7 @@ GLOBAL_LIST_EMPTY(apostles)
 						ABNORMALITY_WORK_REPRESSION = list(30, 30, 35, 40, 45)
 						)
 	work_damage_amount = 14
-	work_damage_type = CLONE
+	work_damage_type = PALE_DAMAGE
 	can_patrol = FALSE
 
 	light_system = MOVABLE_LIGHT
@@ -131,7 +131,7 @@ GLOBAL_LIST_EMPTY(apostles)
 		playsound(L.loc, 'sound/machines/clockcult/ark_damage.ogg', 50 - attack_range, TRUE, -1)
 		// The farther you are from white night - the less damage it deals
 		var/dealt_damage = max(5, holy_revival_damage - attack_range)
-		L.apply_damage(dealt_damage, CLONE, null, L.run_armor_check(null, CLONE), spread_damage = TRUE)
+		L.apply_damage(dealt_damage, PALE_DAMAGE, null, L.run_armor_check(null, PALE_DAMAGE), spread_damage = TRUE)
 		if(ishuman(L) && dealt_damage > 25)
 			L.emote("scream")
 		to_chat(L, "<span class='userdanger'>The holy light... IT BURNS!!</span>")
@@ -226,13 +226,13 @@ GLOBAL_LIST_EMPTY(apostles)
 	friendly_verb_continuous = "stares down"
 	friendly_verb_simple = "stare down"
 	speak_emote = list("says")
-	melee_damage_type = BRUTE
-	armortype = BRUTE
+	melee_damage_type = RED_DAMAGE
+	armortype = RED_DAMAGE
 	melee_damage_lower = 35
 	melee_damage_upper = 45
 	obj_damage = 400
 	ranged = TRUE
-	damage_coeff = list(BRUTE = 1.5, OXY = 0.5, BURN = 0.5, CLONE = 0.5)
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 0.5)
 	speed = 4
 	move_to_delay = 6
 	pixel_x = -8
@@ -290,7 +290,7 @@ GLOBAL_LIST_EMPTY(apostles)
 	var/scythe_cooldown_time = 10 SECONDS
 	var/scythe_range = 2
 	var/scythe_damage = 250
-	var/scythe_damage_type = BRUTE
+	var/scythe_damage_type = RED_DAMAGE
 
 /mob/living/simple_animal/hostile/apostle/scythe/OpenFire()
 	if(!can_act)
@@ -328,12 +328,12 @@ GLOBAL_LIST_EMPTY(apostles)
 	maxHealth = 3000
 	speed = 5
 	move_to_delay = 7
-	melee_damage_type = CLONE
-	armortype = CLONE
-	damage_coeff = list(BRUTE = 0.5, OXY = 0.5, BURN = 0.5, CLONE = 1.5)
+	melee_damage_type = PALE_DAMAGE
+	armortype = PALE_DAMAGE
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 1.5)
 	scythe_range = 3
 	scythe_cooldown_time = 8 SECONDS // More often, since the damage increase was disliked.
-	scythe_damage_type = CLONE
+	scythe_damage_type = PALE_DAMAGE
 	scythe_damage = 150 // It's a big AoE unlike base game where it's smaller and as it is you straight up die unless you have 7+ Pale resist. You also have TWO of these AND WN hitting you for ~80 Pale at this range.
 
 /mob/living/simple_animal/hostile/apostle/spear
@@ -344,9 +344,9 @@ GLOBAL_LIST_EMPTY(apostles)
 	attack_sound = 'sound/abnormalities/whitenight/spear.ogg'
 	icon_state = "apostle_spear"
 	icon_living = "apostle_spear"
-	melee_damage_type = BURN
-	armortype = BURN
-	damage_coeff = list(BRUTE = 0.5, OXY = 0.5, BURN = 1.5, CLONE = 0.5)
+	melee_damage_type = BLACK_DAMAGE
+	armortype = BLACK_DAMAGE
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 0.5)
 	var/spear_cooldown
 	var/spear_cooldown_time = 10 SECONDS
 	var/spear_max = 50
@@ -413,7 +413,7 @@ GLOBAL_LIST_EMPTY(apostles)
 				if(L in been_hit)
 					continue
 				visible_message("<span class='boldwarning'>[src] runs through [L]!</span>")
-				L.apply_damage(spear_damage, BURN, null, L.run_armor_check(null, BURN), spread_damage = TRUE)
+				L.apply_damage(spear_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 				new /obj/effect/temp_visual/cleave(get_turf(L))
 				if(!(L in been_hit))
 					been_hit += L
@@ -430,9 +430,9 @@ GLOBAL_LIST_EMPTY(apostles)
 	minimum_distance = 4
 	melee_damage_lower = 25
 	melee_damage_upper = 35
-	melee_damage_type = BURN // Okay, look, they aren't really meant to melee anyway
-	armortype = BURN
-	damage_coeff = list(BRUTE = 0.5, OXY = 1.5, BURN = 0.5, CLONE = 0.5)
+	melee_damage_type = BLACK_DAMAGE // Okay, look, they aren't really meant to melee anyway
+	armortype = BLACK_DAMAGE
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 0.5)
 	var/staff_cooldown
 	var/staff_cooldown_time = 20 SECONDS
 	var/staff_damage = 20
@@ -505,7 +505,7 @@ GLOBAL_LIST_EMPTY(apostles)
 			for(var/mob/living/L in AT)
 				if(faction_check_mob(L))
 					continue
-				L.apply_damage(staff_damage, OXY, null, L.run_armor_check(null, OXY), spread_damage = TRUE)
+				L.apply_damage(staff_damage, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
 				if(ishuman(L))
 					var/mob/living/carbon/human/H = L
 					if(H.sanity_lost)

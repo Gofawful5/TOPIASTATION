@@ -13,7 +13,7 @@
 			)
 	start_qliphoth = 1
 	work_damage_amount = 10
-	work_damage_type = CLONE
+	work_damage_type = PALE_DAMAGE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/thirteen,
@@ -54,7 +54,7 @@
 
 		stoplag(1)
 		new /obj/effect/temp_visual/thirteen(get_turf(L))	//A visual effect if it hits
-		L.apply_damage(worldwide_damage, CLONE, null, L.run_armor_check(null, CLONE), spread_damage = TRUE)
+		L.apply_damage(worldwide_damage, PALE_DAMAGE, null, L.run_armor_check(null, PALE_DAMAGE), spread_damage = TRUE)
 	addtimer(CALLBACK(src, .proc/Reset), reset_time)
 	return
 

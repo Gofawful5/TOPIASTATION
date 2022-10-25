@@ -10,8 +10,9 @@
 	icon_state = "nothing"
 	icon_living = "nothing"
 	icon_dead = "nothing_dead"
-	melee_damage_type = BRUTE
-	damage_coeff = list(BRUTE = 0.3, OXY = 0.8, BURN = 0.8, CLONE = 1.2)
+	melee_damage_type = RED_DAMAGE
+	armortype = RED_DAMAGE
+	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.3, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1.2)
 	melee_damage_lower = 45
 	melee_damage_upper = 55
 	speed = 2
@@ -156,7 +157,7 @@
 
 /mob/living/simple_animal/hostile/abnormality/nothing_there/apply_damage(damage, damagetype, def_zone, blocked, forced, spread_damage, wound_bonus, bare_wound_bonus, sharpness, white_healable)
 	. = ..()
-	if(damagetype == BRUTE || damage < 5)
+	if(damagetype == RED_DAMAGE || damage < 5)
 		return
 	last_heal_time = world.time + 10 SECONDS // Heal delayed when taking damage; Doubled because it was a little too quick.
 
@@ -190,7 +191,7 @@
 	switch(current_stage)
 		if(1)
 			icon_state = "nothing_egg"
-			damage_coeff = list(BRUTE = 0, OXY = 0.6, BURN = 0.6, CLONE = 1)
+			damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 0.6, PALE_DAMAGE = 1)
 			can_act = FALSE
 			next_transform = world.time + rand(10 SECONDS, 25 SECONDS)
 		if(2)
@@ -203,7 +204,7 @@
 			icon_state = icon_living
 			pixel_x = -16
 			base_pixel_x = -16
-			damage_coeff = list(BRUTE = 0, OXY = 0.4, BURN = 0.4, CLONE = 0.8)
+			damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0.4, BLACK_DAMAGE = 0.4, PALE_DAMAGE = 0.8)
 			can_act = TRUE
 			melee_damage_lower = 65
 			melee_damage_upper = 75
@@ -238,7 +239,7 @@
 				if(faction_check_mob(L) || (L in been_hit))
 					continue
 				been_hit += L
-				L.apply_damage(hello_damage, BRUTE, null, L.run_armor_check(null, BRUTE), spread_damage = TRUE)
+				L.apply_damage(hello_damage, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
 				if(L.health < 0)
 					L.gib()
 	playsound(get_turf(src), 'sound/abnormalities/nothingthere/hello_bam.ogg', 100, 0, 7)
@@ -259,7 +260,7 @@
 		for(var/mob/living/L in T)
 			if(faction_check_mob(L))
 				continue
-			L.apply_damage(goodbye_damage, BRUTE, null, L.run_armor_check(null, BRUTE), spread_damage = TRUE)
+			L.apply_damage(goodbye_damage, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
 			if(L.health < 0)
 				L.gib()
 	playsound(get_turf(src), 'sound/abnormalities/nothingthere/goodbye_attack.ogg', 75, 0, 5)
