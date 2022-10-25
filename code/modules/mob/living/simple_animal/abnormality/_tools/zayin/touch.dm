@@ -24,6 +24,6 @@
 					M.gib()
 			if(2)
 				for(var/mob/living/carbon/human/M in GLOB.player_list)
-					M.apply_damage(5000, WHITE_DAMAGE, null, null, spread_damage = TRUE)//You cannot escape.
+					M.apply_damage(5000, OXY, null, null, spread_damage = TRUE)//You cannot escape.
 	else
 		user.gib() //lol, idiot.

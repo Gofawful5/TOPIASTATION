@@ -13,7 +13,7 @@
 		ABNORMALITY_WORK_REPRESSION = list(0, 0, 60, 60, 60)
 		)
 	work_damage_amount = 8 // This was halved what it should be.
-	work_damage_type = BLACK_DAMAGE
+	work_damage_type = BURN
 
 	ego_list = list(
 		/datum/ego_datum/weapon/magicbullet,

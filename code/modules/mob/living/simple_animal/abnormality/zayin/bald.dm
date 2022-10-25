@@ -15,7 +15,7 @@
 						ABNORMALITY_WORK_REPRESSION = 0
 						)
 	work_damage_amount = 4
-	work_damage_type = WHITE_DAMAGE
+	work_damage_type = OXY
 
 	ego_list = list(
 		/datum/ego_datum/weapon/tough,

@@ -19,7 +19,7 @@
 						ABNORMALITY_WORK_REPRESSION = 0
 						)
 	work_damage_amount = 10
-	work_damage_type = RED_DAMAGE
+	work_damage_type = BRUTE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/hornet,
@@ -80,9 +80,9 @@
 	base_pixel_x = -8
 	health = 450
 	maxHealth = 450
-	melee_damage_type = RED_DAMAGE
-	armortype = RED_DAMAGE
-	damage_coeff = list(RED_DAMAGE = 1.2, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 2)
+	melee_damage_type = BRUTE
+	armortype = BRUTE
+	damage_coeff = list(RED_DAMAGE = 1.2, OXY = 1.5, BURN = 0.8, CLONE = 2)
 	melee_damage_lower = 14
 	melee_damage_upper = 18
 	rapid_melee = 2

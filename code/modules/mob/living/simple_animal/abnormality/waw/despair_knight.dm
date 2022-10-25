@@ -16,7 +16,7 @@
 
 	maxHealth = 2000
 	health = 2000
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.2, WHITE_DAMAGE = 1.0, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 0.5)
+	damage_coeff = list(BRUTE = 1.2, OXY = 1.0, BURN = 0.8, CLONE = 0.5)
 	stat_attack = HARD_CRIT
 
 	del_on_death = FALSE
@@ -34,7 +34,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(40, 40, 40, 35, 30)
 						)
 	work_damage_amount = 10
-	work_damage_type = WHITE_DAMAGE
+	work_damage_type = OXY
 
 	ego_list = list(
 		/datum/ego_datum/weapon/despair,

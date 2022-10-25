@@ -14,7 +14,7 @@
 		ABNORMALITY_WORK_REPRESSION = 0
 			)
 	work_damage_amount = 8
-	work_damage_type = BLACK_DAMAGE
+	work_damage_type = BURN
 	max_boxes = 16 // Accurate to base game
 
 	ego_list = list(
@@ -38,9 +38,9 @@
 	maxHealth = 800
 	health = 800
 	pixel_x = -16
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1.2, PALE_DAMAGE = 1)
-	melee_damage_type = RED_DAMAGE
-	armortype = RED_DAMAGE
+	damage_coeff = list(BRUTE = 0.8, OXY = 0.8, BURN = 1.2, CLONE = 1)
+	melee_damage_type = BRUTE
+	armortype = BRUTE
 	stat_attack = HARD_CRIT
 	melee_damage_lower = 20
 	melee_damage_upper = 30
@@ -78,6 +78,6 @@
 		var/atom/throw_target = get_edge_target_turf(L, rand_dir)
 		if(!L.anchored)
 			L.throw_at(throw_target, rand(1, 3), 7, L)
-		L.apply_damage(200, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)//Usually a kill, you can block it if you're good
+		L.apply_damage(200, BRUTE, null, L.run_armor_check(null, BRUTE), spread_damage = TRUE)//Usually a kill, you can block it if you're good
 
 #undef STATUS_EFFECT_TRICKED

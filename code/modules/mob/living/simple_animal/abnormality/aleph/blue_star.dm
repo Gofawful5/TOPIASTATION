@@ -11,7 +11,7 @@
 	icon_state = "blue_star"
 	icon_living = "blue_star"
 	icon_dead = "blue_star_dead"
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.4, WHITE_DAMAGE = 0.2, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1.2)
+	damage_coeff = list(BRUTE = 0.4, OXY = 0.2, BURN = 0.8, CLONE = 1.2)
 	is_flying_animal = TRUE
 	del_on_death = FALSE
 	can_breach = TRUE
@@ -24,7 +24,7 @@
 						ABNORMALITY_WORK_REPRESSION = 40
 						)
 	work_damage_amount = 16
-	work_damage_type = WHITE_DAMAGE
+	work_damage_type = OXY
 	can_patrol = FALSE
 
 	wander = FALSE
@@ -81,7 +81,7 @@
 	for(var/mob/living/L in livinginrange(48, src))
 		if(faction_check_mob(L))
 			continue
-		L.apply_damage((pulse_damage - round(get_dist(src, L) * 1.5)), WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+		L.apply_damage((pulse_damage - round(get_dist(src, L) * 1.5)), OXY, null, L.run_armor_check(null, OXY), spread_damage = TRUE)
 		flash_color(L, flash_color = COLOR_BLUE_LIGHT, flash_time = 70)
 		if(!ishuman(L))
 			continue

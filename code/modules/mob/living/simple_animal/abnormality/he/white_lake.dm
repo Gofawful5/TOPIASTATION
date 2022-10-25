@@ -17,7 +17,7 @@
 		ABNORMALITY_WORK_REPRESSION = 30
 	)
 	work_damage_amount = 10
-	work_damage_type = RED_DAMAGE
+	work_damage_type = BRUTE
 	/// Grab her champion
 	var/champion
 	//Has the weapon been given out?
@@ -56,7 +56,7 @@
 			if(faction_check_mob(L, FALSE) || L.z != z || L.stat == DEAD)
 				continue
 			new /obj/effect/temp_visual/whitelake(get_turf(L))
-			L.apply_damage(50, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+			L.apply_damage(50, OXY, null, L.run_armor_check(null, OXY), spread_damage = TRUE)
 		return
 	var/mob/living/carbon/human/H = champion
 	H.Apply_Gift(new gift_type)	//It's a gift now! Free shit! Oh wait you- oh god you just stabbed that man.
@@ -109,8 +109,8 @@
 	special = "Cannot be dropped until moved from your hands. Twice as effective against monsters."
 	icon_state = "flower_waltz"
 	force = 22
-	damtype = PALE_DAMAGE
-	armortype = PALE_DAMAGE
+	damtype = CLONE
+	armortype = CLONE
 	attack_verb_continuous = list("slices", "cuts")
 	attack_verb_simple = list("slices", "cuts")
 	hitsound = 'sound/weapons/bladeslice.ogg'

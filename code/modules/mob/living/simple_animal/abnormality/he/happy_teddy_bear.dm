@@ -20,7 +20,7 @@
 		ABNORMALITY_WORK_REPRESSION = list(40, 45, 45, 40, 35)
 	)
 	work_damage_amount = 10
-	work_damage_type = WHITE_DAMAGE
+	work_damage_type = OXY
 	max_boxes = 15
 	response_help_continuous = "hugs" // :-)
 	response_help_simple = "hug"

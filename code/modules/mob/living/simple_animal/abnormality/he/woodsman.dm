@@ -15,7 +15,7 @@
 	stat_attack = DEAD
 	melee_damage_lower = 15
 	melee_damage_upper = 30
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1)
+	damage_coeff = list(BRUTE = 1.5, OXY = 0.8, BURN = 0.8, CLONE = 1)
 	vision_range = 14
 	aggro_vision_range = 20
 	attack_action_types = list(/datum/action/innate/abnormality_attack/woodsman_flurry)
@@ -30,7 +30,7 @@
 						ABNORMALITY_WORK_REPRESSION = 45
 						)
 	work_damage_amount = 10
-	work_damage_type = WHITE_DAMAGE
+	work_damage_type = OXY
 	move_to_delay = 4
 	base_pixel_x = -16
 	pixel_x = -16
@@ -223,9 +223,9 @@
 					continue
 				been_hit += L
 				if (i > 6)
-					L.apply_damage(flurry_big, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
+					L.apply_damage(flurry_big, BRUTE, null, L.run_armor_check(null, BRUTE), spread_damage = TRUE)
 				else
-					L.apply_damage(flurry_small, RED_DAMAGE, null, L.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
+					L.apply_damage(flurry_small, BRUTE, null, L.run_armor_check(null, BRUTE), spread_damage = TRUE)
 		if (i > 6)
 			playsound(get_turf(src), 'sound/abnormalities/woodsman/woodsman_strong.ogg', 100, 0, 8) // BAM
 		else

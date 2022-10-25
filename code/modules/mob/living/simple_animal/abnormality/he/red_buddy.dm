@@ -22,14 +22,14 @@
 						ABNORMALITY_WORK_ATTACHMENT = list(20, 55, 60, 60, 60),
 						ABNORMALITY_WORK_REPRESSION = list(20, 55, 60, 60, 60)
 						)
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.8, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 1.5)
+	damage_coeff = list(BRUTE = 0.8, OXY = 0.5, BURN = 1.5, CLONE = 1.5)
 	melee_damage_lower = 50
 	melee_damage_upper = 60 //hits like a truck but is slow as shit
-	melee_damage_type = RED_DAMAGE
-	armortype = RED_DAMAGE
+	melee_damage_type = BRUTE
+	armortype = BRUTE
 	stat_attack = HARD_CRIT
 	work_damage_amount = 0 //his work damage now is entirely related to suffering
-	work_damage_type = RED_DAMAGE
+	work_damage_type = BRUTE
 	attack_verb_continuous = "chomps"
 	attack_verb_simple = "claws"
 	faction = list("blueshep")
@@ -145,7 +145,7 @@
 	if(can_see(src, master_abno, 10))
 		awakened_master = master_abno
 		awakened = TRUE
-		damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 0.1, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1)
+		damage_coeff = list(BRUTE = 0.5, OXY = 0.1, BURN = 0.8, CLONE = 1)
 		adjustHealth(-maxHealth)
 		melee_damage_lower = 60
 		melee_damage_upper = 80
@@ -181,7 +181,7 @@
 				continue
 			if(L.stat == DEAD)
 				continue
-			L.apply_damage(10, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+			L.apply_damage(10, OXY, null, L.run_armor_check(null, OXY), spread_damage = TRUE)
 			heard_awoo = TRUE
 		if(health >= 75 && heard_awoo)
 			adjustHealth(75)

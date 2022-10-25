@@ -13,7 +13,7 @@
 	minimum_distance = 2
 
 	move_to_delay = 4
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1.0, PALE_DAMAGE = 2)
+	damage_coeff = list(BRUTE = 0.5, OXY = 1.5, BURN = 1.0, CLONE = 2)
 	stat_attack = HARD_CRIT
 	attack_action_types = list(/datum/action/innate/abnormality_attack/SpiritGun, /datum/action/innate/abnormality_attack/ButterflySwarm)
 
@@ -31,7 +31,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(0, 0, 60, 60, 60),
 						)
 	work_damage_amount = 12
-	work_damage_type = WHITE_DAMAGE
+	work_damage_type = OXY
 	max_boxes = 16
 	deathmessage = "floats into the air, descending into its own coffin."
 	base_pixel_x = -16
@@ -95,13 +95,13 @@
 	SLEEP_CHECK_DEATH(1.75 SECONDS)
 	playsound(get_turf(src), 'sound/abnormalities/funeral/spiritgun.ogg', 75, 1, 3)
 	if(cooler_target in oview(src, 12))
-		cooler_target.apply_damage(60, WHITE_DAMAGE, null, cooler_target.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+		cooler_target.apply_damage(60, OXY, null, cooler_target.run_armor_check(null, OXY), spread_damage = TRUE)
 		//No longer because fuck you.
 		if(ishuman(target))
 			var/mob/living/carbon/human/kickass_grade1_target = target
 			//I'm not sorry.
 			if(kickass_grade1_target.sanity_lost)
-				kickass_grade1_target.apply_damage(9999, PALE_DAMAGE, null, kickass_grade1_target.run_armor_check(null, PALE_DAMAGE), spread_damage = TRUE)
+				kickass_grade1_target.apply_damage(9999, CLONE, null, kickass_grade1_target.run_armor_check(null, CLONE), spread_damage = TRUE)
 	//This should be brute. But also, it's funny.
 	can_act = TRUE
 	gun_cooldown = world.time + gun_cooldown_time
@@ -204,11 +204,11 @@
 				if (L == src)
 					continue
 				been_hit += L
-				L.apply_damage(swarm_damage, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+				L.apply_damage(swarm_damage, OXY, null, L.run_armor_check(null, OXY), spread_damage = TRUE)
 				if(ishuman(L))
 					var/mob/living/carbon/human/cooler_L = L
 					if(cooler_L.sanity_lost)
-						cooler_L.apply_damage(9999, PALE_DAMAGE, null, cooler_L.run_armor_check(null, PALE_DAMAGE), spread_damage = TRUE)
+						cooler_L.apply_damage(9999, CLONE, null, cooler_L.run_armor_check(null, CLONE), spread_damage = TRUE)
 		SLEEP_CHECK_DEATH(0.5 SECONDS)
 	icon_state = icon_living
 	can_act = TRUE

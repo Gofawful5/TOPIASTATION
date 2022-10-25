@@ -17,7 +17,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(0, 0, 40, 40, 40)
 						)
 	work_damage_amount = 10
-	work_damage_type = RED_DAMAGE
+	work_damage_type = BRUTE
 	ego_list = list(
 		/datum/ego_datum/weapon/loyalty,
 		/datum/ego_datum/weapon/praetorian,
@@ -27,11 +27,11 @@
 	//She doesn't usually breach. However, when she does, she's practically an Aleph-level threat. She's also really slow, and should pack a punch.
 	health = 3000
 	maxHealth = 3000
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.3, WHITE_DAMAGE = 0.6, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1)
+	damage_coeff = list(BRUTE = 0.3, OXY = 0.6, BURN = 0.8, CLONE = 1)
 	melee_damage_lower = 40
 	melee_damage_upper = 52
-	melee_damage_type = RED_DAMAGE
-	armortype = RED_DAMAGE
+	melee_damage_type = BRUTE
+	armortype = BRUTE
 	stat_attack = HARD_CRIT
 	//She has a Quad Artillery Cannon
 	var/fire_cooldown_time = 3 SECONDS	//She has 4 cannons, fires 4 times faster than the artillery bees
@@ -118,9 +118,9 @@
 	pixel_x = -8
 	health = 450
 	maxHealth = 450
-	melee_damage_type = RED_DAMAGE
-	armortype = RED_DAMAGE
-	damage_coeff = list(RED_DAMAGE = 1, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 2)
+	melee_damage_type = BRUTE
+	armortype = BRUTE
+	damage_coeff = list(RED_DAMAGE = 1, OXY = 1.5, BURN = 0.8, CLONE = 2)
 	melee_damage_lower = 14
 	melee_damage_upper = 18
 	rapid_melee = 2
@@ -149,7 +149,7 @@
 	base_pixel_y = -8
 	health = 200
 	maxHealth = 200
-	damage_coeff = list(RED_DAMAGE = 1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1) // Just so it's declared.
+	damage_coeff = list(RED_DAMAGE = 1, OXY = 1, BURN = 1, CLONE = 1) // Just so it's declared.
 	del_on_death = TRUE
 	deathsound = 'sound/abnormalities/bee/death.ogg'
 	speak_emote = list("buzzes")
@@ -200,8 +200,8 @@
 /obj/effect/beeshell/proc/explode()
 	playsound(get_turf(src), 'sound/effects/explosion2.ogg', 50, 0, 8)
 	for(var/mob/living/carbon/human/H in view(2, src))
-		H.apply_damage(boom_damage, RED_DAMAGE, null, H.run_armor_check(null, RED_DAMAGE), spread_damage = TRUE)
-		H.apply_damage(boom_damage, BLACK_DAMAGE, null, H.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
+		H.apply_damage(boom_damage, BRUTE, null, H.run_armor_check(null, BRUTE), spread_damage = TRUE)
+		H.apply_damage(boom_damage, BURN, null, H.run_armor_check(null, BURN), spread_damage = TRUE)
 		if(H.health < 0)
 			H.gib()
 	new /obj/effect/temp_visual/explosion(get_turf(src))

@@ -16,8 +16,8 @@
 						ABNORMALITY_WORK_REPRESSION = 40,
 						)
 	work_damage_amount = 2
-	work_damage_type = RED_DAMAGE
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
+	work_damage_type = BRUTE
+	damage_coeff = list(BRUTE = 0.5, OXY = 1.5, BURN = 1, CLONE = 1)
 	can_breach = TRUE
 	start_qliphoth = 1
 	can_spawn = FALSE // Normally doesn't appear

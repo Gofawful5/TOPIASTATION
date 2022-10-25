@@ -14,7 +14,7 @@
 	is_flying_animal = TRUE
 	maxHealth = 600
 	health = 600
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 2, WHITE_DAMAGE = 2, BLACK_DAMAGE = 2, PALE_DAMAGE = 2)
+	damage_coeff = list(BRUTE = 2, OXY = 2, BURN = 2, CLONE = 2)
 	see_in_dark = 10
 	harm_intent_damage = 10
 	melee_damage_lower = 1
@@ -42,7 +42,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(30, 20, 10, 0, 0)
 						)
 	work_damage_amount = 5
-	work_damage_type = RED_DAMAGE
+	work_damage_type = BRUTE
 
 	ego_list = list(
 		/datum/ego_datum/weapon/beak,
@@ -69,7 +69,7 @@
 	obj_damage = 2500
 	environment_smash = ENVIRONMENT_SMASH_STRUCTURES
 	stat_attack = DEAD
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 0.5)
+	damage_coeff = list(BRUTE = 0.5, OXY = 0.5, BURN = 0.5, CLONE = 0.5)
 	update_icon()
 
 /mob/living/simple_animal/hostile/abnormality/punishing_bird/proc/TransformBack()
@@ -84,7 +84,7 @@
 	environment_smash = initial(environment_smash)
 	stat_attack = initial(stat_attack)
 	adjustHealth(-maxHealth) // Full restoration
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 2, WHITE_DAMAGE = 2, BLACK_DAMAGE = 2, PALE_DAMAGE = 2)
+	damage_coeff = list(BRUTE = 2, OXY = 2, BURN = 2, CLONE = 2)
 	update_icon()
 
 /mob/living/simple_animal/hostile/abnormality/punishing_bird/Life()

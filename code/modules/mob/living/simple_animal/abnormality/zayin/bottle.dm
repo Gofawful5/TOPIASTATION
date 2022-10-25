@@ -17,7 +17,7 @@
 		"Drink" = 100			//Or Drink the water
 		)
 	work_damage_amount = 6
-	work_damage_type = BLACK_DAMAGE
+	work_damage_type = BURN
 
 	ego_list = list(
 		/datum/ego_datum/weapon/little_alice,

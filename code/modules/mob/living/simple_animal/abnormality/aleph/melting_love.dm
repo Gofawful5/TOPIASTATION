@@ -15,8 +15,8 @@
 	health = 4000
 	maxHealth = 4000
 	obj_damage = 600
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = -1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 0.8)
-	melee_damage_type = BLACK_DAMAGE
+	damage_coeff = list(BRUTE = -1, OXY = 1, BURN = 1.5, CLONE = 0.8)
+	melee_damage_type = BURN
 	melee_damage_lower = 30
 	melee_damage_upper = 50
 	projectiletype = /obj/projectile/melting_blob
@@ -35,7 +35,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(0, 0, 0, 0, 0),
 						)
 	work_damage_amount = 14
-	work_damage_type = BLACK_DAMAGE
+	work_damage_type = BURN
 	/* Sounds */
 	projectilesound = 'sound/effects/attackblob.ogg'
 	attack_sound = 'sound/effects/attackblob.ogg'
@@ -203,8 +203,8 @@
 	health = 400
 	maxHealth = 400
 	obj_damage = 200
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = -1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 2, PALE_DAMAGE = 1)
-	melee_damage_type = BLACK_DAMAGE
+	damage_coeff = list(BRUTE = -1, OXY = 1, BURN = 2, CLONE = 1)
+	melee_damage_type = BURN
 	melee_damage_lower = 12
 	melee_damage_upper = 24
 	rapid_melee = 2
@@ -256,7 +256,7 @@
 	/* Stats */
 	health = 2000
 	maxHealth = 2000
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = -1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 2.0, PALE_DAMAGE = 0.8)
+	damage_coeff = list(BRUTE = -1, OXY = 1, BURN = 2.0, CLONE = 0.8)
 	melee_damage_lower = 24
 	melee_damage_upper = 40
 

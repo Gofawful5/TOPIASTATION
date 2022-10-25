@@ -6,7 +6,7 @@
 	icon = 'ModularTegustation/Teguicons/32x48.dmi'
 	icon_state = "silent"
 	icon_living = "silent"
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 0)
+	damage_coeff = list(BRUTE = 0, OXY = 0, BURN = 0, CLONE = 0)
 	can_breach = TRUE
 	threat_level = ALEPH_LEVEL
 	start_qliphoth = 2
@@ -17,7 +17,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(0, 0, 10, 20, 30)
 						)
 	work_damage_amount = 16
-	work_damage_type = WHITE_DAMAGE
+	work_damage_type = OXY
 	can_patrol = FALSE
 
 	wander = FALSE
@@ -66,7 +66,7 @@
 			if(faction_check_mob(L))
 				continue
 			var/dealt_damage = max(4, symphony_damage - round(get_dist(src, L) * 0.2))
-			L.apply_damage(dealt_damage, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+			L.apply_damage(dealt_damage, OXY, null, L.run_armor_check(null, OXY), spread_damage = TRUE)
 
 	if(world.time >= next_movement_time) // Next movement
 		var/movement_volume = 50
@@ -77,26 +77,26 @@
 				next_movement_time = world.time + 4 SECONDS
 			if(1)
 				next_movement_time = world.time + 22 SECONDS
-				damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 1)
+				damage_coeff = list(BRUTE = 0, OXY = 0, BURN = 0, CLONE = 1)
 				spawn_performer(1, WEST)
 			if(2)
 				next_movement_time = world.time + 14.5 SECONDS
-				damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 1, PALE_DAMAGE = 0)
+				damage_coeff = list(BRUTE = 0, OXY = 0, BURN = 1, CLONE = 0)
 				spawn_performer(2, WEST)
 			if(3)
 				next_movement_time = world.time + 11.5 SECONDS
-				damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 1, BLACK_DAMAGE = 0, PALE_DAMAGE = 0)
+				damage_coeff = list(BRUTE = 0, OXY = 1, BURN = 0, CLONE = 0)
 				symphony_damage = 15
 				movement_volume = 3 // No more tinnitus
 				spawn_performer(1, EAST)
 			if(4)
 				next_movement_time = world.time + 23 SECONDS
-				damage_coeff = list(BRUTE = 1, RED_DAMAGE = 1, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 0)
+				damage_coeff = list(BRUTE = 1, OXY = 0, BURN = 0, CLONE = 0)
 				symphony_damage = 10
 				spawn_performer(2, EAST)
 			if(5)
 				next_movement_time = world.time + 999 SECONDS // Never
-				damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 0)
+				damage_coeff = list(BRUTE = 0, OXY = 0, BURN = 0, CLONE = 0)
 				movement_volume = 65 // TA-DA!!!
 		if(current_movement_num < 6)
 			sound_to_playing_players_on_level("sound/abnormalities/silentorchestra/movement[current_movement_num].ogg", movement_volume, zlevel = z)

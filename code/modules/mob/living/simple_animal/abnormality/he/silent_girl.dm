@@ -17,7 +17,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(50, 55, 55, 60, 60)
 						)
 	work_damage_amount = 0
-	work_damage_type = WHITE_DAMAGE
+	work_damage_type = OXY
 	start_qliphoth = 3
 
 	ego_list = list(

@@ -25,14 +25,14 @@
 		ABNORMALITY_WORK_REPRESSION = 30,
 		"Release" = 100
 		)
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.6, WHITE_DAMAGE = 1, BLACK_DAMAGE = 0.8, PALE_DAMAGE = 1.5)
+	damage_coeff = list(BRUTE = 0.6, OXY = 1, BURN = 0.8, CLONE = 1.5)
 	melee_damage_lower = 22
 	melee_damage_upper = 30
-	melee_damage_type = BLACK_DAMAGE
-	armortype = BLACK_DAMAGE
+	melee_damage_type = BURN
+	armortype = BURN
 	stat_attack = HARD_CRIT
 	work_damage_amount = 10
-	work_damage_type = BLACK_DAMAGE
+	work_damage_type = BURN
 	attack_verb_continuous = "cuts"
 	attack_verb_simple = "cuts"
 	faction = list("blueshep")
@@ -231,7 +231,7 @@
 		melee_damage_lower = 30
 		melee_damage_upper = 40
 		move_to_delay = 2
-		damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.1, WHITE_DAMAGE = 0.7, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 1)
+		damage_coeff = list(BRUTE = 0.1, OXY = 0.7, BURN = 0.5, CLONE = 1)
 		adjustHealth(-maxHealth)
 
 /mob/living/simple_animal/hostile/abnormality/blue_shepherd/Move()
@@ -273,7 +273,7 @@
 			for(var/mob/living/L in T)
 				if(L == src)
 					continue
-				L.apply_damage(slash_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
+				L.apply_damage(slash_damage, BURN, null, L.run_armor_check(null, BURN), spread_damage = TRUE)
 			all_turfs -= T
 		SLEEP_CHECK_DEATH(3)
 	slashing = FALSE

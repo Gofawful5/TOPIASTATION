@@ -10,12 +10,12 @@
 	health = 800
 	rapid_melee = 1
 	move_to_delay = 1.7
-	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 4, WHITE_DAMAGE = 4, BLACK_DAMAGE = 4, PALE_DAMAGE = 4)
+	damage_coeff = list(BRUTE = 4, OXY = 4, BURN = 4, CLONE = 4)
 	melee_damage_lower = 1
 	melee_damage_upper = 1
 	speed = 4 //stupidly fast
-	melee_damage_type = RED_DAMAGE
-	armortype = RED_DAMAGE
+	melee_damage_type = BRUTE
+	armortype = BRUTE
 	vision_range = 7 //nerfed vision range so he doesn't go 2 continents away from his friend
 	stat_attack = CONSCIOUS
 	attack_sound = 'sound/abnormalities/scaredycat/catattack.ogg'
@@ -32,7 +32,7 @@
 						ABNORMALITY_WORK_REPRESSION = list(20, 30, 40, 40, 40)
 						) //higher work chance than the rest of oz because he can breach so easily
 	work_damage_amount = 7 //Shit damage because it's a small cat
-	work_damage_type = RED_DAMAGE
+	work_damage_type = BRUTE
 	can_patrol = FALSE
 	deathsound = 'sound/abnormalities/scaredycat/catgrunt.ogg'
 	ego_list = list(
@@ -163,7 +163,7 @@
 	if(courage)
 		melee_damage_lower = 15
 		melee_damage_upper = 20
-		damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0.5, WHITE_DAMAGE = 2, BLACK_DAMAGE = 1.5, PALE_DAMAGE = 0.5)
+		damage_coeff = list(BRUTE = 0.5, OXY = 2, BURN = 1.5, CLONE = 0.5)
 		icon = 'ModularTegustation/Teguicons/48x48.dmi'
 		icon_living = "cat_courage"
 		icon_dead = "dead_courage"
@@ -174,7 +174,7 @@
 		faction = list("neutral")
 		melee_damage_lower = initial(melee_damage_lower)
 		melee_damage_upper = initial(melee_damage_upper) //it shouldn't attack in that form in the first place but...
-		damage_coeff = list(BRUTE = 1, RED_DAMAGE = 4, WHITE_DAMAGE = 4, BLACK_DAMAGE = 4, PALE_DAMAGE = 4)
+		damage_coeff = list(BRUTE = 4, OXY = 4, BURN = 4, CLONE = 4)
 		playsound(src, 'sound/abnormalities/scaredycat/catchange.ogg', 75, FALSE, 4)
 		icon = 'ModularTegustation/Teguicons/32x32.dmi'
 		icon_living = "scaredy_cat"

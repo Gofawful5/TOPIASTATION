@@ -16,7 +16,7 @@
 						ABNORMALITY_WORK_REPRESSION = -100	//He's a snobby shrimp dude.
 						)
 	work_damage_amount = 11
-	work_damage_type = WHITE_DAMAGE	//He insults you.
+	work_damage_type = OXY	//He insults you.
 
 	ego_list = list(
 		/datum/ego_datum/weapon/executive,
@@ -111,9 +111,9 @@
 	faction = list("shrimp")
 	health = 400
 	maxHealth = 400
-	melee_damage_type = RED_DAMAGE
-	armortype = RED_DAMAGE
-	damage_coeff = list(RED_DAMAGE = 0.8, WHITE_DAMAGE = 1.5, BLACK_DAMAGE = 1.2, PALE_DAMAGE = 2)
+	melee_damage_type = BRUTE
+	armortype = BRUTE
+	damage_coeff = list(RED_DAMAGE = 0.8, OXY = 1.5, BURN = 1.2, CLONE = 2)
 	melee_damage_lower = 24
 	melee_damage_upper = 27
 	robust_searching = TRUE
@@ -134,9 +134,9 @@
 	faction = list("shrimp")
 	health = 500	//They're here to help
 	maxHealth = 500
-	melee_damage_type = RED_DAMAGE
-	armortype = RED_DAMAGE
-	damage_coeff = list(RED_DAMAGE = 0.6, WHITE_DAMAGE = 0.7, BLACK_DAMAGE = 1.2, PALE_DAMAGE = 2)
+	melee_damage_type = BRUTE
+	armortype = BRUTE
+	damage_coeff = list(RED_DAMAGE = 0.6, OXY = 0.7, BURN = 1.2, CLONE = 2)
 	melee_damage_lower = 14
 	melee_damage_upper = 18
 	robust_searching = TRUE

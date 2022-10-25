@@ -37,7 +37,7 @@
 			playsound(get_turf(src), 'sound/machines/clockcult/ark_scream.ogg', 50, 0, 4)
 			new /obj/effect/temp_visual/fragment_song(get_turf(src))
 			for(var/mob/living/M in range(80, get_turf(src)))
-				M.apply_damage(pulse_damage, WHITE_DAMAGE, null, M.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
+				M.apply_damage(pulse_damage, OXY, null, M.run_armor_check(null, OXY), spread_damage = TRUE)
 			activated = 0
 		else
 			song_cooldown = world.time + song_cooldown_time
