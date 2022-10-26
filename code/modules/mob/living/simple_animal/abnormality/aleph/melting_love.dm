@@ -41,7 +41,7 @@
 	attack_sound = 'sound/effects/attackblob.ogg'
 	deathsound = 'sound/effects/blobattack.ogg'
 	/*Vars and others */
-	loot = list(/obj/item/reagent_containers/glass/bucket/melting)
+	loot = list(/obj/item/reagent_containers/cup/bucket/melting)
 	del_on_death = FALSE
 	var/mob/living/carbon/human/gifted_human = null
 	var/sanityheal_cooldown = 15 SECONDS

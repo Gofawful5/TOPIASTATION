@@ -73,7 +73,7 @@
 /mob/living/simple_animal/hostile/abnormality/bluestar/CanAttack(atom/the_target)
 	return FALSE
 
-/mob/living/simple_animal/hostile/abnormality/bluestar/proc/BluePulse()
+/mob/living/simple_animal/hostile/abnormality/bluestar/proc/BluePulse(target)
 	pulse_cooldown = world.time + pulse_cooldown_time
 	playsound(src, 'sound/abnormalities/bluestar/pulse.ogg', 100, FALSE, 28)
 	var/matrix/init_transform = transform
@@ -90,7 +90,7 @@
 			H.death()
 			animate(H, transform = H.transform*0.01, time = 5)
 			QDEL_IN(H, 5)
-	SLEEP_CHECK_DEATH(3)
+	SLEEP_CHECK_DEATH(3, src)
 	animate(src, transform = init_transform, time = 5)
 
 /mob/living/simple_animal/hostile/abnormality/bluestar/attempt_work(mob/living/carbon/human/user, work_type)

@@ -85,7 +85,7 @@
 /mob/living/simple_animal/hostile/abnormality/general_b/breach_effect()
 	icon_state = "generalbee_breach"
 	addtimer(CALLBACK(GLOBAL_PROC, .proc/show_global_blurb, 5 SECONDS, "My queen? I hear your cries...", 25))
-	SLEEP_CHECK_DEATH(80)
+	sleep(80)
 	var/turf/T = pick(GLOB.department_centers)
 	forceMove(T)
 	icon_living = "general_breach"
@@ -205,7 +205,7 @@
 		if(H.health < 0)
 			H.gib()
 	new /obj/effect/temp_visual/explosion(get_turf(src))
-	var/datum/effect_system/smoke_spread/S = new
+	var/datum/effect_system/fluid_spread/smoke/S = new
 	S.set_up(4, get_turf(src))	//Make the smoke bigger
 	S.start()
 	qdel(src)

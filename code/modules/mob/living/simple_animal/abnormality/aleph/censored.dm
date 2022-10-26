@@ -61,7 +61,7 @@
 		return FALSE
 	return ..()
 
-/mob/living/simple_animal/hostile/abnormality/censored/Moved()
+/mob/living/simple_animal/hostile/abnormality/censored/Moved(atom/old_loc, movement_dir, forced, list/old_locs, momentum_change = TRUE)
 	. = ..()
 	if(!(status_flags & GODMODE))
 		for(var/mob/living/carbon/human/H in view(1, src))
@@ -95,11 +95,11 @@
 	forceMove(get_turf(H))
 	damage_coeff = list(BRUTE = 1, RED_DAMAGE = 0, WHITE_DAMAGE = 0, BLACK_DAMAGE = 0, PALE_DAMAGE = 0)
 	playsound(src, 'sound/abnormalities/censored/convert.ogg', 45, FALSE, 5)
-	SLEEP_CHECK_DEATH(3)
+	SLEEP_CHECK_DEATH(3, src)
 	new /obj/effect/temp_visual/censored(get_turf(src))
 	for(var/i = 1 to 3)
 		new /obj/effect/gibspawner/generic/silent(get_turf(src))
-		SLEEP_CHECK_DEATH(5.5)
+		SLEEP_CHECK_DEATH(5.5, src)
 	var/mob/living/simple_animal/hostile/mini_censored/C = new(get_turf(src))
 	if(!QDELETED(H))
 		C.desc = "What the hell is this? It shouldn't exist... On the second thought, it reminds you of [H.real_name]..."

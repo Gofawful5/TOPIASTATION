@@ -36,7 +36,7 @@
 						) //work chance fluctuates based on level. left to right as level increase.
 	work_damage_amount = 6
 	work_damage_type = RED_DAMAGE
-	deathmessage = "falls over." //shows in chat when the creature is defeated. Default is "stops moving".
+	death_message = "falls over." //shows in chat when the creature is defeated. Default is "stops moving".
 	environment_smash = 1
 	speak_chance = 2
 	emote_see = list("shakes while mumbling...")
@@ -66,10 +66,11 @@
 	..()
 	update_icon()
 	AddElement(/datum/element/waddling) //This made forsaken murderer waddle. Im supprised it was this easy to do this.
-	AddComponent(/datum/component/knockback, 1, FALSE, TRUE) //1 is distance thrown, False is if it can throw anchored objects, True if doesnt apply damage or stun when hits a wall.
+	AddComponent(/datum/element/knockback, 1, FALSE, TRUE) //1 is distance thrown, False is if it can throw anchored objects, True if doesnt apply damage or stun when hits a wall.
 	GiveTarget(user)
 
 /mob/living/simple_animal/hostile/abnormality/forsaken_murderer/update_icon_state()
+	SHOULD_CALL_PARENT(TRUE)
 	if(status_flags & GODMODE) // Not breaching
 		icon_state = initial(icon)
 	else if(health < 1)

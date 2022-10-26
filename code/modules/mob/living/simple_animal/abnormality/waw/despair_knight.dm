@@ -66,7 +66,7 @@
 		P.original = target
 		P.preparePixelProjectile(target, T)
 		addtimer(CALLBACK (P, .obj/projectile/proc/fire), 3)
-	SLEEP_CHECK_DEATH(3)
+	sleep(3)
 	playsound(get_turf(src), 'sound/abnormalities/despairknight/attack.ogg', 50, 0, 4)
 	return
 
@@ -121,7 +121,7 @@
 	var/turf/teleport_target = pick(teleport_potential)
 	animate(src, alpha = 0, time = 5)
 	new /obj/effect/temp_visual/guardian/phase(get_turf(src))
-	SLEEP_CHECK_DEATH(5) // TODO: Add some cool effects here
+	sleep(5) // TODO: Add some cool effects here
 	animate(src, alpha = 255, time = 5)
 	new /obj/effect/temp_visual/guardian/phase/out(teleport_target)
 	forceMove(teleport_target)

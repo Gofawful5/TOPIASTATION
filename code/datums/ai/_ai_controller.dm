@@ -35,6 +35,9 @@ multiple modular subtrees with behaviors
 	///The idle behavior this AI performs when it has no actions.
 	var/datum/idle_behavior/idle_behavior = null
 
+	/datum/ai_controller/proc/PerformIdleBehavior(delta_time)
+		return
+
 	// Movement related things here
 	///Reference to the movement datum we use. Is a type on initialize but becomes a ref afterwards.
 	var/datum/ai_movement/ai_movement = /datum/ai_movement/dumb

@@ -33,7 +33,7 @@
 	work_damage_amount = 12
 	work_damage_type = WHITE_DAMAGE
 	max_boxes = 16
-	deathmessage = "floats into the air, descending into its own coffin."
+	death_message = "floats into the air, descending into its own coffin."
 	base_pixel_x = -16
 	pixel_x = -16
 
@@ -92,7 +92,7 @@
 	visible_message("<span class='userdanger'>[src] levels one of its arms at [cooler_target]!</span>")
 	cooler_target.apply_status_effect(/datum/status_effect/spirit_gun_target) // Re-used for visual indicator
 	dir = get_cardinal_dir(src, target)
-	SLEEP_CHECK_DEATH(1.75 SECONDS)
+	sleep(1.75 SECONDS)
 	playsound(get_turf(src), 'sound/abnormalities/funeral/spiritgun.ogg', 75, 1, 3)
 	if(cooler_target in oview(src, 12))
 		cooler_target.apply_damage(60, WHITE_DAMAGE, null, cooler_target.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
@@ -192,7 +192,7 @@
 	dir = dir_to_target
 	visible_message("<span class='danger'>[src] prepares to open its coffin!</span>")
 	icon_state = "funeral_coffin"
-	SLEEP_CHECK_DEATH(3 SECONDS)
+	sleep(3 SECONDS)
 	playsound(get_turf(src), 'sound/abnormalities/funeral/coffin.ogg', 75, extrarange = 10, ignore_walls = TRUE) // bwiiiiiiinng >flapping
 	for (var/i = 0; i < 24; i++)
 		var/list/been_hit = list()
@@ -209,7 +209,7 @@
 					var/mob/living/carbon/human/cooler_L = L
 					if(cooler_L.sanity_lost)
 						cooler_L.apply_damage(9999, PALE_DAMAGE, null, cooler_L.run_armor_check(null, PALE_DAMAGE), spread_damage = TRUE)
-		SLEEP_CHECK_DEATH(0.5 SECONDS)
+		sleep(0.5 SECONDS)
 	icon_state = icon_living
 	can_act = TRUE
 	swarm_cooldown += world.time

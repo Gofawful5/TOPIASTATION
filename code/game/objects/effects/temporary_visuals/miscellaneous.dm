@@ -237,6 +237,21 @@
 	icon_state = "smoke"
 	duration = 50
 
+/obj/effect/temp_visual/fire
+	icon = 'icons/effects/fire.dmi'
+	icon_state = "3"
+	light_range = LIGHT_RANGE_FIRE
+	light_color = LIGHT_COLOR_FIRE
+	duration = 10
+
+/obj/effect/temp_visual/fire/fast
+	icon_state = "1"
+	duration = 5
+
+/obj/effect/temp_visual/sparks
+	icon_state = "sparks"
+	duration = 5
+
 /obj/effect/temp_visual/small_smoke/halfsecond
 	duration = 5
 
@@ -581,3 +596,227 @@
 /// Remove the image from the modsuit wearer's screen
 /obj/effect/temp_visual/sonar_ping/proc/remove_mind(mob/living/looker)
 	looker?.client?.images -= modsuit_image
+
+/obj/effect/temp_visual/bee_gas
+	icon_state = "mustard"
+	alpha = 0
+	duration = 50
+
+/obj/effect/temp_visual/bee_gas/Initialize()
+	..()
+	animate(src, alpha = rand(125,200), time = 5)
+	addtimer(CALLBACK(src, .proc/fade_out), 5)
+
+/obj/effect/temp_visual/bee_gas/proc/fade_out()
+	animate(src, alpha = 0, time = duration-5)
+
+/obj/effect/temp_visual/sanity_heal
+	icon_state = "shieldsparkles"
+	duration = 2
+
+/obj/effect/temp_visual/judgement
+	icon_state = "judge"
+	duration = 20
+
+/obj/effect/temp_visual/whitelake
+	icon_state = "whitelake"
+	duration = 20
+
+/obj/effect/temp_visual/judgement/Initialize()
+	..()
+	addtimer(CALLBACK(src, .proc/fade_out), 10)
+
+/obj/effect/temp_visual/judgement/proc/fade_out()
+	animate(src, alpha = 0, time = duration-10)
+
+/obj/effect/temp_visual/thirteen
+	icon_state = "thirteen"
+	duration = 20
+
+/obj/effect/temp_visual/paradise_attack
+	icon_state = "paradise_attack"
+	duration = 10
+
+/obj/effect/temp_visual/paradise_attack/Initialize()
+	..()
+	animate(src, alpha = 0, time = duration)
+
+/obj/effect/temp_visual/water_waves
+	name = "ocean"
+	icon = 'icons/turf/floors.dmi'
+	icon_state = "riverwater_motion"
+	layer = ABOVE_ALL_MOB_LAYER
+	density = TRUE
+	duration = 18 SECONDS
+	alpha = 0
+
+/obj/effect/temp_visual/water_waves/Initialize()
+	..()
+	animate(src, alpha = 255, time = 10)
+	addtimer(CALLBACK(src, .proc/fade_out), 10 SECONDS)
+
+/obj/effect/temp_visual/water_waves/proc/fade_out()
+	animate(src, alpha = 0, time = (duration - 10 SECONDS))
+
+/obj/effect/temp_visual/justitia_effect
+	name = "slash"
+	icon_state = "bluestream"
+	duration = 5
+
+/obj/effect/temp_visual/justitia_effect/Initialize()
+	..()
+	animate(src, alpha = 0, transform = transform*2, time = 5)
+
+/obj/effect/temp_visual/fragment_song
+	name = "sound waves"
+	icon_state = "fragment_song"
+	duration = 5
+	pixel_y = 16
+	base_pixel_y = 16
+
+/obj/effect/temp_visual/fragment_song/Initialize()
+	..()
+	animate(src, alpha = 0, transform = transform*3, time = 5)
+
+/obj/effect/temp_visual/saw_effect
+	name = "saw"
+	icon_state = "claw"
+	duration = 4
+
+/obj/effect/temp_visual/smash_effect
+	name = "smash"
+	icon_state = "smash"
+	duration = 4
+
+/obj/effect/temp_visual/green_noon_reload
+	name = "recharging field"
+	icon = 'ModularTegustation/Teguicons/48x48.dmi'
+	icon_state = "green_bot_reload_effect"
+	layer = BELOW_MOB_LAYER
+	pixel_x = -8
+	base_pixel_x = -8
+	duration = 8
+
+/obj/effect/temp_visual/green_noon_reload/Initialize()
+	..()
+	animate(src, alpha = 0, transform = transform*1.5, time = duration)
+
+/obj/effect/temp_visual/slice
+	name = "slice"
+	icon_state = "slice"
+	duration = 4
+
+/obj/effect/temp_visual/hatred
+	name = "hatred"
+	icon = 'ModularTegustation/Teguicons/tegu_effects.dmi'
+	icon_state = "hatred"
+	duration = 3 SECONDS
+
+/obj/effect/temp_visual/hatred/Initialize()
+	..()
+	pixel_x = rand(-16, 16)
+	animate(src, alpha = 0, pixel_z = rand(16, 48), time = duration)
+
+/obj/effect/temp_visual/flesh
+	name = "flesh"
+	icon = 'icons/turf/floors.dmi'
+	icon_state = "flesh0"
+	layer = ABOVE_ALL_MOB_LAYER
+	density = TRUE
+	duration = 8 SECONDS
+	alpha = 0
+
+/obj/effect/temp_visual/flesh/Initialize()
+	..()
+	icon_state = "flesh[rand(0,3)]"
+	animate(src, alpha = 255, time = 5)
+	addtimer(CALLBACK(src, .proc/fade_out), 4 SECONDS)
+
+/obj/effect/temp_visual/flesh/proc/fade_out()
+	animate(src, alpha = 0, time = (duration - 4 SECONDS))
+
+/obj/effect/temp_visual/funeral_swarm
+	name = "funeral swarm"
+	icon = 'ModularTegustation/Teguicons/32x32.dmi'
+	icon_state = "funeral_swarm"
+	layer = BELOW_MOB_LAYER
+	duration = 0.5 SECONDS
+
+/obj/effect/temp_visual/black_fixer_ability
+	name = "pulse"
+	icon = 'ModularTegustation/Teguicons/tegu_effects.dmi'
+	icon_state = "black_fixer"
+	pixel_y = 30
+	base_pixel_y = 30
+	duration = 4
+	alpha = 175
+
+/obj/effect/temp_visual/black_fixer_ability/Initialize()
+	..()
+	animate(src, alpha = 0, transform = transform*4, time = 4)
+
+/obj/effect/temp_visual/censored
+	icon = 'ModularTegustation/Teguicons/128x128.dmi'
+	icon_state = "censored_kill"
+	layer = ABOVE_ALL_MOB_LAYER
+	duration = 20
+	alpha = 0
+	pixel_x = -48
+	base_pixel_x = -48
+	pixel_y = -48
+	base_pixel_y = -48
+
+/obj/effect/temp_visual/censored/Initialize()
+	..()
+	animate(src, alpha = 255, time = 2)
+	addtimer(CALLBACK(src, .proc/fade_out), 17)
+	for(var/i = 1 to 9)
+		addtimer(CALLBACK(src, .proc/shake), 2*i)
+
+/obj/effect/temp_visual/censored/proc/shake()
+	animate(src, pixel_x = base_pixel_x + rand(-4, 4), pixel_y = base_pixel_y + rand(-4, 4), time = 1)
+
+/obj/effect/temp_visual/censored/proc/fade_out()
+	animate(src, alpha = 0, time = 2)
+
+/obj/effect/temp_visual/beakbite
+	name = "bite"
+	icon_state = "bite"
+	color = COLOR_RED
+
+/obj/effect/temp_visual/apocaspiral
+	icon = 'ModularTegustation/Teguicons/224x128.dmi'
+	name = "apocaspiral"
+	icon_state = "apocalypse_enchant_effect"
+	layer = ABOVE_ALL_MOB_LAYER
+
+/obj/effect/temp_visual/ambermidnight_hole
+	name = "hole"
+	icon = 'ModularTegustation/Teguicons/224x128.dmi'
+	icon_state = "ambermidnight_hole"
+	duration = 10 SECONDS
+	pixel_x = -96
+	base_pixel_x = -96
+	pixel_y = -16
+	base_pixel_y = -16
+
+/obj/effect/temp_visual/ambermidnight_hole/Initialize()
+	..()
+	animate(src, alpha = 0, time = duration)
+
+/obj/effect/temp_visual/cross
+	name = "holy cross"
+	icon = 'icons/effects/32x64.dmi'
+	icon_state = "cross"
+	duration = 2 SECONDS
+
+/obj/effect/temp_visual/cross/fall
+	icon_state = "cross_fall"
+	duration = 8 SECONDS
+
+/obj/effect/temp_visual/cross/fall/Initialize()
+	..()
+	addtimer(CALLBACK(src, .proc/FadeOut), 6 SECONDS)
+
+/obj/effect/temp_visual/cross/fall/proc/FadeOut()
+	animate(src, alpha = 0, time = 2 SECONDS)

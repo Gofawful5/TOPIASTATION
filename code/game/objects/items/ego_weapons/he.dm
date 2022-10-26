@@ -184,7 +184,7 @@
 			naked_parry = TRUE
 		else
 			naked_parry = FALSE
-		RegisterSignal(user, COMSIG_MOB_APPLY_DAMGE, .proc/Announce_Parry)
+		RegisterSignal(user, COMSIG_MOB_APPLY_DAMAGE, .proc/Announce_Parry)
 		addtimer(CALLBACK(src, .proc/disable_parry, cooler_user), 0.6 SECONDS) // Set to 3 for test,ing base is 0.6
 		to_chat(user,"<span class='userdanger'>You attempt to parry the attack!</span>")
 
@@ -193,7 +193,7 @@
 	user.physiology.white_mod /= 0.01
 	user.physiology.black_mod /= 0.01
 	user.physiology.pale_mod /= 0.01
-	UnregisterSignal(user, COMSIG_MOB_APPLY_DAMGE)
+	UnregisterSignal(user, COMSIG_MOB_APPLY_DAMAGE)
 	if (naked_parry)
 		addtimer(CALLBACK(src, .proc/parry_cooldown, user), 2 SECONDS)
 	else

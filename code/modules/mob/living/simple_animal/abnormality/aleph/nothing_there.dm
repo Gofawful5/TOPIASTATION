@@ -74,7 +74,7 @@
 		return FALSE
 	return ..()
 
-/mob/living/simple_animal/hostile/abnormality/nothing_there/Moved()
+/mob/living/simple_animal/hostile/abnormality/nothing_there/Moved(atom/old_loc, movement_dir, forced, list/old_locs, momentum_change = TRUE)
 	if(current_stage == 3)
 		playsound(get_turf(src), 'sound/abnormalities/nothingthere/walk.ogg', 50, 0, 3)
 	return ..()
@@ -155,7 +155,7 @@
 			heard_words[speaker] += raw_message
 	listen_chance = initial(listen_chance)
 
-/mob/living/simple_animal/hostile/abnormality/nothing_there/apply_damage(damage, damagetype, def_zone, blocked, forced, spread_damage, wound_bonus, bare_wound_bonus, sharpness, white_healable)
+/mob/living/simple_animal/hostile/abnormality/nothing_there/apply_damage(damage, damagetype, def_zone, blocked, forced, spread_damage, wound_bonus, bare_wound_bonus, sharpness, attack_direction, white_healable)
 	. = ..()
 	if(damagetype == RED_DAMAGE || damage < 5)
 		return
@@ -223,7 +223,7 @@
 	var/turf/target_turf = get_turf(target)
 	for(var/i = 1 to 2)
 		target_turf = get_step(target_turf, get_dir(get_turf(src), target_turf))
-	SLEEP_CHECK_DEATH(5)
+	SLEEP_CHECK_DEATH(5, src)
 	var/list/been_hit = list()
 	var/broken = FALSE
 	for(var/turf/T in getline(get_turf(src), target_turf))
@@ -247,14 +247,14 @@
 	icon_state = icon_living
 	can_act = TRUE
 
-/mob/living/simple_animal/hostile/abnormality/nothing_there/proc/Goodbye()
+/mob/living/simple_animal/hostile/abnormality/nothing_there/proc/Goodbye(target)
 	if(goodbye_cooldown > world.time)
 		return
 	goodbye_cooldown = world.time + goodbye_cooldown_time
 	can_act = FALSE
 	playsound(get_turf(src), 'sound/abnormalities/nothingthere/goodbye_cast.ogg', 75, 0, 5)
 	icon_state = "nothing_blade"
-	SLEEP_CHECK_DEATH(8)
+	SLEEP_CHECK_DEATH(8, src)
 	for(var/turf/T in view(2, src))
 		new /obj/effect/temp_visual/smash_effect(T)
 		for(var/mob/living/L in T)
@@ -264,7 +264,7 @@
 			if(L.health < 0)
 				L.gib()
 	playsound(get_turf(src), 'sound/abnormalities/nothingthere/goodbye_attack.ogg', 75, 0, 5)
-	SLEEP_CHECK_DEATH(3)
+	SLEEP_CHECK_DEATH(3, src)
 	icon_state = icon_living
 	can_act = TRUE
 

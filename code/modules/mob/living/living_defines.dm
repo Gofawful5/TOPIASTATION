@@ -33,6 +33,9 @@
 	var/staminaloss = 0
 	/// when the mob goes from "normal" to crit
 	var/crit_threshold = HEALTH_THRESHOLD_CRIT
+	// Sanity damage. Humans go insane when it reaches 0
+	var/sanityhealth = 220
+	var/maxSanity = 100
 	///When the mob enters hard critical state and is fully incapacitated.
 	var/hardcrit_threshold = HEALTH_THRESHOLD_FULLCRIT
 

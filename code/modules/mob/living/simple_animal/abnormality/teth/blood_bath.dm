@@ -39,7 +39,7 @@
 		visible_message("<span class='warning'>[src] drags [user] into itself!</span>")
 		playsound(get_turf(src),'sound/effects/wounds/blood2.ogg')
 		playsound(get_turf(src),'sound/effects/footstep/water1.ogg')
-		SLEEP_CHECK_DEATH(3 SECONDS)
+		SLEEP_CHECK_DEATH(3, src)
 		hands ++
 		if(hands < 4)
 			max_boxes += 4

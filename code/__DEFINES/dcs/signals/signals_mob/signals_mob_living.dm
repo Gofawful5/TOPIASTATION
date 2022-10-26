@@ -49,6 +49,9 @@
 ///from base of mob/living/death(): (gibbed)
 #define COMSIG_LIVING_DEATH "living_death"
 
+///from base of mob/living/carbon/human/SanityLossEffect(): (attribute)
+#define COMSIG_HUMAN_INSANE "human_insane"
+
 ///from base of mob/living/Write_Memory(): (dead, gibbed)
 #define COMSIG_LIVING_WRITE_MEMORY "living_write_memory"
 	#define COMPONENT_DONT_WRITE_MEMORY (1<<0)

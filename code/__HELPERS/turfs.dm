@@ -102,6 +102,42 @@ Turf and target are separate in case you want to teleport some distance from a t
 	return destination
 
 /**
+ * Get a list of turfs in a line from `M` to `N`.
+ *
+ * Uses the ultra-fast [Bresenham Line-Drawing Algorithm](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm).
+ */
+/proc/getline(atom/M,atom/N)
+	var/px=M.x		//starting x
+	var/py=M.y
+	var/line[] = list(locate(px,py,M.z))
+	var/dx=N.x-px	//x distance
+	var/dy=N.y-py
+	var/dxabs = abs(dx)//Absolute value of x distance
+	var/dyabs = abs(dy)
+	var/sdx = SIGN(dx)	//Sign of x distance (+ or -)
+	var/sdy = SIGN(dy)
+	var/x=dxabs>>1	//Counters for steps taken, setting to distance/2
+	var/y=dyabs>>1	//Bit-shifting makes me l33t.  It also makes getline() unnessecarrily fast.
+	var/j			//Generic integer for counting
+	if(dxabs>=dyabs)	//x distance is greater than y
+		for(j=0;j<dxabs;j++)//It'll take dxabs steps to get there
+			y+=dyabs
+			if(y>=dxabs)	//Every dyabs steps, step once in y direction
+				y-=dxabs
+				py+=sdy
+			px+=sdx		//Step on in x direction
+			line+=locate(px,py,M.z)//Add the turf to the list
+	else
+		for(j=0;j<dyabs;j++)
+			x+=dxabs
+			if(x>=dyabs)
+				x-=dyabs
+				px+=sdx
+			py+=sdy
+			line+=locate(px,py,M.z)
+	return line
+
+/**
  * Returns the top-most atom sitting on the turf.
  * For example, using this on a disk, which is in a bag, on a mob,
  * will return the mob because it's on the turf.
@@ -330,6 +366,36 @@ Turf and target are separate in case you want to teleport some distance from a t
 
 	return turf_list
 
+	// Will return all mobs that are close enough to the center
+/proc/livinginrange(dist=0, atom/center=usr)
+	if(!dist)
+		return list()
+
+	var/list/mobs = list()
+	for(var/mob/living/L in GLOB.mob_living_list)
+		var/check_place = L
+		if(isatom(L.loc)) // Not a turf/area
+			check_place = L.loc
+		if(get_dist(center, check_place) <= dist)
+			mobs += L
+
+	return mobs
+
+// Will return all mobs that are in view regardless of their location(i.e. in a locker)
+/proc/livinginview(dist=0, atom/center=usr)
+	if(!dist)
+		return list()
+
+	var/list/mobs = list()
+	for(var/mob/living/L in GLOB.mob_living_list)
+		var/check_place = L
+		if(isatom(L.loc)) // Not a turf/area
+			check_place = L.loc
+		if(check_place in view(dist, center))
+			mobs += L
+
+	return mobs
+
 ///Returns a random turf on the station
 /proc/get_random_station_turf()
 	var/list/turfs = get_area_turfs(pick(GLOB.the_station_areas))
@@ -407,3 +473,36 @@ Turf and target are separate in case you want to teleport some distance from a t
 	if(locate(type_to_find) in location)
 		return TRUE
 	return FALSE
+
+/proc/show_blurb(client/C, duration, blurb_text, fade_time = 5)
+	if(!C)
+		return
+
+	var/style = "font-family: 'Fixedsys'; -dm-text-outline: 1 black; font-size: 11px;"
+	var/text = blurb_text
+	text = uppertext(text)
+
+	var/obj/effect/overlay/T = new()
+	T.alpha = 0
+	T.maptext_height = 64
+	T.maptext_width = 424
+	T.layer = FLOAT_LAYER
+	T.plane = HUD_PLANE
+	T.appearance_flags = APPEARANCE_UI_IGNORE_ALPHA
+	T.screen_loc = "LEFT+1,BOTTOM+2"
+
+	C.screen += T
+	animate(T, alpha = 255, time = 10)
+	T.maptext = "<span style=\"[style]\">[text]</span>"
+
+	addtimer(CALLBACK(GLOBAL_PROC, .proc/fade_blurb, C, T, fade_time), duration)
+
+/proc/fade_blurb(client/C, obj/T, fade_time = 5)
+	animate(T, alpha = 0, time = fade_time)
+	sleep(fade_time)
+	C.screen -= T
+	qdel(T)
+
+/proc/show_global_blurb(duration, blurb_text, fade_time = 5) // Shows a blurb to every client
+	for(var/client/C in GLOB.clients)
+		show_blurb(C, duration, blurb_text, fade_time)

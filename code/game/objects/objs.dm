@@ -5,6 +5,7 @@
 	var/obj_flags = CAN_BE_HIT
 
 	var/damtype = BRUTE
+	var/armortype = RED_DAMAGE
 	var/force = 0
 
 	/// How good a given object is at causing wounds on carbons. Higher values equal better shots at creating serious wounds.
@@ -234,6 +235,10 @@
 			                  bullet = text2num(result["values"][BULLET]),\
 			                  laser = text2num(result["values"][LASER]),\
 			                  energy = text2num(result["values"][ENERGY]),\
+			                  red = text2num(result["values"][RED_DAMAGE]),\
+			                  white = text2num(result["values"][WHITE_DAMAGE]),\
+			                  black = text2num(result["values"][BLACK_DAMAGE]),\
+			                  pale = text2num(result["values"][PALE_DAMAGE]),\
 			                  bomb = text2num(result["values"][BOMB]),\
 			                  bio = text2num(result["values"][BIO]),\
 			                  fire = text2num(result["values"][FIRE]),\

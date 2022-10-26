@@ -80,7 +80,7 @@
 			if(L.stat == DEAD)
 				continue
 			L.apply_damage(song_damage, WHITE_DAMAGE, null, L.run_armor_check(null, WHITE_DAMAGE), spread_damage = TRUE)
-		SLEEP_CHECK_DEATH(3)
+		SLEEP_CHECK_DEATH(3, src)
 	can_act = TRUE
 	song_cooldown = world.time + song_cooldown_time
 
@@ -105,6 +105,7 @@
 	GiveTarget(user)
 
 /mob/living/simple_animal/hostile/abnormality/fragment/update_icon_state()
+	SHOULD_CALL_PARENT(TRUE)
 	if(status_flags & GODMODE) // Not breaching
 		icon_state = initial(icon)
 	else // Breaching

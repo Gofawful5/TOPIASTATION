@@ -86,7 +86,7 @@
 	var/matrix/init_transform = transform
 	animate(src, transform = transform*2, time = 3, easing = BACK_EASING|EASE_OUT)
 	icon_state = "rose_pissed"
-	SLEEP_CHECK_DEATH(3)
+	sleep(3)
 	animate(src, transform = init_transform, time = 5)
 	icon_state = "rose_activated"
 

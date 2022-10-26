@@ -186,6 +186,13 @@
 #define GASFIRE_LAYER 5.05
 #define RIPPLE_LAYER 5.1
 
+#define LOW_LANDMARK_LAYER 9
+#define MID_LANDMARK_LAYER 9.1
+#define HIGH_LANDMARK_LAYER 9.2
+#define AREA_LAYER 10
+#define MASSIVE_OBJ_LAYER 11
+#define POINT_LAYER 12
+
 //---------- LIGHTING -------------
 
 #define LIGHTING_PRIMARY_LAYER 15	//The layer for the main lights of the station

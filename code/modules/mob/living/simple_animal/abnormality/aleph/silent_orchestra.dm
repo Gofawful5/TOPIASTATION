@@ -112,7 +112,7 @@
 						H.visible_message("<span class='danger'>[H]'s head explodes!</span>")
 						new /obj/effect/gibspawner/generic/silent(get_turf(H))
 						playsound(get_turf(H), 'sound/abnormalities/silentorchestra/headbomb.ogg', 50, 1)
-				SLEEP_CHECK_DEATH(4 SECONDS)
+				SLEEP_CHECK_DEATH(4, src)
 				animate(src, alpha = 0, time = 2 SECONDS)
 				QDEL_IN(src, 2 SECONDS)
 

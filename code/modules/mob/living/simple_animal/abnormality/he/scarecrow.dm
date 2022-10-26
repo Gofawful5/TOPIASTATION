@@ -31,7 +31,7 @@
 						)
 	work_damage_amount = 10
 	work_damage_type = WHITE_DAMAGE
-	deathmessage = "stops moving, with its torso rotating forwards."
+	death_message = "stops moving, with its torso rotating forwards."
 	deathsound = 'sound/abnormalities/scarecrow/death.ogg'
 
 	ego_list = list(
@@ -68,14 +68,14 @@
 			finishing = TRUE
 			H.Stun(10 SECONDS)
 			playsound(get_turf(src), 'sound/abnormalities/scarecrow/start_drink.ogg', 50, 1)
-			SLEEP_CHECK_DEATH(2)
+			SLEEP_CHECK_DEATH(2, src)
 			for(var/i = 1 to 6)
 				if(!targets_from.Adjacent(H) || QDELETED(H)) // They can still be saved if you move them away
 					finishing = FALSE
 					return
 				playsound(get_turf(src), 'sound/abnormalities/scarecrow/drink.ogg', 50, 1)
 				adjustBruteLoss(-(maxHealth*0.05)) // Can restore 30% of HP
-				SLEEP_CHECK_DEATH(4)
+				SLEEP_CHECK_DEATH(4, src)
 			if(!targets_from.Adjacent(H) || QDELETED(H))
 				finishing = FALSE
 				return

@@ -95,8 +95,10 @@
 	var/armour_penetration = 0
 	///Damage type of a simple mob's melee attack, should it do damage.
 	var/melee_damage_type = BRUTE
+	///Armor type that is checked when attacking someone
+	var/armortype = RED_DAMAGE
 	/// 1 for full damage , 0 for none , -1 for 1:1 heal from that source.
-	var/list/damage_coeff = list(BRUTE = 1, BURN = 1, TOX = 1, CLONE = 1, STAMINA = 0, OXY = 1)
+	var/list/damage_coeff = list(BRUTE = 1, BURN = 1, TOX = 1, CLONE = 1, STAMINA = 0, OXY = 1, RED_DAMAGE = 1, WHITE_DAMAGE = 1, BLACK_DAMAGE = 1, PALE_DAMAGE = 1)
 	///Attacking verb in present continuous tense.
 	var/attack_verb_continuous = "attacks"
 	///Attacking verb in present simple tense.
@@ -146,6 +148,9 @@
 	var/dextrous = FALSE
 	var/dextrous_hud_type = /datum/hud/dextrous
 
+	///If the creature should have an innate TRAIT_MOVE_FLYING trait added on init that is also toggled off/on on death/revival.
+	var/is_flying_animal = FALSE
+
 	///The Status of our AI, can be set to AI_ON (On, usual processing), AI_IDLE (Will not process, but will return to AI_ON if an enemy comes near), AI_OFF (Off, Not processing ever), AI_Z_OFF (Temporarily off due to nonpresence of players).
 	var/AIStatus = AI_ON
 	///once we have become sentient, we can never go back.
@@ -190,6 +195,8 @@
 		AddComponent(/datum/component/personal_crafting)
 		ADD_TRAIT(src, TRAIT_ADVANCEDTOOLUSER, ROUNDSTART_TRAIT)
 		ADD_TRAIT(src, TRAIT_CAN_STRIP, ROUNDSTART_TRAIT)
+	if(is_flying_animal)
+		ADD_TRAIT(src, TRAIT_MOVE_FLYING, ROUNDSTART_TRAIT)
 	ADD_TRAIT(src, TRAIT_NOFIRE_SPREAD, ROUNDSTART_TRAIT)
 	for(var/trait in weather_immunities)
 		ADD_TRAIT(src, trait, ROUNDSTART_TRAIT)
@@ -231,6 +238,16 @@
 		SSidlenpcpool.idle_mobs_by_zlevel[T.z] -= src
 
 	return ..()
+
+/mob/living/simple_animal/vv_edit_var(var_name, var_value)
+	. = ..()
+	switch(var_name)
+		if(NAMEOF(src, is_flying_animal))
+			if(stat != DEAD)
+				if(!is_flying_animal)
+					REMOVE_TRAIT(src, TRAIT_MOVE_FLYING, ROUNDSTART_TRAIT)
+				else
+					ADD_TRAIT(src, TRAIT_MOVE_FLYING, ROUNDSTART_TRAIT)
 
 /mob/living/simple_animal/examine(mob/user)
 	. = ..()
@@ -456,6 +473,8 @@
 			new i(loc)
 
 /mob/living/simple_animal/death(gibbed)
+	if(is_flying_animal)
+		REMOVE_TRAIT(src, TRAIT_MOVE_FLYING, ROUNDSTART_TRAIT)
 	if(nest)
 		nest.spawned_mobs -= src
 		nest = null
@@ -524,6 +543,8 @@
 		return
 	icon_state = icon_living
 	set_density(initial(density))
+	if(is_flying_animal)
+		ADD_TRAIT(src, TRAIT_MOVE_FLYING, ROUNDSTART_TRAIT)
 
 /mob/living/simple_animal/proc/make_babies() // <3 <3 <3
 	if(gender != FEMALE || stat || next_scan_time > world.time || !childtype || !animal_species || !SSticker.IsRoundInProgress())

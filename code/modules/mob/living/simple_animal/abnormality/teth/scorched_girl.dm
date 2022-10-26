@@ -91,10 +91,10 @@
 		if(!do_after(src, 1.5 SECONDS, target = src))
 			return
 	else
-		SLEEP_CHECK_DEATH(1.5 SECONDS)
+		sleep(1.5 SECONDS)
 	exploding = TRUE
 	playsound(get_turf(src), 'sound/abnormalities/scorchedgirl/ability.ogg', 60, 0, 4)
-	SLEEP_CHECK_DEATH(3 SECONDS)
+	sleep(3 SECONDS)
 	// Ka-boom
 	playsound(get_turf(src), 'sound/abnormalities/scorchedgirl/explosion.ogg', 125, 0, 8)
 	for(var/mob/living/carbon/human/H in view(7, src))
@@ -102,7 +102,7 @@
 		if(H.health < 0)
 			H.gib()
 	new /obj/effect/temp_visual/explosion(get_turf(src))
-	var/datum/effect_system/smoke_spread/S = new
+	var/datum/effect_system/fluid_spread/smoke/S = new
 	S.set_up(7, get_turf(src))
 	S.start()
 	qdel(src)
@@ -124,6 +124,7 @@
 	GiveTarget(user)
 
 /mob/living/simple_animal/hostile/abnormality/scorched_girl/update_icon_state()
+	SHOULD_CALL_PARENT(TRUE)
 	if(status_flags & GODMODE) // Not breaching
 		icon_state = initial(icon)
 	else // Breaching

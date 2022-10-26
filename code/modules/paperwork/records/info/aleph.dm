@@ -1,7 +1,7 @@
 //Silent Fucker
 /obj/item/paper/fluff/info/aleph/tso
 	name = "T-01-31"
-	info = {"<h1><center>T-01-31</center></h1>	<br>
+	var/info = {"<h1><center>T-01-31</center></h1>	<br>
 	Name : The Silent Orchestra<br>
 	Risk Class : Aleph	<br>
 	Max PE Boxes : 30	<br>
@@ -27,7 +27,7 @@
 //Blue Star
 /obj/item/paper/fluff/info/aleph/bluestar
 	name = "O-03-93"
-	info = {"<h1><center>O-03-93</center></h1>	<br>
+	var/info = {"<h1><center>O-03-93</center></h1>	<br>
 	Name : Blue Star<br>
 	Risk Class : Aleph	<br>
 	Max PE Boxes : 30	<br>
@@ -54,7 +54,7 @@
 //White Night
 /obj/item/paper/fluff/info/aleph/whitenight
 	name = "T-03-46"
-	info = {"<h1><center>T-03-46</center></h1>	<br>
+	var/info = {"<h1><center>T-03-46</center></h1>	<br>
 	Name : White Night<br>
 	Risk Class : Aleph	<br>
 	Max PE Boxes : 30	<br>
@@ -79,7 +79,7 @@
 //Nothing There
 /obj/item/paper/fluff/info/aleph/nothingthere
 	name = "O-06-20"
-	info = {"<h1><center>O-06-20</center></h1>	<br>
+	var/info = {"<h1><center>O-06-20</center></h1>	<br>
 	Name : Nothing There<br>
 	Risk Class : Aleph	<br>
 	Max PE Boxes : 30	<br>
@@ -106,7 +106,7 @@
 //The Mountain of Smiling Bodies
 /obj/item/paper/fluff/info/aleph/mountain
 	name = "T-01-75"
-	info = {"<h1><center>T-01-75</center></h1>	<br>
+	var/info = {"<h1><center>T-01-75</center></h1>	<br>
 	Name : The Mountain Of Smiling Bodies<br>
 	Risk Class : Aleph	<br>
 	Max PE Boxes : 30	<br>
@@ -136,7 +136,7 @@
 //Staining Rose
 /obj/item/paper/fluff/info/aleph/rose
 	name = "F-04-116"
-	info = {"<h1><center>F-04-116</center></h1>	<br>
+	var/info = {"<h1><center>F-04-116</center></h1>	<br>
 	Name : Staining Rose<br>
 	Risk Class : Aleph	<br>
 	Max PE Boxes : 30	<br>
@@ -158,7 +158,7 @@
 //Melting Love
 /obj/item/paper/fluff/info/aleph/melty
 	name = "D-03-109"
-	info = {"<h1><center>D-03-109</center></h1>	<br>
+	var/info = {"<h1><center>D-03-109</center></h1>	<br>
 	Name : Melting Love<br>
 	Risk Class : Aleph	<br>
 	Max PE Boxes : 30	<br>
@@ -187,7 +187,7 @@
 //Censored
 /obj/item/paper/fluff/info/aleph/censored
 	name = "O-03-89"
-	info = {"<h1><center>O-03-89</center></h1>	<br>
+	var/info = {"<h1><center>O-03-89</center></h1>	<br>
 	Name : CENSORED<br>
 	Risk Class : Aleph	<br>
 	Max PE Boxes : 30	<br>

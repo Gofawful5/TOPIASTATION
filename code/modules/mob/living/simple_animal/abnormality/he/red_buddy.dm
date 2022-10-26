@@ -185,7 +185,7 @@
 			heard_awoo = TRUE
 		if(health >= 75 && heard_awoo)
 			adjustHealth(75)
-		SLEEP_CHECK_DEATH(1 SECONDS)
+		sleep(1 SECONDS)
 
 /mob/living/simple_animal/hostile/abnormality/red_buddy/proc/AdjustSuffering(pain)
 	suffering = clamp(pain + suffering, 0, 50)

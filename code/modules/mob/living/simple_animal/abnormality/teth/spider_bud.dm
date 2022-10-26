@@ -33,7 +33,7 @@
 		user.forceMove(casing)
 		casing.icon_state = pick("cocoon_large1","cocoon_large2","cocoon_large3")
 		casing.density = FALSE
-		SLEEP_CHECK_DEATH(50)
+		sleep(50)
 		icon_state = "spider_closed"
 		return
 

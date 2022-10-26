@@ -151,7 +151,7 @@
 		datum_reference.qliphoth_change(-4)
 	else
 		datum_reference.qliphoth_change(-1)
-		SLEEP_CHECK_DEATH(10)
+		sleep(10)
 	if(status_flags & GODMODE)
 		var/lie //if shepperd's lying or not
 		if(prob(lie_chance))
@@ -205,7 +205,7 @@
 	if(slash_current == 0)
 		slash_current = slash_cooldown
 		say(pick(combat_lines))
-		SLEEP_CHECK_DEATH(10)
+		sleep(10)
 		slashing = TRUE
 		slash()
 	..()
@@ -275,7 +275,7 @@
 					continue
 				L.apply_damage(slash_damage, BLACK_DAMAGE, null, L.run_armor_check(null, BLACK_DAMAGE), spread_damage = TRUE)
 			all_turfs -= T
-		SLEEP_CHECK_DEATH(3)
+		sleep(3)
 	slashing = FALSE
 
 /mob/living/simple_animal/hostile/abnormality/blue_shepherd/proc/OnMobDeath(datum/source, mob/living/died, gibbed)

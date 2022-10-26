@@ -1,7 +1,7 @@
 //Bottle of Tears
 /obj/item/paper/fluff/info/zayin/bottle
 	name = "F-04-113"
-	info = {"<h1><center>F-04-113</center></h1>	<br>
+	var/info = {"<h1><center>F-04-113</center></h1>	<br>
 	Name : Bottle of Tears	<br>
 	Risk Class : Zayin	<br>
 	Max PE Boxes : 10	<br>
@@ -19,7 +19,7 @@
 //One Sin
 /obj/item/paper/fluff/info/zayin/onesin
 	name = "O-03-03"
-	info = {"<h1><center>O-03-03</center></h1>	<br>
+	var/info = {"<h1><center>O-03-03</center></h1>	<br>
 	Name : One Sin and Hundreds of Good Deeds	<br>
 	Risk Class : Zayin	<br>
 	Max PE Boxes : 10	<br>
@@ -36,7 +36,7 @@
 //Wellcheers
 /obj/item/paper/fluff/info/zayin/shrimple
 	name = "F-05-52"
-	info = {"<h1><center>F-05-52</center></h1>	<br>
+	var/info = {"<h1><center>F-05-52</center></h1>	<br>
 	Name : Opened Can of WellCheers	<br>
 	Risk Class : Zayin	<br>
 	Max PE Boxes : 10	<br>
@@ -57,7 +57,7 @@
 //BALD
 /obj/item/paper/fluff/info/zayin/bald
 	name = "BALD-IS-AWESOME"
-	info = {"<h1><center>BALD-IS-AWESOME</center></h1>	<br>
+	var/info = {"<h1><center>BALD-IS-AWESOME</center></h1>	<br>
 	Name : You're Bald	<br>
 	Risk Class: Zayin	<br>
 	Max PE Boxes : 6	<br>
@@ -75,7 +75,7 @@
 //Fairy Festival
 /obj/item/paper/fluff/info/zayin/fairy
 	name = "F-04-83"
-	info = {"<h1><center>F-04-83</center></h1>	<br>
+	var/info = {"<h1><center>F-04-83</center></h1>	<br>
 	Name : Fairy Festival	<br>
 	Risk Class : Zayin	<br>
 	Max PE Boxes : 10	<br>
@@ -93,7 +93,7 @@
 //We can change anything
 /obj/item/paper/fluff/info/zayin/change
 	name = "T-09-85"
-	info = {"<h1><center>T-09-85</center></h1>	<br>
+	var/info = {"<h1><center>T-09-85</center></h1>	<br>
 	Name : We can change anything!	<br>
 	Risk Class : Zayin	<br>
 	Max PE Boxes : 10	<br>

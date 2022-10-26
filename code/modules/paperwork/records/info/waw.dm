@@ -1,7 +1,7 @@
 //Warden
 /obj/item/paper/fluff/info/waw/warden
 	name = "T-01-114"
-	info = {"<h1><center>T-01-114</center></h1>	<br>
+	var/info = {"<h1><center>T-01-114</center></h1>	<br>
 	Name : The Warden	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>
@@ -27,7 +27,7 @@
 //Bee
 /obj/item/paper/fluff/info/waw/queenbee
 	name = "T-04-50"
-	info = {"<h1><center>T-04-50</center></h1>	<br>
+	var/info = {"<h1><center>T-04-50</center></h1>	<br>
 	Name : Queen Bee	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>
@@ -50,7 +50,7 @@
 //Jbird
 /obj/item/paper/fluff/info/waw/jbird
 	name = "O-02-62"
-	info = {"<h1><center>O-02-62</center></h1>	<br>
+	var/info = {"<h1><center>O-02-62</center></h1>	<br>
 	Name : Judgement Bird	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>
@@ -74,7 +74,7 @@
 //Bbird
 /obj/item/paper/fluff/info/waw/bbird
 	name = "O-02-40"
-	info = {"<h1><center>O-02-40</center></h1>	<br>
+	var/info = {"<h1><center>O-02-40</center></h1>	<br>
 	Name : Big Bird	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>
@@ -101,7 +101,7 @@
 //KOD
 /obj/item/paper/fluff/info/waw/kod
 	name = "O-01-73"
-	info = {"<h1><center>O-01-73</center></h1>	<br>
+	var/info = {"<h1><center>O-01-73</center></h1>	<br>
 	Name : The Knight Of Despair	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>
@@ -128,7 +128,7 @@
 //QOH
 /obj/item/paper/fluff/info/waw/qoh
 	name = "O-01-04"
-	info = {"<h1><center>O-01-04</center></h1>	<br>
+	var/info = {"<h1><center>O-01-04</center></h1>	<br>
 	Name : The Queen Of Hatred	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>
@@ -156,7 +156,7 @@
 //General Bee
 /obj/item/paper/fluff/info/waw/generalbee
 	name = "T-01-118"
-	info = {"<h1><center>T-01-118</center></h1>	<br>
+	var/info = {"<h1><center>T-01-118</center></h1>	<br>
 	Name : General Bee	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>
@@ -182,7 +182,7 @@
 //Shrimp
 /obj/item/paper/fluff/info/waw/shrimpexec
 	name = "O-02-119"
-	info = {"<h1><center>O-02-119</center></h1>	<br>
+	var/info = {"<h1><center>O-02-119</center></h1>	<br>
 	Name : A Shrimp Association Executive	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>
@@ -207,7 +207,7 @@
 //Silence
 /obj/item/paper/fluff/info/waw/silence
 	name = "O-04-120"
-	info = {"<h1><center>O-02-120</center></h1>	<br>
+	var/info = {"<h1><center>O-02-120</center></h1>	<br>
 	Name : The Price Of Silence	<br>
 	Risk Class : Waw	<br>
 	Max PE Boxes : 24	<br>

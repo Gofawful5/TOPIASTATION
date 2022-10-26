@@ -445,6 +445,70 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark/start/new_player)
 /obj/effect/landmark/unit_test_top_right
 	name = "unit test zone top right"
 
+/* LC13 landmarks */
+
+/obj/effect/landmark/abnormality_spawn
+	name = "abnormality spawn"
+	var/datum/abnormality/datum_reference = null
+
+/obj/effect/landmark/abnormality_spawn/Destroy()
+	QDEL_NULL(datum_reference)
+	return ..()
+
+// Department's center
+/obj/effect/landmark/department_center
+	name = "department_center"
+
+/obj/effect/landmark/department_center/Initialize(mapload)
+	..()
+	GLOB.department_centers += get_turf(src)
+	return INITIALIZE_HINT_QDEL
+
+/obj/effect/landmark/abnormality_spawn/training_rabbit
+	name = "training rabbit spawn"
+
+/obj/effect/landmark/abnormality_spawn/training_rabbit/Initialize(mapload)
+	..()
+	return INITIALIZE_HINT_LATELOAD
+
+/obj/effect/landmark/abnormality_spawn/training_rabbit/LateInitialize()
+	..()
+	datum_reference = new(src, /mob/living/simple_animal/hostile/abnormality/training_rabbit)
+	//incredibly dumb idea that only works if there's one training rabbit console
+	var/obj/machinery/computer/abnormality/training_rabbit/AR = get_closest_atom(/obj/machinery/computer/abnormality/training_rabbit, GLOB.abnormality_consoles, src)
+	if(istype(AR))
+		AR.datum_reference = datum_reference
+	return
+
+
+/obj/effect/landmark/abnormality_spawn/tutorial
+	name = "tutorial spawn (bill)"
+	var/chosen = /mob/living/simple_animal/hostile/abnormality/bill
+
+/obj/effect/landmark/abnormality_spawn/tutorial/Initialize(mapload)
+	..()
+	return INITIALIZE_HINT_LATELOAD
+
+/obj/effect/landmark/abnormality_spawn/tutorial/LateInitialize()
+	..()
+	datum_reference = new(src, chosen)
+	//Pick the closest console
+	var/obj/machinery/computer/abnormality/tutorial/AR = get_closest_atom(/obj/machinery/computer/abnormality/tutorial, GLOB.abnormality_consoles, src)
+	if(istype(AR))
+		AR.datum_reference = datum_reference
+	return
+
+/obj/effect/landmark/abnormality_spawn/tutorial/shadow
+	name = "tutorial spawn (shadow)"
+	chosen = /mob/living/simple_animal/hostile/abnormality/shadow
+
+/obj/effect/landmark/abnormality_spawn/tutorial/cube
+	name = "tutorial spawn (cube)"
+	chosen = /mob/living/simple_animal/hostile/abnormality/cube
+
+/obj/effect/landmark/abnormality_spawn/tutorial/fairy
+	name = "tutorial spawn (fairy)"
+	chosen = /mob/living/simple_animal/hostile/abnormality/fairy_swarm
 
 /obj/effect/landmark/start/hangover
 	name = "hangover spawn"

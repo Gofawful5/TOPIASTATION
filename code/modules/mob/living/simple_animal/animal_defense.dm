@@ -102,7 +102,7 @@
 	. = ..()
 	if(.)
 		var/damage = rand(user.melee_damage_lower, user.melee_damage_upper)
-		return attack_threshold_check(damage, user.melee_damage_type)
+		return attack_threshold_check(damage, user.melee_damage_type, user.armortype)
 
 /mob/living/simple_animal/attack_slime(mob/living/simple_animal/slime/M, list/modifiers)
 	if(..()) //successful slime attack

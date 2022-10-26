@@ -82,7 +82,7 @@
 	UnregisterSignal(SSdcs, COMSIG_GLOB_MOB_DEATH)
 	return ..()
 
-/mob/living/simple_animal/hostile/abnormality/big_bird/Moved()
+/mob/living/simple_animal/hostile/abnormality/big_bird/Moved(atom/old_loc, movement_dir, forced, list/old_locs, momentum_change = TRUE)
 	. = ..()
 	if(!(status_flags & GODMODE)) // Whitaker nerf
 		playsound(get_turf(src), 'sound/abnormalities/bigbird/step.ogg', 50, 1)

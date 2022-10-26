@@ -135,7 +135,7 @@
 				icon_state = "mosb_bite2"
 			else
 				icon_state = "mosb_bite"
-			SLEEP_CHECK_DEATH(3)
+			sleep(3)
 			if(!targets_from.Adjacent(L) || QDELETED(L)) // They can still be saved if you move them away
 				finishing = FALSE
 				return
@@ -249,7 +249,7 @@
 		return
 	finishing = TRUE
 	visible_message("<span class='danger'>[src] prepares to spit an acidic substance at [target]!</span>")
-	SLEEP_CHECK_DEATH(4)
+	sleep(4)
 	spit_cooldown = world.time + spit_cooldown_time
 	playsound(get_turf(src), 'sound/abnormalities/mountain/spit.ogg', 75, 1, 3)
 	for(var/k = 1 to 3)
@@ -264,7 +264,7 @@
 			P.original = target
 			P.preparePixelProjectile(target, src)
 			P.fire()
-		SLEEP_CHECK_DEATH(2)
+		sleep(2)
 	finishing = FALSE
 
 /mob/living/simple_animal/hostile/abnormality/mountain/failure_effect(mob/living/carbon/human/user, work_type, pe)

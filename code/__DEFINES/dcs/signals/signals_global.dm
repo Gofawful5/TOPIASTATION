@@ -34,6 +34,14 @@
 #define COMSIG_GLOB_JOB_AFTER_LATEJOIN_SPAWN "!job_after_latejoin_spawn"
 /// crewmember joined the game (mob/living, rank)
 #define COMSIG_GLOB_CREWMEMBER_JOINED "!crewmember_joined"
+/// a human mob went insane (mob/living/carbon/human, attribute)
+#define COMSIG_GLOB_HUMAN_INSANE "!human_insane"
+/// a lobotomy_corp subsystem meltdown occured
+#define COMSIG_GLOB_MELTDOWN_START "!meltdown_started"
+/// a new abnormality has spawned with their room (/datum/abnormality)
+#define COMSIG_GLOB_ABNORMALITY_SPAWN "!abno_spawned"
+///an abnormality has breached
+#define COMSIG_GLOB_ABNORMALITY_BREACH "!abno_breach"
 /// Random event is trying to roll. (/datum/round_event_control/random_event)
 /// Called by (/datum/round_event_control/preRunEvent).
 #define COMSIG_GLOB_PRE_RANDOM_EVENT "!pre_random_event"

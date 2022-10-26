@@ -77,6 +77,7 @@
 			helper_dash(target)
 
 /mob/living/simple_animal/hostile/abnormality/helper/update_icon_state()
+	SHOULD_CALL_PARENT(TRUE)
 	if(status_flags & GODMODE)
 		icon = initial(icon)
 		pixel_x = initial(pixel_x)
@@ -119,13 +120,13 @@
 	if(T.density)
 		stop_charge = TRUE
 	for(var/obj/structure/window/W in T.contents)
-		W.obj_destruction("spinning blades")
+		W.atom_destruction("spinning blades")
 	for(var/obj/machinery/door/D in T.contents)
 		if(D.density)
 			D.open(2)
 	if(stop_charge)
 		playsound(src, 'sound/abnormalities/helper/disable.ogg', 75, 1)
-		SLEEP_CHECK_DEATH(5 SECONDS)
+		sleep(5 SECONDS)
 		charging = FALSE
 		return
 	forceMove(T)

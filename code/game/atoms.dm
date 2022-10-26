@@ -289,6 +289,9 @@
 	// The integrity to max_integrity ratio is still preserved.
 	set_custom_materials(custom_materials)
 
+	ComponentInitialize()
+	InitializeAIController()
+
 	if(ispath(ai_controller))
 		ai_controller = new ai_controller(src)
 
@@ -307,6 +310,10 @@
  */
 /atom/proc/LateInitialize()
 	set waitfor = FALSE
+
+/// Put your [AddComponent] calls here
+/atom/proc/ComponentInitialize()
+	return
 
 /**
  * Top level of the destroy chain for most atoms
@@ -2067,3 +2074,13 @@
 	if(caller && (caller.pass_flags & pass_flags_self))
 		return TRUE
 	. = !density
+
+/**
+* Instantiates the AI controller of this atom. Override this if you want to assign variables first.
+*
+* This will work fine without manually passing arguments.
+
++*/
+/atom/proc/InitializeAIController()
+	if(ispath(ai_controller))
+		ai_controller = new ai_controller(src)

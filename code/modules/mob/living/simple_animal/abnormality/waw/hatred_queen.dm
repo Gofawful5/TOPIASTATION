@@ -253,14 +253,14 @@
 		if(NORTH)
 			S.pixel_y += 16
 			S.layer -= 0.1
-	SLEEP_CHECK_DEATH(1.5 SECONDS)
+	SLEEP_CHECK_DEATH(1.5 SECONDS, src)
 	icon_state = "hatredrecoil"
 	beats_hit = list()
 	var/i = 1
 	for(var/turf/T in turfs_to_hit)
 		addtimer(CALLBACK(src, .proc/BeatsTurf, T), i*0.4)
 		i++
-	SLEEP_CHECK_DEATH(2 SECONDS)
+	SLEEP_CHECK_DEATH(2 SECONDS, src)
 	S.fade_out()
 	icon_state = icon_living
 	can_act = TRUE
@@ -323,7 +323,7 @@
 			b++
 			addtimer(CALLBACK(src, .atom/movable/proc/say, beamtalk[b]), beam_startup/2)
 			b++
-		SLEEP_CHECK_DEATH(beam_startup) //time between beam startup stage
+		SLEEP_CHECK_DEATH(beam_startup, src) //time between beam startup stage
 	var/turf/MT = get_step(my_turf, my_dir)
 	if(datum_reference?.qliphoth_meter != 2) //beam starts on the tile of qoh when hostile breach, allows stage 2 to hit people behind her
 		MT = get_turf(my_turf)
@@ -390,12 +390,12 @@
 					else
 						adjustBruteLoss(-damage_dealt/4) //less healing from nonhumans
 				accumulated_beam_damage += damage_dealt
-		SLEEP_CHECK_DEATH(2)
+		SLEEP_CHECK_DEATH(2, src)
 	beamloop.stop()
 	QDEL_NULL(current_beam)
 	for(var/obj/effect/qoh_sygil/S in spawned_effects)
 		S.fade_out()
-	SLEEP_CHECK_DEATH(3 SECONDS) //Rest after laser beam
+	SLEEP_CHECK_DEATH(3 SECONDS, src) //Rest after laser beam
 	can_act = TRUE
 	beam_cooldown = world.time + beam_cooldown_time
 
@@ -436,7 +436,7 @@
 	var/obj/effect/qoh_sygil/S = new(teleport_target)
 	S.icon_state = "qoh2"
 	addtimer(CALLBACK(S, .obj/effect/qoh_sygil/proc/fade_out), 2 SECONDS)
-	SLEEP_CHECK_DEATH(2 SECONDS)
+	SLEEP_CHECK_DEATH(2 SECONDS, src)
 	animate(src, alpha = 255, time = 5)
 	new /obj/effect/temp_visual/guardian/phase/out(teleport_target)
 	forceMove(teleport_target)

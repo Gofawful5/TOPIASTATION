@@ -56,7 +56,7 @@
 			_last_pinged = world.time
 		user.adjustOxyLoss(10, updating_health=TRUE, forced=TRUE)
 		_times_strangled++
-		SLEEP_CHECK_DEATH(1 SECONDS)
+		sleep(1 SECONDS)
 	src.unbuckle_mob(user, force=TRUE)
 	src.icon_state = "teddy"
 	src.visible_message("<span class='warning'>[src] drops [user] to the ground!</span>")
@@ -65,7 +65,7 @@
 // can only unbuckle dead things
 // hopefully prevents people from attempting to "save" the victim, which would break the immersion
 // (because strangle code will continue whether they're buckled or not)
-/mob/living/simple_animal/hostile/abnormality/happyteddybear/unbuckle_mob(mob/living/buckled_mob, force)
+/mob/living/simple_animal/hostile/abnormality/happyteddybear/unbuckle_mob(mob/living/buckled_mob, force, can_fall = FALSE)
 	if(buckled_mob.stat == DEAD)
 		. = ..()
 

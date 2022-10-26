@@ -1,6 +1,6 @@
 
 
-/mob/living/carbon/apply_damage(damage, damagetype = BRUTE, def_zone = null, blocked = FALSE, forced = FALSE, spread_damage = FALSE, wound_bonus = 0, bare_wound_bonus = 0, sharpness = NONE, attack_direction = null)
+/mob/living/carbon/apply_damage(damage, damagetype = BRUTE, def_zone = null, blocked = FALSE, forced = FALSE, spread_damage = FALSE, wound_bonus = 0, bare_wound_bonus = 0, sharpness = NONE, attack_direction = null, white_healable = FALSE)
 	SEND_SIGNAL(src, COMSIG_MOB_APPLY_DAMAGE, damage, damagetype, def_zone)
 	var/hit_percent = (100-blocked)/100
 	if(!damage || (!forced && hit_percent <= 0))
@@ -43,6 +43,14 @@
 					update_damage_overlays()
 			else
 				adjustStaminaLoss(damage_amount, forced = forced)
+		if(RED_DAMAGE)
+			adjustRedLoss(damage_amount, forced = forced)
+		if(WHITE_DAMAGE)
+			adjustWhiteLoss(damage_amount, forced = forced, white_healable = white_healable)
+		if(BLACK_DAMAGE)
+			adjustBlackLoss(damage_amount, forced = forced, white_healable = white_healable)
+		if(PALE_DAMAGE)
+			adjustPaleLoss(damage_amount, forced = forced)
 	return TRUE
 
 

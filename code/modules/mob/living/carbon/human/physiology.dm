@@ -9,6 +9,11 @@
 	var/stamina_mod = 1 // % of stamina damage taken from all sources
 	var/brain_mod = 1 // % of brain damage taken from all sources
 
+	var/red_mod = 1
+	var/white_mod = 1
+	var/black_mod = 1
+	var/pale_mod = 1
+
 	var/pressure_mod = 1 // % of brute damage taken from low or high pressure (stacks with brute_mod)
 	var/heat_mod = 1 // % of burn damage taken from heat (stacks with burn_mod)
 	var/cold_mod = 1 // % of burn damage taken from cold (stacks with burn_mod)
@@ -22,6 +27,12 @@
 	var/datum/armor/armor // internal armor datum
 
 	var/hunger_mod = 1 //% of hunger rate taken per tick.
+
+	var/work_success_mod = 1 // %dditive Modifier to the success rate of works
+	var/instinct_success_mod = 0 // Additive Modifier to the success rate of Instinct works
+	var/insight_success_mod = 0 // Additive Modifier to the success rate of Insight works
+	var/attachment_success_mod = 0 // Additive Modifier to the success rate of Attachment works
+	var/repression_success_mod = 0 // Additive Modifier to the success rate of Repression works
 
 /datum/physiology/New()
 	armor = new

@@ -33,6 +33,90 @@
 	AddElement(/datum/element/connect_loc, loc_connections)
 	GLOB.human_list += src
 
+/mob/living/carbon/human/proc/init_attributes()
+	for(var/type in GLOB.attribute_types)
+		if(ispath(type, /datum/attribute))
+			var/datum/attribute/atr = new type
+			attributes[atr.name] = atr
+			atr.on_update(src)
+
+/mob/living/carbon/human/proc/init_gifts_slots()
+	for(var/gift_slot in list(HAT, HELMET, EYE, FACE, MOUTH_1, MOUTH_2, CHEEK, BROOCH, NECKWEAR, LEFTBACK, RIGHTBACK, HAND_1, HAND_2, SPECIAL))
+		var/datum/ego_gifts/filled_slot = new /datum/ego_gifts/empty
+		filled_slot.slot = gift_slot
+		src.Apply_Gift(filled_slot)
+
+/mob/living/carbon/human/verb/show_attributes_self()
+	set category = "IC"
+	set name = "Show Attributes"
+
+	show_attributes()
+
+/mob/living/carbon/human/verb/show_attributes_to(mob/living/L in oview(1))
+	set category = "IC"
+	set name = "Show Attributes To"
+
+	if(istype(L))
+		if(do_after(src, 1 SECONDS, L))
+			show_attributes(L)
+			to_chat(src, "<span class='notice'>You have shown your attributes to [L].</span>")
+			return
+		to_chat(src, "<span class='notice'>You must remain in place to show someone your attributes!</span>")
+
+/mob/living/carbon/human/proc/show_attributes(mob/viewer = src)
+	if(!LAZYLEN(attributes))
+		to_chat(viewer, "<span class='warning'>[src] has no attributes!</span>")
+		return
+
+	var/list/dat = list()
+	dat += "<b>[real_name]</b><br>"
+	dat += "Level [get_text_level()]<br>"
+	for(var/atrname in attributes)
+		var/datum/attribute/atr = attributes[atrname]
+		dat += "[atr.name] [get_attribute_text_level(atr.get_level())]: [round(atr.level)]/[round(atr.level_limit)] + [round(atr.level_buff)]"
+
+	var/datum/browser/popup = new(viewer, "skills", "<div align='center'>Attributes</div>", 300, 300)
+	popup.set_content(dat.Join("<br>"))
+	popup.open(FALSE)
+
+/mob/living/carbon/human/verb/show_gifts_self()
+	set category = "IC"
+	set name = "View Gifts"
+
+	ShowGifts()
+
+/mob/living/carbon/human/verb/show_gifts_other(mob/living/L in oview(1))
+	set category = "IC"
+	set name = "Show Gifts To"
+
+	if(istype(L))
+		if(do_after(src, 1 SECONDS, L))
+			ShowGifts(L)
+			emote("spin")
+			to_chat(src, "<span class='notice'>You have shown your Gifts to [L].</span>")
+			return
+		to_chat(src, "<span class='notice'>You must remain in place to show someone your Gifts!</span>")
+
+/mob/living/carbon/human/proc/ShowGifts(mob/viewer = src)
+	if(!LAZYLEN(ego_gift_list))
+		to_chat(viewer, "<span class='warning'>[src] has no Gifts!</span>")
+		return
+
+	var/list/dat = list()
+	dat += "<div align='center'><b>[real_name]</b></div><br>"
+	dat += "<div align='center'>Slot | Name ( Fortitude | Prudence | Temperance | Justice )</div><br>"
+	for(var/beta_gift in ego_gift_list) // These show the benefits of each one and at level 4+ you can lock the gift in place.
+		var/datum/ego_gifts/alpha_gift = ego_gift_list[beta_gift]
+		dat += "[alpha_gift.slot]: [alpha_gift.name] \
+			( [alpha_gift.fortitude_bonus >= 0 ? "+[alpha_gift.fortitude_bonus]":"[alpha_gift.fortitude_bonus]"] | \
+			[alpha_gift.prudence_bonus >= 0 ? "+[alpha_gift.prudence_bonus]":"[alpha_gift.prudence_bonus]"] | \
+			[alpha_gift.temperance_bonus >= 0 ? "+[alpha_gift.temperance_bonus]":"[alpha_gift.temperance_bonus]"] | \
+			[alpha_gift.justice_bonus >= 0 ? "+[alpha_gift.justice_bonus]":"[alpha_gift.justice_bonus]"] ) \
+			[get_user_level(src) > 3 && viewer == src ? "<A href='byond://?src=[REF(alpha_gift)]'>[alpha_gift.locked ? "Locked" : "Unlocked"]</A>" : ""]"
+	var/datum/browser/popup = new(viewer, "gifts", "<div align='center'>E.G.O. Gifts</div>", 600, 450)
+	popup.set_content(dat.Join("<br>"))
+	popup.open(FALSE)
+
 /mob/living/carbon/human/proc/setup_mood()
 	if (CONFIG_GET(flag/disable_human_mood))
 		return
@@ -755,6 +839,24 @@
 		hud_used.healthdoll.add_overlay(mutable_appearance('icons/hud/screen_gen.dmi', "[t]6"))
 	for(var/t in get_disabled_limbs()) //Disabled limbs
 		hud_used.healthdoll.add_overlay(mutable_appearance('icons/hud/screen_gen.dmi', "[t]7"))
+
+/mob/living/carbon/human/proc/update_sanity_hud()
+	if(!client || !hud_used)
+		return
+	else
+		if(hud_used.sanityhealth)
+			if(sanityhealth >= maxSanity)
+				hud_used.sanityhealth.icon_state = "sanity0"
+			else if(sanityhealth > maxSanity*0.8)
+				hud_used.sanityhealth.icon_state = "sanity1"
+			else if(sanityhealth > maxSanity*0.6)
+				hud_used.sanityhealth.icon_state = "sanity2"
+			else if(sanityhealth > maxSanity*0.4)
+				hud_used.sanityhealth.icon_state = "sanity3"
+			else if(sanityhealth > maxSanity*0.2)
+				hud_used.sanityhealth.icon_state = "sanity4"
+			else
+				hud_used.sanityhealth.icon_state = "sanity5"
 
 /mob/living/carbon/human/fully_heal(admin_revive = FALSE)
 	dna?.species.spec_fully_heal(src)

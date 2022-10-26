@@ -131,3 +131,10 @@
 
 /datum/movespeed_modifier/auto_wash
 	multiplicative_slowdown = 3
+
+/datum/movespeed_modifier/metabolicboost
+	multiplicative_slowdown = -1.5
+
+/datum/movespeed_modifier/justice_attribute
+	variable = TRUE
+	multiplicative_slowdown = 0

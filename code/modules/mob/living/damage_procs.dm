@@ -14,7 +14,7 @@
  *
  * Returns TRUE if damage applied
  */
-/mob/living/proc/apply_damage(damage = 0,damagetype = BRUTE, def_zone = null, blocked = FALSE, forced = FALSE, spread_damage = FALSE, wound_bonus = 0, bare_wound_bonus = 0, sharpness = NONE, attack_direction = null)
+/mob/living/proc/apply_damage(damage = 0,damagetype = BRUTE, def_zone = null, blocked = FALSE, forced = FALSE, spread_damage = FALSE, wound_bonus = 0, bare_wound_bonus = 0, sharpness = NONE, attack_direction = null, white_healable = FALSE)
 	SEND_SIGNAL(src, COMSIG_MOB_APPLY_DAMAGE, damage, damagetype, def_zone)
 	var/hit_percent = (100-blocked)/100
 	if(!damage || (!forced && hit_percent <= 0))
@@ -260,6 +260,24 @@
 
 /mob/living/proc/setStaminaLoss(amount, updating_health = TRUE, forced = FALSE)
 	return
+
+/mob/living/proc/getSanityLoss()
+	return maxSanity - sanityhealth
+
+/mob/living/proc/adjustRedLoss(amount, updating_health = TRUE, forced = FALSE)
+	return adjustBruteLoss(amount, forced = forced)
+
+/mob/living/proc/adjustWhiteLoss(amount, updating_health = TRUE, forced = FALSE, white_healable = FALSE)
+	return adjustBruteLoss(amount, forced = forced) // White damage deals brute for everyone but humans
+
+/mob/living/proc/adjustBlackLoss(amount, updating_health = TRUE, forced = FALSE, white_healable = FALSE)
+	adjustBruteLoss(amount, forced = forced)
+	adjustWhiteLoss(amount, forced = forced, white_healable = white_healable)
+	return amount
+
+/mob/living/proc/adjustPaleLoss(amount, updating_health = TRUE, forced = FALSE)
+	var/damage_amt = maxHealth * (amount/100)
+	return adjustBruteLoss(damage_amt, forced = forced)
 
 /**
  * heal ONE external organ, organ gets randomly selected from damaged ones.

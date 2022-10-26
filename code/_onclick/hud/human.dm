@@ -301,6 +301,10 @@
 	healthdoll.hud = src
 	infodisplay += healthdoll
 
+	sanityhealth = new /atom/movable/screen/sanityhealth()
+	sanityhealth.hud = src
+	infodisplay += sanityhealth
+
 	stamina = new /atom/movable/screen/stamina()
 	stamina.hud = src
 	infodisplay += stamina

@@ -165,3 +165,7 @@
 
 ///from living/flash_act(), when a mob is successfully flashed.
 #define COMSIG_MOB_FLASHED "mob_flashed"
+
+// Abnormality Work Signals
+#define COMSIG_WORK_STARTED "work_started" // Work Start/Attempt
+#define COMSIG_WORK_COMPLETED "work_completed" // Work Complete

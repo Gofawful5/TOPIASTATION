@@ -123,6 +123,11 @@ GLOBAL_LIST_EMPTY(features_by_species)
 	var/heatmod = 1
 	///multiplier for stun durations
 	var/stunmod = 1
+	///multiplier for colour damages
+	var/redmod = 1
+	var/whitemod = 1
+	var/blackmod = 1
+	var/palemod = 1
 	///multiplier for money paid at payday
 	var/payday_modifier = 1
 	///Type of damage attack does. Ethereals attack with burn damage for example.
@@ -1271,7 +1276,10 @@ GLOBAL_LIST_EMPTY(features_by_species)
 
 
 	var/attack_direction = get_dir(user, human)
-	apply_damage(weapon.force * weakness, weapon.damtype, def_zone, armor_block, human, wound_bonus = Iwound_bonus, bare_wound_bonus = weapon.bare_wound_bonus, sharpness = weapon.get_sharpness(), attack_direction = attack_direction)
+
+	var/justice_mod = 1 + (get_attribute_level(user, JUSTICE_ATTRIBUTE)/100)
+
+	apply_damage((weapon.force * weakness) * justice_mod, weapon.damtype, def_zone, armor_block, user, wound_bonus = Iwound_bonus, bare_wound_bonus = weapon.bare_wound_bonus, sharpness = weapon.get_sharpness(), attack_direction, white_healable = TRUE)
 
 	if(!weapon.force)
 		return FALSE //item force is zero
@@ -1343,8 +1351,8 @@ GLOBAL_LIST_EMPTY(features_by_species)
 
 	return TRUE
 
-/datum/species/proc/apply_damage(damage, damagetype = BRUTE, def_zone = null, blocked, mob/living/carbon/human/H, forced = FALSE, spread_damage = FALSE, wound_bonus = 0, bare_wound_bonus = 0, sharpness = NONE, attack_direction = null)
-	SEND_SIGNAL(H, COMSIG_MOB_APPLY_DAMAGE, damage, damagetype, def_zone, wound_bonus, bare_wound_bonus, sharpness, attack_direction)
+/datum/species/proc/apply_damage(damage, damagetype = BRUTE, def_zone = null, blocked, mob/living/carbon/human/H, forced = FALSE, spread_damage = FALSE, wound_bonus = 0, bare_wound_bonus = 0, sharpness = NONE, attack_direction = null, white_healable = FALSE)
+	SEND_SIGNAL(H, COMSIG_MOB_APPLY_DAMAGE, damage, damagetype, def_zone, wound_bonus, bare_wound_bonus, sharpness, attack_direction, white_healable)
 	var/hit_percent = (100-(blocked+armor))/100
 	hit_percent = (hit_percent * (100-H.physiology.damage_resistance))/100
 	if(!damage || (!forced && hit_percent <= 0))
@@ -1397,6 +1405,23 @@ GLOBAL_LIST_EMPTY(features_by_species)
 		if(BRAIN)
 			var/damage_amount = forced ? damage : damage * hit_percent * H.physiology.brain_mod
 			H.adjustOrganLoss(ORGAN_SLOT_BRAIN, damage_amount)
+		if(RED_DAMAGE) // TODO
+			H.damageoverlaytemp = 20
+			var/damage_amount = forced ? damage : damage * hit_percent * redmod * H.physiology.red_mod
+			if(BP)
+				if(BP.receive_damage(damage_amount, 0, wound_bonus = wound_bonus, bare_wound_bonus = bare_wound_bonus, sharpness = sharpness))
+					H.update_damage_overlays()
+			else//no bodypart, we deal damage with a more general method.
+				H.adjustBruteLoss(damage_amount)
+		if(WHITE_DAMAGE)
+			var/damage_amount = forced ? damage : damage * hit_percent * whitemod * H.physiology.white_mod
+			H.adjustWhiteLoss(damage_amount, forced = forced, white_healable = white_healable)
+		if(BLACK_DAMAGE)
+			var/damage_amount = forced ? damage : damage * hit_percent * blackmod * H.physiology.black_mod
+			H.adjustBlackLoss(damage_amount, forced = forced, white_healable = white_healable)
+		if(PALE_DAMAGE)
+			var/damage_amount = forced ? damage : damage * hit_percent * palemod * H.physiology.pale_mod
+			H.adjustPaleLoss(damage_amount, forced = forced)
 	return 1
 
 /datum/species/proc/on_hit(obj/projectile/P, mob/living/carbon/human/H)

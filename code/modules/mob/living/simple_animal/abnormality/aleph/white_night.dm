@@ -20,7 +20,7 @@ GLOBAL_LIST_EMPTY(apostles)
 	pixel_y = -16
 	base_pixel_y = -16
 	loot = list(/obj/item/ego_weapon/paradise)
-	deathmessage = "evaporates in a moment, leaving heavenly light and feathers behind."
+	death_message = "evaporates in a moment, leaving heavenly light and feathers behind."
 	deathsound = 'sound/abnormalities/whitenight/apostle_death.ogg'
 	can_breach = TRUE
 	threat_level = ALEPH_LEVEL
@@ -121,7 +121,7 @@ GLOBAL_LIST_EMPTY(apostles)
 			for(var/mob/living/L in T)
 				new /obj/effect/temp_visual/dir_setting/cult/phase(T, L.dir)
 				addtimer(CALLBACK(src, .proc/revive_target, L, i, faction_check))
-		SLEEP_CHECK_DEATH(1.5)
+		sleep(1.5)
 
 /mob/living/simple_animal/hostile/abnormality/white_night/proc/revive_target(mob/living/L, attack_range = 1, faction_check = "apostle")
 	if(L in been_hit)
@@ -242,7 +242,6 @@ GLOBAL_LIST_EMPTY(apostles)
 	aggro_vision_range = 20
 	robust_searching = TRUE
 	stat_attack = HARD_CRIT
-	a_intent = INTENT_HARM
 	move_resist = MOVE_FORCE_STRONG
 	pull_force = MOVE_FORCE_STRONG
 	can_buckle_to = FALSE
@@ -311,7 +310,7 @@ GLOBAL_LIST_EMPTY(apostles)
 	//playsound(get_turf(src), 'sound/abnormalities/whitenight/delay.ogg', 75, 0, 2)
 	for(var/turf/T in view(scythe_range, src))
 		new /obj/effect/temp_visual/cult/sparks(T)
-	SLEEP_CHECK_DEATH(10)
+	sleep(10)
 	for(var/turf/T in view(scythe_range, src))
 		new /obj/effect/temp_visual/smash_effect(T)
 		for(var/mob/living/L in T)
@@ -319,7 +318,7 @@ GLOBAL_LIST_EMPTY(apostles)
 				continue
 			L.apply_damage(scythe_damage, scythe_damage_type, null, L.run_armor_check(null, scythe_damage_type), spread_damage = TRUE)
 	playsound(get_turf(src), 'sound/abnormalities/whitenight/scythe_spell.ogg', 75, 0, 5)
-	SLEEP_CHECK_DEATH(5)
+	sleep(5)
 	can_act = TRUE
 
 /mob/living/simple_animal/hostile/apostle/scythe/guardian
@@ -382,7 +381,7 @@ GLOBAL_LIST_EMPTY(apostles)
 		new /obj/effect/temp_visual/cult/sparks(T)
 	spear_cooldown = world.time + spear_cooldown_time
 	playsound(get_turf(src), 'sound/abnormalities/whitenight/spear_charge.ogg', 75, 0, 5)
-	SLEEP_CHECK_DEATH(22)
+	sleep(22)
 	been_hit = list()
 	playsound(get_turf(src), 'sound/abnormalities/whitenight/spear_dash.ogg', 100, 0, 20)
 	do_dash(dir_to_target, 0)
@@ -398,7 +397,7 @@ GLOBAL_LIST_EMPTY(apostles)
 	if(T.density)
 		stop_charge = TRUE
 	for(var/obj/structure/window/W in T.contents)
-		W.obj_destruction("holy spear")
+		W.atom_destruction("holy spear")
 	for(var/obj/machinery/door/D in T.contents)
 		if(D.density)
 			addtimer(CALLBACK (D, .obj/machinery/door/proc/open))
@@ -488,16 +487,16 @@ GLOBAL_LIST_EMPTY(apostles)
 	for(var/turf/TT in chosen_turfs)
 		addtimer(CALLBACK(src, .proc/HolyBeam, TT))
 	playsound(get_turf(src), 'sound/abnormalities/whitenight/staff_prepare.ogg', 75, 0, 7)
-	SLEEP_CHECK_DEATH(2.5 SECONDS)
+	sleep(2.5 SECONDS)
 	beamloop.start()
-	SLEEP_CHECK_DEATH(hit_ticks * 2)
+	sleep(hit_ticks * 2)
 	beamloop.stop()
 	can_act = TRUE
 
 /mob/living/simple_animal/hostile/apostle/staff/proc/HolyBeam(turf/T)
 	new /obj/effect/temp_visual/dir_setting/curse/grasp_portal/fading(T)
 	var/turf/MT = get_turf(src)
-	SLEEP_CHECK_DEATH(2.5 SECONDS)
+	sleep(2.5 SECONDS)
 	var/datum/beam/B = MT.Beam(T, "sm_arc_dbz_referance", time=hit_ticks*2)
 	var/list/affected_turfs = getline(MT, T)
 	for(var/i = 1 to hit_ticks)

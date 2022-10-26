@@ -97,7 +97,7 @@
 		"<span class='hear'>You hear a metal clange and squishing.</span>")
 	src.adjustBruteLoss(-666) // Actually just the conversion of health he heals scaled to equivalent health that Helper has.
 	for(var/obj/item/organ/O in body.getorganszone(BODY_ZONE_CHEST, TRUE))
-		if(istype(O,/obj/item/organ/heart))
+		if(istype(O,/obj/item/organ/internal/heart))
 			O.Remove(body)
 			QDEL_NULL(O)
 			break
@@ -210,7 +210,7 @@
 	dir = dir_to_target
 	playsound(get_turf(src), 'sound/abnormalities/woodsman/woodsman_prepare.ogg', 75, 0, 5)
 	icon_state = "woodsman_prepare"
-	SLEEP_CHECK_DEATH(1.5 SECONDS)
+	SLEEP_CHECK_DEATH(1.5, src)
 	for (var/i = 0; i < flurry_count; i++)
 		icon_state = icon_living
 		var/list/been_hit = list()
@@ -230,7 +230,7 @@
 			playsound(get_turf(src), 'sound/abnormalities/woodsman/woodsman_strong.ogg', 100, 0, 8) // BAM
 		else
 			playsound(get_turf(src), 'sound/abnormalities/woodsman/woodsman_attack.ogg', 75, 0, 5)
-		SLEEP_CHECK_DEATH(0.25 SECONDS)
+		SLEEP_CHECK_DEATH(0.25, src)
 		icon_state = "woodsman_prepare"
 	icon_state = icon_living
 	can_act = TRUE
@@ -268,9 +268,9 @@
 		return FALSE
 	. = ..()
 	to_chat(user, "<span class='userdanger'>The Woodsman swings his axe down and...!</span>")
-	SLEEP_CHECK_DEATH(2 SECONDS)
+	SLEEP_CHECK_DEATH(2, src)
 	for(var/obj/item/organ/O in M.getorganszone(BODY_ZONE_CHEST, TRUE))
-		if(istype(O,/obj/item/organ/heart))
+		if(istype(O,/obj/item/organ/internal/heart))
 			O.Remove(M)
 			QDEL_NULL(O)
 			break

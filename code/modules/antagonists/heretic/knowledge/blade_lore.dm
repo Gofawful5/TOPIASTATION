@@ -395,6 +395,7 @@
 		wound_bonus = 5,
 		sharpness = SHARP_EDGED,
 		attack_direction = get_dir(source, target),
+		white_healable = FALSE
 	)
 
 	if(target.stat != DEAD)

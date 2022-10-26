@@ -56,7 +56,7 @@
 			finishing = TRUE
 			icon_state = "warden_attack"
 			playsound(get_turf(src), 'sound/hallucinations/wail.ogg', 50, 1)
-			SLEEP_CHECK_DEATH(5)
+			SLEEP_CHECK_DEATH(5, src)
 
 			//Takes your skin and leaves your bone. You are now a flesh servant under her skirt in GBJ
 			H.dust()

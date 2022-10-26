@@ -65,6 +65,7 @@
 	return FALSE
 
 /mob/living/simple_animal/hostile/abnormality/bald/update_icon_state()
+	SHOULD_CALL_PARENT(TRUE)
 	switch(length(bald_users))
 		if(3 to 5)
 			icon_state = "bald2"

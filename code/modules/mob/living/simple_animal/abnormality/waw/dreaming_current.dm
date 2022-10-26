@@ -68,7 +68,7 @@
 	if((status_flags & GODMODE) && prob(2)) // Contained
 		icon_state = "current_bubble"
 		playsound(src, "sound/effects/bubbles.ogg", 30, TRUE)
-		SLEEP_CHECK_DEATH(12)
+		sleep(12)
 		icon_state = icon_living
 	if(.)
 		if((dash_cooldown <= world.time) && prob(15))
@@ -107,7 +107,7 @@
 		potential_turfs -= T
 	icon_state = "current_prepare"
 	playsound(src, "sound/effects/bubbles.ogg", 50, TRUE, 7)
-	SLEEP_CHECK_DEATH(18)
+	sleep(18)
 	been_hit = list()
 	icon_state = "current_attack"
 	for(var/turf/T in movement_path)
@@ -116,7 +116,7 @@
 		if(!Adjacent(T))
 			break
 		ChargeAt(T)
-		SLEEP_CHECK_DEATH(0.8)
+		sleep(0.8)
 	charging = FALSE
 	icon_state = icon_living
 	dash_cooldown = world.time + dash_cooldown_time
@@ -124,7 +124,7 @@
 /mob/living/simple_animal/hostile/abnormality/dreaming_current/proc/ChargeAt(turf/T)
 	face_atom(T)
 	for(var/obj/structure/window/W in T.contents)
-		W.obj_destruction("teeth")
+		W.atom_destruction("teeth")
 	for(var/obj/machinery/door/D in T.contents)
 		if(D.density)
 			addtimer(CALLBACK (D, .obj/machinery/door/proc/open))

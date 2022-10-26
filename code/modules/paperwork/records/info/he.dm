@@ -1,7 +1,7 @@
 //Teddy Bear
 /obj/item/paper/fluff/info/he/bear
 	name = "T-04-06"
-	info = {"<h1><center>T-04-06</center></h1>	<br>
+	var/info = {"<h1><center>T-04-06</center></h1>	<br>
 	Name : Happy Teddy Bear	<br>
 	Risk Class : He	<br>
 	Max PE Boxes : 15	<br>
@@ -18,7 +18,7 @@
 //Reddit
 /obj/item/paper/fluff/info/he/reddit
 	name = "T-05-41"
-	info = {"<h1><center>T-05-41</center></h1>	<br>
+	var/info = {"<h1><center>T-05-41</center></h1>	<br>
 	Name : All-Around Helper	<br>
 	Risk Class : He	<br>
 	Max PE Boxes : 18	<br>
@@ -42,7 +42,7 @@
 //Red Queen
 /obj/item/paper/fluff/info/he/queen
 	name = "F-01-112"
-	info = {"<h1><center>F-01-112</center></h1>	<br>
+	var/info = {"<h1><center>F-01-112</center></h1>	<br>
 	Name : The Red Queen	<br>
 	Risk Class : He	<br>
 	Max PE Boxes : 18	<br>
@@ -60,7 +60,7 @@
 //Scarecrow
 /obj/item/paper/fluff/info/he/scarecrow
 	name = "F-01-87"
-	info = {"<h1><center>F-01-87</center></h1>	<br>
+	var/info = {"<h1><center>F-01-87</center></h1>	<br>
 	Name : Scarecrow Searching for Wisdom	<br>
 	Risk Class : He	<br>
 	Max PE Boxes : 18	<br>
@@ -85,7 +85,7 @@
 //White Lake
 /obj/item/paper/fluff/info/he/whitelake
 	name = "F-01-113"
-	info = {"<h1><center>F-01-113</center></h1>	<br>
+	var/info = {"<h1><center>F-01-113</center></h1>	<br>
 	Name : White Lake	<br>
 	Risk Class : He	<br>
 	Max PE Boxes : 18	<br>
@@ -105,7 +105,7 @@
 //Silent Girl
 /obj/item/paper/fluff/info/he/silent_girl
 	name = "T-01-115"
-	info = {"<h1><center>T-01-115</center></h1>    <br>
+	var/info = {"<h1><center>T-01-115</center></h1>    <br>
 	Name : Silent Girl    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 18    <br>
@@ -129,7 +129,7 @@
 //Blue Shep
 /obj/item/paper/fluff/info/he/blue_shep
 	name = "F-01-117"
-	info = {"<h1><center>F-01-117</center></h1>    <br>
+	var/info = {"<h1><center>F-01-117</center></h1>    <br>
 	Name : Blue Smocked Shepard    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 18    <br>
@@ -160,7 +160,7 @@
 //Reddened Buddy
 /obj/item/paper/fluff/info/he/red_buddy
 	name = "F-02-127"
-	info = {"<h1><center>F-01-127</center></h1>    <br>
+	var/info = {"<h1><center>F-01-127</center></h1>    <br>
 	Name : Reddened Buddy    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 18    <br>
@@ -192,7 +192,7 @@
 //Rudolta
 /obj/item/paper/fluff/info/he/rudolta
 	name = "F-02-49"
-	info = {"<h1><center>F-02-49</center></h1>    <br>
+	var/info = {"<h1><center>F-02-49</center></h1>    <br>
 	Name : Rudolta of the Sleigh    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 18    <br>
@@ -217,7 +217,7 @@
 //Der Freischutz
 /obj/item/paper/fluff/info/he/derfreishutz
 	name = "F-01-69"
-	info = {"<h1><center>F-01-69</center></h1>    <br>
+	var/info = {"<h1><center>F-01-69</center></h1>    <br>
 	Name : Der Freischütz    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 18    <br>
@@ -237,7 +237,7 @@
 // Warm-Hearted Woodsman
 /obj/item/paper/fluff/info/he/woodsman
 	name = "F-05-32"
-	info = {"<h1><center>F-05-32</center></h1>    <br>
+	var/info = {"<h1><center>F-05-32</center></h1>    <br>
 	Name : Warm-Hearted Woodsman    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 18    <br>
@@ -265,7 +265,7 @@
 // Laetitia
 /obj/item/paper/fluff/info/he/laetitia
 	name = "O-01-67"
-	info = {"<h1><center>O-01-67</center></h1>    <br>
+	var/info = {"<h1><center>O-01-67</center></h1>    <br>
 	Name : Laetitia    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 16    <br>
@@ -283,7 +283,7 @@
 // Warm-Hearted Woodsman
 /obj/item/paper/fluff/info/he/funeral
 	name = "T-01-68"
-	info = {"<h1><center>T-01-68</center></h1>    <br>
+	var/info = {"<h1><center>T-01-68</center></h1>    <br>
 	Name : Funeral of the Dead Butterflies    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 16    <br>
@@ -309,7 +309,7 @@
 //Scaredy Cat
 /obj/item/paper/fluff/info/he/scaredycat
 	name = "F-02-126"
-	info = {"<h1><center>F-02-126</center></h1>    <br>
+	var/info = {"<h1><center>F-02-126</center></h1>    <br>
 	Name : Scaredy Cat    <br>
 	Risk Class : HE    <br>
 	Max PE Boxes : 16    <br>

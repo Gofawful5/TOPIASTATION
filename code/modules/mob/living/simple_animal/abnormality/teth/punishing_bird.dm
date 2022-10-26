@@ -170,12 +170,12 @@
 
 /mob/living/simple_animal/hostile/abnormality/punishing_bird/attack_hand(mob/living/carbon/human/M)
 	..()
-	if(M.a_intent == INTENT_HARM)
+	if(M)
 		Retaliate(M)
 
 /mob/living/simple_animal/hostile/abnormality/punishing_bird/attack_paw(mob/living/carbon/human/M)
 	..()
-	if(M.a_intent != INTENT_HELP)
+	if(M)
 		Retaliate(M)
 
 /mob/living/simple_animal/hostile/abnormality/punishing_bird/attack_animal(mob/living/simple_animal/M)

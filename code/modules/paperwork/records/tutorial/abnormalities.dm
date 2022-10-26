@@ -4,7 +4,7 @@
 
 /obj/item/paper/fluff/info/tutorial/bill
 	name = "O-01-122"
-	info = {"<h1><center>O-01-122</center></h1>	<br>
+	var/info = {"<h1><center>O-01-122</center></h1>	<br>
 	Name : Bill	<br>
 	Risk Class : Teth	<br>
 	Max PE Boxes : 12	<br>
@@ -28,7 +28,7 @@
 
 /obj/item/paper/fluff/info/tutorial/cube
 	name = "O-04-123"
-	info = {"<h1><center>O-04-123</center></h1>	<br>
+	var/info = {"<h1><center>O-04-123</center></h1>	<br>
 	Name : THE CUBE	<br>
 	Risk Class : Teth	<br>
 	Max PE Boxes : 12	<br>
@@ -52,7 +52,7 @@
 
 /obj/item/paper/fluff/info/tutorial/shadow
 	name = "O-01-124"
-	info = {"<h1><center>O-01-124</center></h1>	<br>
+	var/info = {"<h1><center>O-01-124</center></h1>	<br>
 	Name : Shadow Man	<br>
 	Risk Class : Teth	<br>
 	Max PE Boxes : 12	<br>
@@ -76,7 +76,7 @@
 
 /obj/item/paper/fluff/info/tutorial/fairy
 	name = "O-02-125"
-	info = {"<h1><center>O-01-125</center></h1>	<br>
+	var/info = {"<h1><center>O-01-125</center></h1>	<br>
 	Name : Fairy Swarm	<br>
 	Risk Class : Teth	<br>
 	Max PE Boxes : 12	<br>
