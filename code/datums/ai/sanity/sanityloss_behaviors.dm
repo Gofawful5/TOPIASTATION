@@ -65,12 +65,10 @@
 				break
 
 		// if the target has a weapon, chance to disarm them
-		if(W && DT_PROB(20, delta_time))
-			living_pawn.a_intent = INTENT_DISARM
-			attack(controller, target, delta_time)
+		if(W && DT_PROB(MONKEY_ATTACK_DISARM_PROB, delta_time))
+			attack(controller, target, delta_time, TRUE)
 		else
-			living_pawn.a_intent = INTENT_HARM
-			attack(controller, target, delta_time)
+			attack(controller, target, delta_time, FALSE)
 
 
 /datum/ai_behavior/insanity_attack_mob/finish_action(datum/ai_controller/controller, succeeded)
