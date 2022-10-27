@@ -83,7 +83,9 @@
 
 	//Use GET_TARGETS_FROM(mob) to access this
 	//Attempting to call GET_TARGETS_FROM(mob) when this var is null will just return mob as a base
-	var/atom/targets_from = null //all range/attack/etc. calculations should be done from this atom, defaults to the mob itself, useful for Vehicles and such
+	var/datum/weakref/targets_from
+	/datum/weakref/proc/Adjacent(atom/neighbor) // basic inheritance, unused
+		return
 	///if true, equivalent to having a wanted_objects list containing ALL objects.
 	var/attack_all_objects = FALSE
 	///id for a timer to call LoseTarget(), used to stop mobs fixating on a target they can't reach
@@ -93,13 +95,10 @@
 
 /mob/living/simple_animal/hostile/Initialize(mapload)
 	. = ..()
-	if(!targets_from)
-		targets_from = src
 	wanted_objects = typecacheof(wanted_objects)
 
 /mob/living/simple_animal/hostile/Destroy()
 	//We can't use losetarget here because fucking cursed blobs override it to do nothing the motherfuckers
-	targets_from = null
 	GiveTarget(null)
 	return ..()
 
@@ -648,7 +647,7 @@
 				. += M.loc
 
 /mob/living/simple_animal/hostile/proc/get_targets_from()
-	var/atom/target_from = GET_TARGETS_FROM(src)
+	var/atom/target_from = targets_from.resolve()
 	if(!target_from)
 		targets_from = null
 		return src

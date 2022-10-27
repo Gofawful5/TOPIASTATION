@@ -20,5 +20,5 @@
 	name = "/tg/ Station 13"
 	fps = 20
 #ifdef FIND_REF_NO_CHECK_TICK
-	loop_checks = FALSE
+	loop_checks = 0
 #endif
