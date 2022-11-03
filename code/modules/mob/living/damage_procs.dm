@@ -33,6 +33,14 @@
 			adjustCloneLoss(damage_amount, forced = forced)
 		if(STAMINA)
 			adjustStaminaLoss(damage_amount, forced = forced)
+		if(RED_DAMAGE)
+			adjustRedLoss(damage_amount, forced = forced)
+		if(WHITE_DAMAGE)
+			adjustWhiteLoss(damage_amount, forced = forced, white_healable = white_healable)
+		if(BLACK_DAMAGE)
+			adjustBlackLoss(damage_amount, forced = forced, white_healable = white_healable)
+		if(PALE_DAMAGE)
+			adjustPaleLoss(damage_amount, forced = forced)
 	return TRUE
 
 ///like [apply_damage][/mob/living/proc/apply_damage] except it always uses the damage procs
@@ -50,6 +58,14 @@
 			return adjustCloneLoss(damage)
 		if(STAMINA)
 			return adjustStaminaLoss(damage)
+		if(RED_DAMAGE)
+			return adjustRedLoss(damage)
+		if(WHITE_DAMAGE)
+			return adjustWhiteLoss(damage)
+		if(BLACK_DAMAGE)
+			return adjustBlackLoss(damage)
+		if(PALE_DAMAGE)
+			return adjustPaleLoss(damage)
 
 /// return the damage amount for the type given
 /mob/living/proc/get_damage_amount(damagetype = BRUTE)

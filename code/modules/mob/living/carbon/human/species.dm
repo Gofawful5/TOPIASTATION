@@ -1277,9 +1277,7 @@ GLOBAL_LIST_EMPTY(features_by_species)
 
 	var/attack_direction = get_dir(user, human)
 
-	var/justice_mod = 1 + (get_attribute_level(user, JUSTICE_ATTRIBUTE)/100)
-
-	apply_damage((weapon.force * weakness) * justice_mod, weapon.damtype, def_zone, armor_block, user, wound_bonus = Iwound_bonus, bare_wound_bonus = weapon.bare_wound_bonus, sharpness = weapon.get_sharpness(), attack_direction, white_healable = TRUE)
+	apply_damage(weapon.force * weakness, weapon.damtype, def_zone, armor_block, human, wound_bonus = Iwound_bonus, bare_wound_bonus = weapon.bare_wound_bonus, sharpness = weapon.get_sharpness(), attack_direction = attack_direction, white_healable = TRUE)
 
 	if(!weapon.force)
 		return FALSE //item force is zero

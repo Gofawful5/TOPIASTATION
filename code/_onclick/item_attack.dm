@@ -245,16 +245,17 @@
 
 /mob/living/attacked_by(obj/item/attacking_item, mob/living/user)
 	send_item_attack_message(attacking_item, user)
-	if(attacking_item.force)
-		var/justice_mod = 1 + (get_attribute_level(user, JUSTICE_ATTRIBUTE)/100)
-		apply_damage((attacking_item.force * justice_mod), attacking_item.damtype, white_healable = TRUE)
-		if(attacking_item.damtype in list(RED_DAMAGE, BLACK_DAMAGE, PALE_DAMAGE))
-			if(prob(33))
-				attacking_item.add_mob_blood(src)
-				var/turf/location = get_turf(src)
-				add_splatter_floor(location)
-				if(get_dist(user, src) <= 1)	//people with TK won't get smeared with blood
-					user.add_mob_blood(src)
+	if(!attacking_item.force)
+		return FALSE
+	var/damage = attacking_item.force
+	if(mob_biotypes & MOB_ROBOTIC)
+		damage *= attacking_item.demolition_mod
+	apply_damage(damage, attacking_item.damtype, white_healable = TRUE)
+	if(attacking_item.damtype == BRUTE && prob(33))
+		attacking_item.add_mob_blood(src)
+		var/turf/location = get_turf(src)
+		add_splatter_floor(location)
+		if(get_dist(user, src) <= 1) //people with TK won't get smeared with blood
 			user.add_mob_blood(src)
 	return TRUE //successful attack
 

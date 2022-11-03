@@ -95,7 +95,7 @@
 //Middle right (status indicators)
 #define ui_healthdoll "EAST-1:28,CENTER-2:17"
 #define ui_health "EAST-1:28,CENTER-1:19"
-#define ui_sanityhealth "EAST-1:28,CENTER:12"
+#define ui_sanityhealth "EAST-1:28,CENTER-4:14"
 #define ui_internal "EAST-1:28,CENTER+1:21"
 #define ui_mood "EAST-1:28,CENTER:21"
 #define ui_spacesuit "EAST-1:28,CENTER-4:14"
