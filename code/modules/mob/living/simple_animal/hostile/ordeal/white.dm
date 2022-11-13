@@ -305,13 +305,9 @@
 	..()
 	if(!.)
 		return
-	if(damage_reflection)
-		ReflectDamage(M, M?.dna?.species?.attack_type, M?.dna?.species?.punchdamagehigh)
 
 /mob/living/simple_animal/hostile/ordeal/white_fixer/attack_paw(mob/living/carbon/human/M)
 	..()
-	if(damage_reflection)
-		ReflectDamage(M, M?.dna?.species?.attack_type, 5)
 
 /mob/living/simple_animal/hostile/ordeal/white_fixer/attack_animal(mob/living/simple_animal/M)
 	. = ..()
