@@ -838,7 +838,6 @@
 	for(var/t in get_disabled_limbs()) //Disabled limbs
 		hud_used.healthdoll.add_overlay(mutable_appearance('icons/hud/screen_gen.dmi', "[t]7"))
 
-<<<<<<< HEAD
 /mob/living/carbon/human/proc/update_sanity_hud()
 	if(!client || !hud_used)
 		return
@@ -857,19 +856,6 @@
 			else
 				hud_used.sanityhealth.icon_state = "sanity5"
 
-/mob/living/carbon/human/fully_heal(admin_revive = FALSE)
-	dna?.species.spec_fully_heal(src)
-	if(admin_revive)
-		regenerate_limbs()
-		regenerate_organs()
-	remove_all_embedded_objects()
-	set_heartattack(FALSE)
-	for(var/datum/mutation/human/HM in dna.mutations)
-		if(HM.quality != POSITIVE)
-			dna.remove_mutation(HM.name)
-	set_coretemperature(get_body_temp_normal(apply_change=FALSE))
-	heat_exposure_stacks = 0
-=======
 /mob/living/carbon/human/fully_heal(heal_flags = HEAL_ALL)
 	if(heal_flags & HEAL_NEGATIVE_MUTATIONS)
 		for(var/datum/mutation/human/existing_mutation in dna.mutations)
@@ -879,8 +865,6 @@
 	if(heal_flags & HEAL_TEMP)
 		set_coretemperature(get_body_temp_normal(apply_change = FALSE))
 		heat_exposure_stacks = 0
-
->>>>>>> upstream/master
 	return ..()
 
 /mob/living/carbon/human/is_nearsighted()

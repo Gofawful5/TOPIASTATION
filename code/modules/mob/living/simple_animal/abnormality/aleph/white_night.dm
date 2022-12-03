@@ -145,8 +145,8 @@ GLOBAL_LIST_EMPTY(apostles)
 			if(ishuman(L))
 				var/mob/living/carbon/human/H = L
 				H.adjustSanityLoss((holy_revival_damage * 0.75) * (H.maxSanity/100)) // It actually heals, don't worry
-			L.regenerate_limbs()
-			L.regenerate_organs()
+				H.regenerate_limbs()
+				H.regenerate_organs()
 			to_chat(L, "<span class='notice'>The holy light heals you!</span>")
 
 /mob/living/simple_animal/hostile/abnormality/white_night/proc/SpawnApostles()
