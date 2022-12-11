@@ -411,7 +411,7 @@
 	dna_block = DNA_POD_HAIR_BLOCK
 	restyle_flags = EXTERNAL_RESTYLE_PLANT
 
-	color_source = ORGAN_COLOR_OVERRIDE
+	color_source = ORGAN_COLOR_HAIR
 
 /obj/item/organ/external/pod_hair/get_global_feature_list()
 	return GLOB.pod_hair_list
@@ -420,10 +420,3 @@
 	if(!(human.head?.flags_inv & HIDEHAIR) || (human.wear_mask?.flags_inv & HIDEHAIR))
 		return TRUE
 	return FALSE
-
-/obj/item/organ/external/pod_hair/get_global_feature_list()
-	return GLOB.pod_hair_list
-
-/obj/item/organ/external/pod_hair/override_color(rgb_value)
-	var/list/rgb_list = rgb2num(rgb_value)
-	return rgb(255 - rgb_list[1], 255 - rgb_list[2], 255 - rgb_list[3])
