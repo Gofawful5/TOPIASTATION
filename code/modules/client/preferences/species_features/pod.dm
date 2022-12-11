@@ -11,18 +11,15 @@
 	var/icon/head_icon = icon('icons/mob/species/human/bodyparts_greyscale.dmi', "pod_head_m")
 
 	for (var/name in values)
-		var/datum/sprite_accessory/accessory = GLOB.pod_hair_list[name]
-		if (accessory == null || accessory.icon_state == null)
+		var/datum/sprite_accessory/pod_hair = GLOB.pod_hair_list[name]
+		if (pod_hair == null || pod_hair.icon_state == null)
 			continue
 
-	for (var/pod_name in GLOB.pod_hair_list)
-		var/datum/sprite_accessory/pod_hair = GLOB.pod_hair_list[pod_name]
-		if(pod_hair.locked)
-			continue
+		var/icon/final_icon = new(head_icon)
 
 		var/icon/beard_icon = values[name]
 		beard_icon.Blend(COLOR_DARK_MODERATE_LIME_GREEN, ICON_MULTIPLY)
-		final_icon.Blend(icon(accessory.icon, "m_pod_hair_[accessory.icon_state]_ADJ"), ICON_OVERLAY)
+		final_icon.Blend(icon(pod_hair.icon, "m_pod_hair_[pod_hair.icon_state]_ADJ"), ICON_OVERLAY)
 
 		final_icon.Crop(10, 19, 22, 31)
 		final_icon.Scale(32, 32)
@@ -32,7 +29,7 @@
 	return values
 
 /datum/preference/choiced/pod_hair/create_default_value()
-	return pick(assoc_to_keys_features(GLOB.pod_hair_list))
+	return pick(GLOB.pod_hair_list)
 
 /datum/preference/choiced/pod_hair/apply_to_human(mob/living/carbon/human/target, value)
 	target.dna.features["pod_hair"] = value
