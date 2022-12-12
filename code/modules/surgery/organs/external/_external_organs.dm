@@ -411,7 +411,7 @@
 	dna_block = DNA_POD_HAIR_BLOCK
 	restyle_flags = EXTERNAL_RESTYLE_PLANT
 
-	color_source = ORGAN_COLOR_OVERRIDE
+	color_source = ORGAN_COLOR_HAIR
 
 /obj/item/organ/external/pod_hair/get_global_feature_list()
 	return GLOB.pod_hair_list

@@ -1751,6 +1751,10 @@
 	icon = 'icons/mob/species/podperson_hair.dmi'
 	em_block = TRUE
 
+/datum/sprite_accessory/pod_hair/bald
+	name = "Bald"
+	icon_state = null
+
 /datum/sprite_accessory/pod_hair/ivy
 	name = "Ivy"
 	icon_state = "ivy"
