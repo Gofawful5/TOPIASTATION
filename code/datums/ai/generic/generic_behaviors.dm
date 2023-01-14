@@ -41,7 +41,7 @@
 
 /datum/ai_behavior/break_spine/setup(datum/ai_controller/controller, target_key)
 	. = ..()
-	controller.current_movement_target = controller.blackboard[target_key]
+	set_movement_target(controller, controller.blackboard[target_key])
 
 /datum/ai_behavior/break_spine/perform(delta_time, datum/ai_controller/controller, target_key)
 	var/mob/living/batman = controller.blackboard[target_key]
@@ -82,11 +82,11 @@
 /datum/ai_behavior/use_in_hand/perform(delta_time, datum/ai_controller/controller)
 	. = ..()
 	var/mob/living/pawn = controller.pawn
-	var/obj/item/held = pawn.get_item_by_slot(pawn.get_active_hand())
+	var/obj/item/held = pawn.get_active_held_item()
 	if(!held)
 		finish_action(controller, FALSE)
 		return
-	pawn.activate_hand(pawn.get_active_hand())
+	pawn.activate_hand()
 	finish_action(controller, TRUE)
 
 /// Use the currently held item, or unarmed, on a weakref to an object in the world
@@ -100,7 +100,7 @@
 	var/target = target_ref?.resolve()
 	if(!target)
 		return FALSE
-	controller.current_movement_target = target
+	set_movement_target(controller, target)
 
 /datum/ai_behavior/use_on_object/perform(delta_time, datum/ai_controller/controller, target_key)
 	. = ..()
@@ -129,7 +129,7 @@
 /datum/ai_behavior/give/setup(datum/ai_controller/controller, target_key)
 	. = ..()
 	var/datum/weakref/target_ref = controller.blackboard[target_key]
-	controller.current_movement_target = target_ref?.resolve()
+	set_movement_target(controller, target_ref?.resolve())
 
 /datum/ai_behavior/give/perform(delta_time, datum/ai_controller/controller, target_key)
 	. = ..()
@@ -196,7 +196,7 @@
 /datum/ai_behavior/consume/setup(datum/ai_controller/controller, target_key)
 	. = ..()
 	var/datum/weakref/target_ref = controller.blackboard[target_key]
-	controller.current_movement_target = target_ref?.resolve()
+	set_movement_target(controller, target_ref?.resolve())
 
 /datum/ai_behavior/consume/perform(delta_time, datum/ai_controller/controller, target_key, hunger_timer_key)
 	. = ..()
@@ -255,7 +255,7 @@
 		finish_action(controller, TRUE)
 		return
 
-	controller.current_movement_target = living_target
+	set_movement_target(controller, living_target)
 	attack(controller, living_target)
 
 /datum/ai_behavior/attack/finish_action(datum/ai_controller/controller, succeeded)
@@ -291,7 +291,7 @@
 		finish_action(controller, TRUE)
 		return
 
-	controller.current_movement_target = living_target
+	set_movement_target(controller, living_target)
 
 /datum/ai_behavior/follow/finish_action(datum/ai_controller/controller, succeeded)
 	. = ..()
