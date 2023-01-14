@@ -139,13 +139,6 @@ SUBSYSTEM_DEF(garbage)
 			pass_counts[i] = 0
 			fail_counts[i] = 0
 
-#ifdef EXPERIMENT_515_QDEL_HARD_REFERENCE
-// 1 from the hard reference in the queue, and 1 from the variable used before this
-#define IS_DELETED(datum, _) (refcount(##datum) == 2)
-#else
-#define IS_DELETED(datum, gcd_at_time) (isnull(##datum) || ##datum.gc_destroyed != gcd_at_time)
-#endif
-
 /datum/controller/subsystem/garbage/proc/HandleQueue(level = GC_QUEUE_FILTER)
 	if (level == GC_QUEUE_FILTER)
 		delslasttick = 0
@@ -166,32 +159,26 @@ SUBSYSTEM_DEF(garbage)
 	//Normally this isn't expensive, but the gc queue can grow to 40k items, and that gets costly/causes overrun.
 	for (var/i in 1 to length(queue))
 		var/list/L = queue[i]
-		if (length(L) < GC_QUEUE_ITEM_INDEX_COUNT)
+		if (length(L) < 2)
 			count++
 			if (MC_TICK_CHECK)
 				return
 			continue
 
-		var/queued_at_time = L[GC_QUEUE_ITEM_QUEUE_TIME]
-		var/GCd_at_time = L[GC_QUEUE_ITEM_GCD_DESTROYED]
-		if(queued_at_time > cut_off_time)
+		var/GCd_at_time = L[1]
+		if(GCd_at_time > cut_off_time)
 			break // Everything else is newer, skip them
 		count++
-
-#ifdef EXPERIMENT_515_QDEL_HARD_REFERENCE
-		var/datum/D = L[GC_QUEUE_ITEM_REF]
-#else
-		var/refID = L[GC_QUEUE_ITEM_REF]
+		var/refID = L[2]
 		var/datum/D
 		D = locate(refID)
-#endif
 
-		if (IS_DELETED(D, GCd_at_time)) // So if something else coincidently gets the same ref, it's not deleted by mistake
+		if (!D || D.gc_destroyed != GCd_at_time) // So if something else coincidently gets the same ref, it's not deleted by mistake
 			++gcedlasttick
 			++totalgcs
 			pass_counts[level]++
 			#ifdef REFERENCE_TRACKING
-			reference_find_on_fail -= text_ref(D) //It's deleted we don't care anymore.
+			reference_find_on_fail -= refID //It's deleted we don't care anymore.
 			#endif
 			if (MC_TICK_CHECK)
 				return
@@ -207,7 +194,7 @@ SUBSYSTEM_DEF(garbage)
 		switch (level)
 			if (GC_QUEUE_CHECK)
 				#ifdef REFERENCE_TRACKING
-				if(reference_find_on_fail[text_ref(D)])
+				if(reference_find_on_fail[refID])
 					INVOKE_ASYNC(D, TYPE_PROC_REF(/datum,find_references))
 					ref_searching = TRUE
 				#ifdef GC_FAILURE_HARD_LOOKUP
@@ -215,17 +202,12 @@ SUBSYSTEM_DEF(garbage)
 					INVOKE_ASYNC(D, TYPE_PROC_REF(/datum,find_references))
 					ref_searching = TRUE
 				#endif
-				reference_find_on_fail -= text_ref(D)
+				reference_find_on_fail -= refID
 				#endif
 				var/type = D.type
 				var/datum/qdel_item/I = items[type]
 
-				var/message = "## TESTING: GC: -- [text_ref(D)] | [type] was unable to be GC'd --"
-#if DM_VERSION >= 515
-				message = "[message] (ref count of [refcount(D)])"
-#endif
-				log_world(message)
-
+				log_world("## TESTING: GC: -- [text_ref(D)] | [type] was unable to be GC'd --")
 				#ifdef TESTING
 				for(var/c in GLOB.admins) //Using testing() here would fill the logs with ADMIN_VV garbage
 					var/client/admin = c
@@ -260,27 +242,19 @@ SUBSYSTEM_DEF(garbage)
 		queue.Cut(1,count+1)
 		count = 0
 
-#undef IS_DELETED
-
 /datum/controller/subsystem/garbage/proc/Queue(datum/D, level = GC_QUEUE_FILTER)
 	if (isnull(D))
 		return
 	if (level > GC_QUEUE_COUNT)
 		HardDelete(D)
 		return
-	var/queue_time = world.time
-
-#ifdef EXPERIMENT_515_QDEL_HARD_REFERENCE
-	var/refid = D
-#else
+	var/gctime = world.time
 	var/refid = text_ref(D)
-#endif
-	if (D.gc_destroyed <= 0)
-		D.gc_destroyed = queue_time
-	
+
+	D.gc_destroyed = gctime
 	var/list/queue = queues[level]
 
-	queue[++queue.len] = list(queue_time, refid, D.gc_destroyed) // not += for byond reasons
+	queue[++queue.len] = list(gctime, refid) // not += for byond reasons
 
 //this is mainly to separate things profile wise.
 /datum/controller/subsystem/garbage/proc/HardDelete(datum/D)

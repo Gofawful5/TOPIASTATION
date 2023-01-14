@@ -29,8 +29,6 @@
 	var/trait_booster
 	/// How much the trait above, if supplied, boosts the construct speed of this item
 	var/trait_modifier = 1
-	/// Category for general crafting menu
-	var/category
 
 /datum/stack_recipe/New(
 	title,
@@ -47,7 +45,6 @@
 	applies_mats = FALSE,
 	trait_booster,
 	trait_modifier = 1,
-	category,
 )
 
 	src.title = title
@@ -63,7 +60,6 @@
 	src.applies_mats = applies_mats
 	src.trait_booster = trait_booster
 	src.trait_modifier = trait_modifier
-	src.category = src.category || category || CAT_MISC
 
 /datum/stack_recipe/radial
 	/// Optional info to be shown on the radial option for this item
@@ -86,10 +82,8 @@
 	trait_modifier = 1,
 	desc,
 	required_noun,
-	category,
 )
-	if(category)
-		src.category = category
+
 	if(desc)
 		src.desc = desc
 	if(required_noun)

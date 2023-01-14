@@ -133,10 +133,6 @@
 	update_appearance()
 	RegisterSignal(src, COMSIG_ITEM_RECHARGED, PROC_REF(instant_reload))
 
-/obj/item/gun/ballistic/Destroy()
-	QDEL_NULL(magazine)
-	return ..()
-
 /obj/item/gun/ballistic/add_weapon_description()
 	AddElement(/datum/element/weapon_description, attached_proc = PROC_REF(add_notes_ballistic))
 
@@ -331,7 +327,7 @@
 	update_appearance()
 
 /obj/item/gun/ballistic/can_shoot()
-	return chambered?.loaded_projectile
+	return chambered
 
 /obj/item/gun/ballistic/attackby(obj/item/A, mob/user, params)
 	. = ..()

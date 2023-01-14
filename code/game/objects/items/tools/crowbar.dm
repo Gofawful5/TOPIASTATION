@@ -21,12 +21,8 @@
 	attack_verb_simple = list("attack", "bash", "batter", "bludgeon", "whack")
 	tool_behaviour = TOOL_CROWBAR
 	toolspeed = 1
-	armor_type = /datum/armor/item_crowbar
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, FIRE = 50, ACID = 30)
 	var/force_opens = FALSE
-
-/datum/armor/item_crowbar
-	fire = 50
-	acid = 30
 
 /obj/item/crowbar/Initialize(mapload)
 	. = ..()
@@ -181,14 +177,10 @@
 	w_class = WEIGHT_CLASS_HUGE
 	slot_flags = NONE
 	toolspeed = 1.25
-	armor_type = /datum/armor/crowbar_mechremoval
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 100, BIO = 0, FIRE = 100, ACID = 0)
 	resistance_flags = FIRE_PROOF
 	bare_wound_bonus = 15
 	wound_bonus = 10
-
-/datum/armor/crowbar_mechremoval
-	bomb = 100
-	fire = 100
 
 /obj/item/crowbar/mechremoval/Initialize(mapload)
 	. = ..()

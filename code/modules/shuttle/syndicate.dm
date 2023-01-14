@@ -13,6 +13,11 @@
 	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | ACID_PROOF
 	flags_1 = NODECONSTRUCT_1
 
+/obj/machinery/computer/shuttle/syndicate/allowed(mob/M)
+	if(issilicon(M) && !(ROLE_SYNDICATE in M.faction))
+		return FALSE
+	return ..()
+
 /obj/machinery/computer/shuttle/syndicate/launch_check(mob/user)
 	. = ..()
 	if(!.)
@@ -44,7 +49,7 @@
 	. = ..()
 	if(!.)
 		return FALSE
-	if(!is_reserved_level(z))
+	if(!is_centcom_level(z))
 		to_chat(user, span_warning("Pods are one way!"))
 		return FALSE
 	return TRUE

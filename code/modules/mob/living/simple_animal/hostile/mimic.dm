@@ -99,7 +99,7 @@
 	..()
 
 /// Mimics can't be made out of these objects
-GLOBAL_LIST_INIT(animatable_blacklist, list(/obj/structure/table, /obj/structure/cable, /obj/structure/window, /obj/structure/blob))
+GLOBAL_LIST_INIT(mimic_blacklist, list(/obj/structure/table, /obj/structure/cable, /obj/structure/window, /obj/structure/blob))
 
 /mob/living/simple_animal/hostile/mimic/copy
 	health = 100
@@ -143,7 +143,7 @@ GLOBAL_LIST_INIT(animatable_blacklist, list(/obj/structure/table, /obj/structure
 		faction |= "[REF(owner)]"
 
 /mob/living/simple_animal/hostile/mimic/copy/proc/CheckObject(obj/O)
-	if((isitem(O) || isstructure(O)) && !is_type_in_list(O, GLOB.animatable_blacklist))
+	if((isitem(O) || isstructure(O)) && !is_type_in_list(O, GLOB.mimic_blacklist))
 		return TRUE
 	return FALSE
 
@@ -381,8 +381,7 @@ GLOBAL_LIST_INIT(animatable_blacklist, list(/obj/structure/table, /obj/structure
 				return FALSE
 			var/mobs_stored = 0
 			for(var/mob/living/M in contents)
-				mobs_stored++
-				if(mobs_stored >= mob_storage_capacity)
+				if(++mobs_stored >= mob_storage_capacity)
 					return FALSE
 		L.stop_pulling()
 
@@ -399,7 +398,6 @@ GLOBAL_LIST_INIT(animatable_blacklist, list(/obj/structure/table, /obj/structure
 
 /datum/action/innate/mimic
 	background_icon_state = "bg_default"
-	overlay_icon_state = "bg_default_border"
 
 /datum/action/innate/mimic/lock
 	name = "Lock/Unlock"

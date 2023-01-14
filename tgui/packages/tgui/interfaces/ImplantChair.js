@@ -25,7 +25,7 @@ export const ImplantChair = (props, context) => {
                 {data.occupant.stat === 0
                   ? 'Conscious'
                   : data.occupant.stat === 1
-                    ? 'Unconscious'
+                    ? 'Unconcious'
                     : 'Dead'}
               </LabeledList.Item>
             )}

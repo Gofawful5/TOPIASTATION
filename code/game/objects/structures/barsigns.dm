@@ -6,19 +6,11 @@
 	req_access = list(ACCESS_BAR)
 	max_integrity = 500
 	integrity_failure = 0.5
-	armor_type = /datum/armor/sign_barsign
+	armor = list(MELEE = 20, BULLET = 20, LASER = 20, ENERGY = 100, BOMB = 0, BIO = 0, FIRE = 50, ACID = 50)
 	buildable_sign = FALSE
 
 	var/panel_open = FALSE
 	var/datum/barsign/chosen_sign
-
-/datum/armor/sign_barsign
-	melee = 20
-	bullet = 20
-	laser = 20
-	energy = 100
-	fire = 50
-	acid = 50
 
 /obj/structure/sign/barsign/Initialize(mapload)
 	. = ..()
@@ -84,10 +76,10 @@
 
 /obj/structure/sign/barsign/screwdriver_act(mob/living/user, obj/item/tool)
 	tool.play_tool_sound(src)
-	panel_open = !panel_open
-	if(panel_open)
+	if(!panel_open)
 		to_chat(user, span_notice("You open the maintenance panel."))
 		set_sign(new /datum/barsign/hiddensigns/signoff)
+		panel_open = TRUE
 		return TOOL_ACT_TOOLTYPE_SUCCESS
 	to_chat(user, span_notice("You close the maintenance panel."))
 
@@ -97,6 +89,7 @@
 		set_sign(new /datum/barsign/hiddensigns/signoff)
 	else
 		set_sign(chosen_sign)
+	panel_open = FALSE
 	return TOOL_ACT_TOOLTYPE_SUCCESS
 
 /obj/structure/sign/barsign/attackby(obj/item/I, mob/user)

@@ -57,59 +57,58 @@
 		eatverbs = string_list(eatverbs)
 	if(venue_value)
 		AddElement(/datum/element/venue_price, venue_value)
-	make_edible()
-	make_processable()
-	make_leave_trash()
-	make_grillable()
-	make_decompose(mapload)
-	make_bakeable()
-	make_microwaveable()
+	MakeEdible()
+	MakeProcessable()
+	MakeLeaveTrash()
+	MakeGrillable()
+	MakeDecompose(mapload)
+	MakeBakeable()
+	make_microwavable()
 	ADD_TRAIT(src, FISHING_BAIT_TRAIT, INNATE_TRAIT)
 
 ///This proc adds the edible component, overwrite this if you for some reason want to change some specific args like callbacks.
-/obj/item/food/proc/make_edible()
+/obj/item/food/proc/MakeEdible()
 	AddComponent(/datum/component/edible,\
-		initial_reagents = food_reagents,\
-		food_flags = food_flags,\
-		foodtypes = foodtypes,\
-		volume = max_volume,\
-		eat_time = eat_time,\
-		tastes = tastes,\
-		eatverbs = eatverbs,\
-		bite_consumption = bite_consumption,\
-		junkiness = junkiness,\
-	)
+				initial_reagents = food_reagents,\
+				food_flags = food_flags,\
+				foodtypes = foodtypes,\
+				volume = max_volume,\
+				eat_time = eat_time,\
+				tastes = tastes,\
+				eatverbs = eatverbs,\
+				bite_consumption = bite_consumption,\
+				junkiness = junkiness)
 
 
 ///This proc handles processable elements, overwrite this if you want to add behavior such as slicing, forking, spooning, whatever, to turn the item into something else
-/obj/item/food/proc/make_processable()
+/obj/item/food/proc/MakeProcessable()
 	return
 
 ///This proc handles grillable components, overwrite if you want different grill results etc.
-/obj/item/food/proc/make_grillable()
+/obj/item/food/proc/MakeGrillable()
 	if(burns_on_grill)
 		AddComponent(/datum/component/grillable, /obj/item/food/badrecipe, rand(20 SECONDS, 30 SECONDS), FALSE)
 	return
 
 ///This proc handles bakeable components, overwrite if you want different bake results etc.
-/obj/item/food/proc/make_bakeable()
+/obj/item/food/proc/MakeBakeable()
 	if(burns_in_oven)
 		AddComponent(/datum/component/bakeable, /obj/item/food/badrecipe, rand(25 SECONDS, 40 SECONDS), FALSE)
 	return
 
 /// This proc handles the microwave component. Overwrite if you want special microwave results.
 /// By default, all food is microwavable. However, they will be microwaved into a bad recipe (burnt mess).
-/obj/item/food/proc/make_microwaveable()
+/obj/item/food/proc/make_microwavable()
 	AddElement(/datum/element/microwavable)
 
 ///This proc handles trash components, overwrite this if you want the object to spawn trash
-/obj/item/food/proc/make_leave_trash()
+/obj/item/food/proc/MakeLeaveTrash()
 	if(trash_type)
 		AddElement(/datum/element/food_trash, trash_type)
 	return
 
 ///This proc makes things decompose. Set preserved_food to TRUE to make it never decompose.
 ///Set decomp_req_handle to TRUE to only make it decompose when someone picks it up.
-/obj/item/food/proc/make_decompose(mapload)
+/obj/item/food/proc/MakeDecompose(mapload)
 	if(!preserved_food)
 		AddComponent(/datum/component/decomposition, mapload, decomp_req_handle, decomp_flags = foodtypes, decomp_result = decomp_type, ant_attracting = ant_attracting, custom_time = decomposition_time)

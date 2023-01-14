@@ -84,8 +84,6 @@
 				for(var/J in legacy_configs)
 					LoadEntries(J)
 				break
-	if (fexists("[directory]/dev_overrides.txt"))
-		LoadEntries("dev_overrides.txt")
 	loadmaplist(CONFIG_MAPS_FILE)
 	LoadMOTD()
 	LoadPolicy()
@@ -294,7 +292,7 @@ Value is raw html.
 
 Possible keywords :
 Job titles / Assigned roles (ghost spawners for example) : Assistant , Captain , Ash Walker
-Mob types : /mob/living/basic/carp
+Mob types : /mob/living/simple_animal/hostile/carp
 Antagonist types : /datum/antagonist/highlander
 Species types : /datum/species/lizard
 special keywords defined in _DEFINES/admin.dm

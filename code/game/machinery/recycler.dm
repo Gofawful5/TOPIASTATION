@@ -53,8 +53,8 @@
 /obj/machinery/recycler/RefreshParts()
 	. = ..()
 	var/amt_made = 0
-	for(var/datum/stock_part/manipulator/manipulator in component_parts)
-		amt_made = 12.5 * manipulator.tier //% of materials salvaged
+	for(var/obj/item/stock_parts/manipulator/M in component_parts)
+		amt_made = 12.5 * M.rating //% of materials salvaged
 	amount_produced = min(50, amt_made) + 50
 	var/datum/component/butchering/butchering = GetComponent(/datum/component/butchering/recycler)
 	butchering.effectiveness = amount_produced
@@ -111,19 +111,17 @@
 	SIGNAL_HANDLER
 	INVOKE_ASYNC(src, PROC_REF(eat), AM)
 
-/obj/machinery/recycler/proc/eat(atom/movable/morsel, sound=TRUE)
+/obj/machinery/recycler/proc/eat(atom/movable/AM0, sound=TRUE)
 	if(machine_stat & (BROKEN|NOPOWER))
 		return
 	if(safety_mode)
 		return
-	if(iseffect(morsel))
+	if(iseffect(AM0))
 		return
-	if(!isturf(morsel.loc))
+	if(!isturf(AM0.loc))
 		return //I don't know how you called Crossed() but stop it.
-	if(morsel.resistance_flags & INDESTRUCTIBLE)
-		return
 
-	var/list/to_eat = morsel.get_all_contents()
+	var/list/to_eat = AM0.get_all_contents()
 
 	var/living_detected = FALSE //technically includes silicons as well but eh
 	var/list/nom = list()
@@ -158,10 +156,10 @@
 		playsound(src, item_recycle_sound, (50 + nom.len*5), TRUE, nom.len, ignore_walls = (nom.len - 10)) // As a substitute for playing 50 sounds at once.
 	if(not_eaten)
 		playsound(src, 'sound/machines/buzz-sigh.ogg', (50 + not_eaten*5), FALSE, not_eaten, ignore_walls = (not_eaten - 10)) // Ditto.
-	if(!ismob(morsel))
-		qdel(morsel)
+	if(!ismob(AM0))
+		qdel(AM0)
 	else // Lets not qdel a mob, yes?
-		for(var/iterable in morsel.contents)
+		for(var/iterable in AM0.contents)
 			var/atom/movable/content = iterable
 			qdel(content)
 

@@ -21,9 +21,10 @@
 		if(kiss_power)
 			psy_coeff = 1
 		external_power_immediate += projectile.damage * bullet_energy + kiss_power
-		log_activation(who = projectile.firer, how = projectile.fired_from)
+		if(!has_been_powered)
+			log_activation(cause = projectile.fired_from, source = projectile.firer)
 	else
-		external_damage_immediate += projectile.damage * bullet_energy * 0.1
+		external_damage_immediate += projectile.damage * bullet_energy
 		// Stop taking damage at emergency point, yell to players at danger point.
 		// This isn't clean and we are repeating [/obj/machinery/power/supermatter_crystal/proc/calculate_damage], sorry for this.
 		var/damage_to_be = damage + external_damage_immediate * clamp((emergency_point - damage) / emergency_point, 0, 1)
@@ -31,9 +32,25 @@
 			visible_message(span_notice("[src] compresses under stress, resisting further impacts!"))
 	return BULLET_ACT_HIT
 
+/obj/machinery/power/supermatter_crystal/proc/log_activation(source, cause)
+	var/fired_from_str = cause ? " with [cause]" : ""
+	investigate_log(
+		source \
+			? "has been powered for the first time by [key_name(source)][fired_from_str]." \
+			: "has been powered for the first time.",
+		INVESTIGATE_ENGINE
+	)
+	message_admins(
+		source \
+			? "[src] [ADMIN_JMP(src)] has been powered for the first time by [cause ? ADMIN_FULLMONTY(source) + (fired_from_str) : (cause ? source : "environmental factors")]." \
+			: "[src] [ADMIN_JMP(src)] has been powered for the first time."
+	)
+
+	has_been_powered = TRUE
+
 /obj/machinery/power/supermatter_crystal/singularity_act()
 	var/gain = 100
-	investigate_log("was consumed by a singularity.", INVESTIGATE_ENGINE)
+	investigate_log("consumed by singularity.", INVESTIGATE_ENGINE)
 	message_admins("Singularity has consumed a supermatter shard and can now become stage six.")
 	visible_message(span_userdanger("[src] is consumed by the singularity!"))
 	var/turf/sm_turf = get_turf(src)
@@ -68,7 +85,8 @@
 			to_chat(user, span_danger("You extract a sliver from \the [src]. \The [src] begins to react violently!"))
 			new /obj/item/nuke_core/supermatter_sliver(src.drop_location())
 			external_power_trickle += 800
-			log_activation(who = user, how = scalpel)
+			if(!has_been_powered)
+				log_activation(source = scalpel, cause = user)
 			scalpel.usesLeft--
 			if (!scalpel.usesLeft)
 				to_chat(user, span_notice("A tiny piece of \the [scalpel] falls off, rendering it useless!"))
@@ -91,12 +109,13 @@
 		if(do_after(user, 3 SECONDS, src))
 			message_admins("[ADMIN_LOOKUPFLW(user)] attached [destabilizing_crystal] to the supermatter at [ADMIN_VERBOSEJMP(src)].")
 			user.log_message("attached [destabilizing_crystal] to the supermatter", LOG_GAME)
-			user.investigate_log("attached [destabilizing_crystal] to a supermatter crystal.", INVESTIGATE_ENGINE)
+			investigate_log("[key_name(user)] attached [destabilizing_crystal] to a supermatter crystal.", INVESTIGATE_ENGINE)
 			to_chat(user, span_danger("\The [destabilizing_crystal] snaps onto \the [src]."))
 			set_delam(SM_DELAM_PRIO_IN_GAME, /datum/sm_delam/cascade)
-			external_damage_immediate += 10
+			external_damage_immediate += 100
 			external_power_trickle += 500
-			log_activation(who = user, how = destabilizing_crystal)
+			if(!has_been_powered)
+				log_activation(source = destabilizing_crystal, cause = user)
 			qdel(destabilizing_crystal)
 		return
 

@@ -15,7 +15,6 @@
 	. = ..()
 	if(!proximity)
 		return
-	. |= AFTERATTACK_PROCESSED_ITEM
 	if(!target.reagents)
 		return
 

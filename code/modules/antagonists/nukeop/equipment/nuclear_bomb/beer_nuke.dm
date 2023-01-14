@@ -5,8 +5,6 @@
 	proper_bomb = FALSE
 	/// The keg located within the beer nuke.
 	var/obj/structure/reagent_dispensers/beerkeg/keg
-	/// Reagent that is produced once the nuke detonates.
-	var/flood_reagent = /datum/reagent/consumable/ethanol/beer
 
 /obj/machinery/nuclearbomb/beer/Initialize(mapload)
 	. = ..()
@@ -52,7 +50,7 @@
 /obj/machinery/nuclearbomb/beer/proc/local_foam()
 	var/datum/reagents/tmp_holder = new/datum/reagents(1000)
 	tmp_holder.my_atom = src
-	tmp_holder.add_reagent(flood_reagent, 100)
+	tmp_holder.add_reagent(/datum/reagent/consumable/ethanol/beer, 100)
 
 	var/datum/effect_system/fluid_spread/foam/foam = new
 	foam.set_up(200, holder = src, location = get_turf(src), carry = tmp_holder)
@@ -61,6 +59,5 @@
 
 /obj/machinery/nuclearbomb/beer/really_actually_explode(detonation_status)
 	disarm_nuke()
-	var/datum/round_event_control/scrubber_overflow/custom/event = locate(/datum/round_event_control/scrubber_overflow/custom) in SSevents.control
-	event.custom_reagent = flood_reagent
+	var/datum/round_event_control/event = locate(/datum/round_event_control/scrubber_overflow/beer) in SSevents.control
 	event.runEvent()

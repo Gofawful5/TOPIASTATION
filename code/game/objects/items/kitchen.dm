@@ -31,14 +31,10 @@
 	attack_verb_continuous = list("attacks", "stabs", "pokes")
 	attack_verb_simple = list("attack", "stab", "poke")
 	hitsound = 'sound/weapons/bladeslice.ogg'
-	armor_type = /datum/armor/kitchen_fork
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, FIRE = 50, ACID = 30)
 	sharpness = SHARP_POINTY
 	var/datum/reagent/forkload //used to eat omelette
 	custom_price = PAYCHECK_LOWER
-
-/datum/armor/kitchen_fork
-	fire = 50
-	acid = 30
 
 /obj/item/kitchen/fork/Initialize(mapload)
 	. = ..()
@@ -146,7 +142,7 @@
 	throw_range = 5
 	attack_verb_simple = list("whack", "spoon", "tap")
 	attack_verb_continuous = list("whacks", "spoons", "taps")
-	armor_type = /datum/armor/kitchen_spoon
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, FIRE = 50, ACID = 30)
 	custom_materials = list(/datum/material/iron=120)
 	custom_price = PAYCHECK_LOWER * 5
 	tool_behaviour = TOOL_MINING
@@ -159,10 +155,6 @@
 	custom_materials = list(/datum/material/plastic=120)
 	custom_price = PAYCHECK_LOWER * 2
 	toolspeed = 75 // The plastic spoon takes 5 minutes to dig through a single mineral turf... It's one, continuous, breakable, do_after...
-
-/datum/armor/kitchen_spoon
-	fire = 50
-	acid = 30
 
 /obj/item/kitchen/spoon/plastic/Initialize(mapload)
 	. = ..()

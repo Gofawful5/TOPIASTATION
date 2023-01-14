@@ -150,7 +150,6 @@ SUBSYSTEM_DEF(shuttle)
 			pack_processing += generated_packs
 			continue
 
-		//we have to create the pack before checking if it has 'contains' because generate_supply_packs manually sets it, therefore we cant check initial.
 		if(!pack.contains)
 			continue
 
@@ -467,9 +466,9 @@ SUBSYSTEM_DEF(shuttle)
 		//Make all cargo consoles speak up
 
 /datum/controller/subsystem/shuttle/proc/checkHostileEnvironment()
-	for(var/datum/hostile_environment_source in hostile_environments)
-		if(QDELETED(hostile_environment_source))
-			hostile_environments -= hostile_environment_source
+	for(var/datum/d in hostile_environments)
+		if(!istype(d) || QDELETED(d))
+			hostile_environments -= d
 	emergency_no_escape = hostile_environments.len
 
 	if(emergency_no_escape && (emergency.mode == SHUTTLE_IGNITING))

@@ -42,12 +42,12 @@
 /obj/machinery/quantumpad/RefreshParts()
 	. = ..()
 	var/E = 0
-	for(var/datum/stock_part/capacitor/capacitor in component_parts)
-		E += capacitor.tier
+	for(var/obj/item/stock_parts/capacitor/C in component_parts)
+		E += C.rating
 	power_efficiency = E
 	E = 0
-	for(var/datum/stock_part/manipulator/manipulator in component_parts)
-		E += manipulator.tier
+	for(var/obj/item/stock_parts/manipulator/M in component_parts)
+		E += M.rating
 	teleport_speed = initial(teleport_speed)
 	teleport_speed -= (E*10)
 	teleport_cooldown = initial(teleport_cooldown)
@@ -90,7 +90,7 @@
 			to_chat(user, span_notice("You insert [K] into [src]'s card slot, initiating the link procedure."))
 			if(do_after(user, 40, target = src))
 				to_chat(user, span_notice("You complete the link between [K] and [src]."))
-				K.set_pad(src)
+				K.qpad = src
 
 	if(default_deconstruction_crowbar(I))
 		return

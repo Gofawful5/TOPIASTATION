@@ -5,17 +5,9 @@
 	secure = TRUE
 	locked = TRUE
 	max_integrity = 500
-	armor_type = /datum/armor/crate_secure
+	armor = list(MELEE = 30, BULLET = 50, LASER = 50, ENERGY = 100, BOMB = 0, BIO = 0, FIRE = 80, ACID = 80)
 	var/tamperproof = 0
 	damage_deflection = 25
-
-/datum/armor/crate_secure
-	melee = 30
-	bullet = 50
-	laser = 50
-	energy = 100
-	fire = 80
-	acid = 80
 
 /obj/structure/closet/crate/secure/Initialize(mapload)
 	. = ..()

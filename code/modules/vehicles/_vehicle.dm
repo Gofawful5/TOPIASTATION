@@ -2,9 +2,9 @@
 	name = "generic vehicle"
 	desc = "Yell at coderbus."
 	icon = 'icons/obj/vehicles.dmi'
-	icon_state = "error"
+	icon_state = "fuckyou"
 	max_integrity = 300
-	armor_type = /datum/armor/obj_vehicle
+	armor = list(MELEE = 30, BULLET = 30, LASER = 30, ENERGY = 0, BOMB = 30, BIO = 0, FIRE = 60, ACID = 60)
 	layer = VEHICLE_LAYER
 	plane = GAME_PLANE_FOV_HIDDEN
 	density = TRUE
@@ -36,14 +36,6 @@
 	var/obj/vehicle/trailer
 	var/are_legs_exposed = FALSE
 
-/datum/armor/obj_vehicle
-	melee = 30
-	bullet = 30
-	laser = 30
-	bomb = 30
-	fire = 60
-	acid = 60
-
 /obj/vehicle/Initialize(mapload)
 	. = ..()
 	occupants = list()
@@ -66,21 +58,14 @@
 	. = ..()
 	if(resistance_flags & ON_FIRE)
 		. += span_warning("It's on fire!")
-	. += generate_integrity_message()
-
-/// Returns a readable string of the vehicle's health for examining. Overridden by subtypes who want to be more verbose with their health messages.
-/obj/vehicle/proc/generate_integrity_message()
-	var/examine_text = ""
-	var/integrity = atom_integrity/max_integrity * 100
-	switch(integrity)
+	var/healthpercent = atom_integrity/max_integrity * 100
+	switch(healthpercent)
 		if(50 to 99)
-			examine_text = "It looks slightly damaged."
+			. += "It looks slightly damaged."
 		if(25 to 50)
-			examine_text = "It appears heavily damaged."
+			. += "It appears heavily damaged."
 		if(0 to 25)
-			examine_text = span_warning("It's falling apart!")
-
-	return examine_text
+			. += span_warning("It's falling apart!")
 
 /obj/vehicle/proc/is_key(obj/item/I)
 	return istype(I, key_type)

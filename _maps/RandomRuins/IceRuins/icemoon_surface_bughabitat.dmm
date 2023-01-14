@@ -297,7 +297,7 @@
 	dir = 4
 	},
 /obj/structure/barricade/wooden/crude,
-/turf/open/misc/snow,
+/turf/closed/mineral/random/snow,
 /area/ruin/bughabitat)
 "Kc" = (
 /obj/structure/table,

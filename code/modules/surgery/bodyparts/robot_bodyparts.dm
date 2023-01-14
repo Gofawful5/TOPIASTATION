@@ -37,10 +37,6 @@
 	medium_burn_msg = ROBOTIC_MEDIUM_BURN_MSG
 	heavy_burn_msg = ROBOTIC_HEAVY_BURN_MSG
 
-	brute_damage_desc = ROBOTIC_BRUTE_EXAMINE_TEXT
-	burn_damage_desc = ROBOTIC_BURN_EXAMINE_TEXT
-	disabling_threshold_percentage = 1
-
 /obj/item/bodypart/arm/right/robot
 	name = "cyborg right arm"
 	desc = "A skeletal limb wrapped in pseudomuscles, with a low-conductivity case."
@@ -59,7 +55,6 @@
 
 	brute_reduction = 5
 	burn_reduction = 4
-	disabling_threshold_percentage = 1
 
 	light_brute_msg = ROBOTIC_LIGHT_BRUTE_MSG
 	medium_brute_msg = ROBOTIC_MEDIUM_BRUTE_MSG
@@ -68,7 +63,6 @@
 	light_burn_msg = ROBOTIC_LIGHT_BURN_MSG
 	medium_burn_msg = ROBOTIC_MEDIUM_BURN_MSG
 	heavy_burn_msg = ROBOTIC_HEAVY_BURN_MSG
-
 
 /obj/item/bodypart/leg/left/robot
 	name = "cyborg left leg"
@@ -88,7 +82,6 @@
 
 	brute_reduction = 5
 	burn_reduction = 4
-	disabling_threshold_percentage = 1
 
 	light_brute_msg = ROBOTIC_LIGHT_BRUTE_MSG
 	medium_brute_msg = ROBOTIC_MEDIUM_BRUTE_MSG
@@ -97,7 +90,6 @@
 	light_burn_msg = ROBOTIC_LIGHT_BURN_MSG
 	medium_burn_msg = ROBOTIC_MEDIUM_BURN_MSG
 	heavy_burn_msg = ROBOTIC_HEAVY_BURN_MSG
-
 
 /obj/item/bodypart/leg/right/robot
 	name = "cyborg right leg"
@@ -117,7 +109,6 @@
 
 	brute_reduction = 5
 	burn_reduction = 4
-	disabling_threshold_percentage = 1
 
 	light_brute_msg = ROBOTIC_LIGHT_BRUTE_MSG
 	medium_brute_msg = ROBOTIC_MEDIUM_BRUTE_MSG
@@ -376,6 +367,7 @@
 	brute_reduction = 0
 	burn_reduction = 0
 	max_damage = 20
+
 
 #undef ROBOTIC_LIGHT_BRUTE_MSG
 #undef ROBOTIC_MEDIUM_BRUTE_MSG

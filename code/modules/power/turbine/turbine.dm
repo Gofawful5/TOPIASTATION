@@ -95,12 +95,13 @@
 		return TOOL_ACT_TOOLTYPE_SUCCESS
 
 	tool.play_tool_sound(src, 50)
-	toggle_panel_open()
+	panel_open = !panel_open
 	if(panel_open)
 		disable_parts(user)
 	else
 		enable_parts(user)
-	balloon_alert(user, "you [panel_open ? "open" : "close"] the maintenance hatch of [src]")
+	var/descriptor = panel_open ? "open" : "close"
+	balloon_alert(user, "you [descriptor] the maintenance hatch of [src]")
 	update_appearance()
 	return TOOL_ACT_TOOLTYPE_SUCCESS
 
@@ -564,8 +565,7 @@
 	var/output_mix_heat_capacity = output_mix.heat_capacity()
 	if(!output_mix_heat_capacity)
 		return 0
-	work_done = min(work_done, (output_mix_heat_capacity * output_mix.temperature - output_mix_heat_capacity * TCMB) / TURBINE_HEAT_CONVERSION_MULTIPLIER)
-	output_mix.temperature = max((output_mix.temperature * output_mix_heat_capacity + work_done * TURBINE_HEAT_CONVERSION_MULTIPLIER) / output_mix_heat_capacity, TCMB)
+	output_mix.temperature = max((output_mix.temperature * output_mix_heat_capacity + work_done * output_mix.total_moles() * TURBINE_HEAT_CONVERSION_MULTIPLIER) / output_mix_heat_capacity, TCMB)
 	return work_done
 
 /obj/item/paper/guides/jobs/atmos/turbine

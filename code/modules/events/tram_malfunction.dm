@@ -1,5 +1,6 @@
 #define TRAM_MALFUNCTION_TIME_UPPER 420
 #define TRAM_MALFUNCTION_TIME_LOWER 240
+#define XING_STATE_GREEN 0
 
 /datum/round_event_control/tram_malfunction
 	name = "Tram Malfunction"
@@ -20,6 +21,7 @@
 		if(tram_ref.specific_lift_id == MAIN_STATION_TRAM)
 			return .
 
+	message_admins("Second pre-condition check for [name] failed, selecting new event.")
 	return FALSE
 
 /datum/round_event/tram_malfunction
@@ -39,20 +41,25 @@
 		if(signal.obj_flags & EMAGGED)
 			return
 
-		signal.start_malfunction()
+		signal.obj_flags |= EMAGGED
+
+		if(signal.signal_state != XING_STATE_GREEN)
+			signal.set_signal_state(XING_STATE_GREEN)
 
 	for(var/obj/structure/industrial_lift/tram as anything in GLOB.lifts)
 		original_lethality = tram.collision_lethality
-		tram.collision_lethality = 2
+		tram.collision_lethality = 4
 
 /datum/round_event/tram_malfunction/end()
 	for(var/obj/machinery/crossing_signal/signal in GLOB.tram_signals)
-		signal.end_malfunction()
+		signal.obj_flags &= ~EMAGGED
+		signal.process()
 
 	for(var/obj/structure/industrial_lift/tram as anything in GLOB.lifts)
 		tram.collision_lethality = original_lethality
 
-	priority_announce("We've successfully reset the software of the tram, normal operations are now resuming. Sorry for any inconvienence this may have caused. We hope you have a good rest of your shift.", "CentCom Engineering Division")
+	priority_announce("We've successfuly reset the software of the tram, normal operations are now resuming. Sorry for the inconvienence.", "CentCom Engineering Division")
 
 #undef TRAM_MALFUNCTION_TIME_UPPER
 #undef TRAM_MALFUNCTION_TIME_LOWER
+#undef XING_STATE_GREEN

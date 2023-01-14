@@ -188,14 +188,7 @@
 		if(!(initial_stat & NOPOWER))
 			SEND_SIGNAL(src, COMSIG_MACHINERY_POWER_LOST)
 			. = TRUE
-
-	if(appearance_power_state != (machine_stat & NOPOWER))
-		update_appearance()
-
-// Saves like 300ms of init by not duping calls in the above proc
-/obj/machinery/update_appearance(updates)
-	. = ..()
-	appearance_power_state = machine_stat & NOPOWER
+	update_appearance()
 
 // connect the machine to a powernet if a node cable or a terminal is present on the turf
 /obj/machinery/power/proc/connect_to_network()
@@ -433,6 +426,6 @@
 		return null
 	for(var/obj/structure/cable/C in src)
 		if(C.machinery_layer & machinery_layer)
-			C.update_appearance() // I hate this. it's here because update_icon_state SCANS nearby turfs for objects to connect to. Wastes cpu time
+			C.update_appearance()
 			return C
 	return null

@@ -10,7 +10,7 @@
 		/obj/item/food/grown/soybeans = 2
 	)
 	result = /obj/item/food/burrito
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/cheesyburrito
 	name ="Cheesy burrito"
@@ -20,7 +20,7 @@
 		/obj/item/food/grown/soybeans = 1
 	)
 	result = /obj/item/food/cheesyburrito
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/carneburrito
 	name ="Carne de asada burrito"
@@ -30,7 +30,7 @@
 		/obj/item/food/grown/soybeans = 1
 	)
 	result = /obj/item/food/carneburrito
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/fuegoburrito
 	name ="Fuego plasma burrito"
@@ -40,7 +40,7 @@
 		/obj/item/food/grown/soybeans = 1
 	)
 	result = /obj/item/food/fuegoburrito
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/nachos
 	name ="Nachos"
@@ -49,7 +49,7 @@
 		/obj/item/food/tortilla = 1
 	)
 	result = /obj/item/food/nachos
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/cheesynachos
 	name ="Cheesy nachos"
@@ -59,7 +59,7 @@
 		/obj/item/food/tortilla = 1
 	)
 	result = /obj/item/food/cheesynachos
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/cubannachos
 	name ="Cuban nachos"
@@ -69,7 +69,7 @@
 		/obj/item/food/tortilla = 1
 	)
 	result = /obj/item/food/cubannachos
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/taco
 	name ="Classic Taco"
@@ -80,7 +80,7 @@
 		/obj/item/food/grown/cabbage = 1,
 	)
 	result = /obj/item/food/taco
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/tacoplain
 	name ="Plain Taco"
@@ -90,7 +90,7 @@
 		/obj/item/food/meat/cutlet = 1,
 	)
 	result = /obj/item/food/taco/plain
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/enchiladas
 	name = "Enchiladas"
@@ -100,7 +100,7 @@
 		/obj/item/food/tortilla = 2
 	)
 	result = /obj/item/food/enchiladas
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/stuffedlegion
 	name = "Stuffed legion"
@@ -112,7 +112,7 @@
 		/datum/reagent/consumable/capsaicin = 2
 	)
 	result = /obj/item/food/stuffedlegion
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN
 
 /datum/crafting_recipe/food/chipsandsalsa
 	name = "Chips and salsa"
@@ -123,70 +123,4 @@
 		/obj/item/food/grown/tomato = 1
 	)
 	result = /obj/item/food/chipsandsalsa
-	category = CAT_MEXICAN
-
-/datum/crafting_recipe/food/classic_chimichanga
-	name = "Classic Chimichanga"
-	reqs = list(
-		/obj/item/food/tortilla = 1,
-		/obj/item/food/meat/cutlet = 2,
-		/obj/item/food/cheese/wedge = 1,
-		/obj/item/food/grown/onion = 1,
-	)
-	result = /obj/item/food/classic_chimichanga
-	category = CAT_MEXICAN
-
-/datum/crafting_recipe/food/vegetarian_chimichanga
-	name = "Vegetarian Chimichanga"
-	reqs = list(
-		/obj/item/food/tortilla = 1,
-		/obj/item/food/grown/cabbage = 1,
-		/obj/item/food/grown/onion = 1,
-		/obj/item/food/grown/chili = 1,
-	)
-	result = /obj/item/food/vegetarian_chimichanga
-	category = CAT_MEXICAN
-
-/datum/crafting_recipe/food/classic_hard_shell_taco
-	name = "Classic Hard-Shell Taco"
-	reqs = list(
-		/obj/item/food/hard_taco_shell = 1,
-		/obj/item/food/meat/cutlet = 1,
-		/obj/item/food/cheese/wedge = 1,
-		/obj/item/food/grown/tomato = 1,
-		/obj/item/food/grown/cabbage = 1,
-	)
-	result = /obj/item/food/classic_hard_shell_taco
-	category = CAT_MEXICAN
-
-/datum/crafting_recipe/food/plain_hard_shell_taco
-	name = "Plain Hard-Shell Taco"
-	reqs = list(
-		/obj/item/food/hard_taco_shell = 1,
-		/obj/item/food/meat/cutlet = 1,
-	)
-	result = /obj/item/food/plain_hard_shell_taco
-	category = CAT_MEXICAN
-
-/datum/crafting_recipe/food/refried_beans
-	name = "Refried Beans"
-	reqs = list(
-		/obj/item/reagent_containers/cup/bowl = 1,
-		/obj/item/food/grown/soybeans = 2,
-		/datum/reagent/water = 5,
-		/obj/item/food/grown/onion = 1,
-	)
-	result = /obj/item/food/refried_beans
-	category = CAT_MEXICAN
-
-/datum/crafting_recipe/food/spanish_rice
-	name = "Spanish Rice"
-	reqs = list(
-		/obj/item/reagent_containers/cup/bowl = 1,
-		/obj/item/food/boiledrice = 1,
-		/obj/item/food/grown/tomato = 1,
-		/datum/reagent/consumable/salt = 1,
-		/datum/reagent/consumable/blackpepper = 1,
-	)
-	result = /obj/item/food/spanish_rice
-	category = CAT_MEXICAN
+	subcategory = CAT_MEXICAN

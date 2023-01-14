@@ -84,13 +84,13 @@
 	if (!eyes)
 		return
 
-	target.adjust_eye_blur(6 SECONDS)
+	target.adjust_blurriness(3)
 	eyes.applyOrganDamage(rand(2,4))
 
 	if(eyes.damage < EYESTAB_BLEEDING_THRESHOLD)
 		return
 
-	target.adjust_eye_blur(30 SECONDS)
+	target.adjust_blurriness(15)
 	if (target.stat != DEAD)
 		to_chat(target, span_danger("Your eyes start to bleed profusely!"))
 
@@ -102,7 +102,7 @@
 	if (prob(50))
 		if (target.stat != DEAD && target.drop_all_held_items())
 			to_chat(target, span_danger("You drop what you're holding and clutch at your eyes!"))
-		target.adjust_eye_blur(20 SECONDS)
+		target.adjust_blurriness(10)
 		target.Unconscious(20)
 		target.Paralyze(40)
 

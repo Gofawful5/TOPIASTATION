@@ -3,8 +3,6 @@
 	bite_consumption_mod = 3
 	foodtypes = VEGETABLES
 	wine_power = 40
-	/// Default mushroom icon for recipes that need any mushroom
-	icon_state = "plumphelmet"
 
 // Reishi
 /obj/item/seeds/reishi

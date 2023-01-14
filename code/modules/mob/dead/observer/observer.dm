@@ -684,7 +684,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 		return FALSE
 
 	target.key = key
-	target.faction = list(FACTION_NEUTRAL)
+	target.faction = list("neutral")
 	return TRUE
 
 /mob/dead/observer/_pointed(atom/pointed_at)
@@ -883,7 +883,6 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	set_sight(initial(sight))
 	if(target)
 		UnregisterSignal(target, COMSIG_MOVABLE_Z_CHANGED)
-		hide_other_mob_action_buttons(target)
 		LAZYREMOVE(target.observers, src)
 
 /mob/dead/observer/verb/observe()

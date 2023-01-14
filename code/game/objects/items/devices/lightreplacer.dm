@@ -27,15 +27,14 @@
 // examines you when you're holding it in your hand, you will be discovered.
 //
 
-#define GLASS_SHEET_USES 5
-#define LIGHTBULB_COST 1
-#define BULB_SHARDS_REQUIRED 4
 
 /obj/item/lightreplacer
+
 	name = "light replacer"
 	desc = "A device to automatically replace lights. Refill with broken or working light bulbs, or sheets of glass."
+
 	icon = 'icons/obj/janitor.dmi'
-	icon_state = "lightreplacer"
+	icon_state = "lightreplacer0"
 	inhand_icon_state = "electronic"
 	worn_icon_state = "light_replacer"
 	lefthand_file = 'icons/mob/inhands/items/devices_lefthand.dmi'
@@ -45,95 +44,97 @@
 	slot_flags = ITEM_SLOT_BELT
 	force = 8
 
-	/// How many uses does our light replacer have?
-	var/uses = 10
-	/// The maximum number of lights this replacer can hold
 	var/max_uses = 20
-	/// The light replacer's charge increment (used for adding to cyborg light replacers)
+	var/uses = 10
+	// How much to increase per each glass?
+	var/increment = 5
+	// How much to take from the glass?
+	var/decrement = 1
 	var/charge = 1
 
-	/// Eating used bulbs gives us bulb shards. Requires BULB_SHARDS_MAXIMUM to produce a new light.
+	// Eating used bulbs gives us bulb shards
 	var/bulb_shards = 0
+	// when we get this many shards, we get a free bulb.
+	var/shards_required = 4
 
-	/// whether it is "bluespace powered" (can be used at a range)
+	// whether it is "bluespace powered" (can be used at a range)
 	var/bluespace_toggle = FALSE
 
 /obj/item/lightreplacer/examine(mob/user)
 	. = ..()
 	. += status_string()
 
-/obj/item/lightreplacer/attackby(obj/item/insert, mob/user, params)
+/obj/item/lightreplacer/attackby(obj/item/W, mob/user, params)
 
-	if(istype(insert, /obj/item/stack/sheet/glass))
-		var/obj/item/stack/sheet/glass/glass_to_insert = insert
+	if(istype(W, /obj/item/stack/sheet/glass))
+		var/obj/item/stack/sheet/glass/G = W
 		if(uses >= max_uses)
 			to_chat(user, span_warning("[src.name] is full."))
 			return
-		else if(glass_to_insert.use(LIGHTBULB_COST))
-			add_uses(GLASS_SHEET_USES)
+		else if(G.use(decrement))
+			AddUses(increment)
 			to_chat(user, span_notice("You insert a piece of glass into \the [src.name]. You have [uses] light\s remaining."))
 			return
 		else
 			to_chat(user, span_warning("You need one sheet of glass to replace lights!"))
 
-	if(istype(insert, /obj/item/shard))
+	if(istype(W, /obj/item/shard))
 		if(uses >= max_uses)
 			to_chat(user, span_warning("\The [src] is full."))
 			return
-		if(!user.temporarilyRemoveItemFromInventory(insert))
+		if(!user.temporarilyRemoveItemFromInventory(W))
 			return
-		add_uses(round(GLASS_SHEET_USES*0.75))
+		AddUses(round(increment*0.75))
 		to_chat(user, span_notice("You insert a shard of glass into \the [src]. You have [uses] light\s remaining."))
-		qdel(insert)
+		qdel(W)
 		return
 
-	if(istype(insert, /obj/item/light))
-		var/obj/item/light/light_to_insert = insert
-		if(light_to_insert.status == 0) // LIGHT OKAY
+	if(istype(W, /obj/item/light))
+		var/obj/item/light/L = W
+		if(L.status == 0) // LIGHT OKAY
 			if(uses < max_uses)
-				if(!user.temporarilyRemoveItemFromInventory(insert))
+				if(!user.temporarilyRemoveItemFromInventory(W))
 					return
-				add_uses(1)
-				qdel(light_to_insert)
+				AddUses(1)
+				qdel(L)
 		else
-			if(!user.temporarilyRemoveItemFromInventory(insert))
+			if(!user.temporarilyRemoveItemFromInventory(W))
 				return
-			to_chat(user, span_notice("You insert [light_to_insert] into \the [src]."))
-			add_shards(1, user)
-			qdel(light_to_insert)
+			to_chat(user, span_notice("You insert [L] into \the [src]."))
+			AddShards(1, user)
+			qdel(L)
 		return
 
-	if(istype(insert, /obj/item/storage))
-		var/obj/item/storage/storage_to_empty = insert
+	if(istype(W, /obj/item/storage))
+		var/obj/item/storage/S = W
 		var/found_lightbulbs = FALSE
 		var/replaced_something = TRUE
 
-		for(var/obj/item/item_to_check in storage_to_empty.contents)
-			if(!istype(item_to_check, /obj/item/light))
-				continue
-			var/obj/item/light/found_light = item_to_check
-			found_lightbulbs = TRUE
-			if(src.uses >= max_uses)
-				break
-			if(found_light.status == LIGHT_OK)
-				replaced_something = TRUE
-				add_uses(1)
-				qdel(found_light)
+		for(var/obj/item/I in S.contents)
+			if(istype(I, /obj/item/light))
+				var/obj/item/light/L = I
+				found_lightbulbs = TRUE
+				if(src.uses >= max_uses)
+					break
+				if(L.status == LIGHT_OK)
+					replaced_something = TRUE
+					AddUses(1)
+					qdel(L)
 
-			else if(found_light.status == LIGHT_BROKEN || found_light.status == LIGHT_BURNED)
-				replaced_something = TRUE
-				add_shards(1, user)
-				qdel(found_light)
+				else if(L.status == LIGHT_BROKEN || L.status == LIGHT_BURNED)
+					replaced_something = TRUE
+					AddShards(1, user)
+					qdel(L)
 
 		if(!found_lightbulbs)
-			to_chat(user, span_warning("\The [storage_to_empty] contains no bulbs."))
+			to_chat(user, span_warning("\The [S] contains no bulbs."))
 			return
 
 		if(!replaced_something && src.uses == max_uses)
 			to_chat(user, span_warning("\The [src] is full!"))
 			return
 
-		to_chat(user, span_notice("You fill \the [src] with lights from \the [storage_to_empty]. " + status_string() + ""))
+		to_chat(user, span_notice("You fill \the [src] with lights from \the [S]. " + status_string() + ""))
 
 /obj/item/lightreplacer/emag_act()
 	if(obj_flags & EMAGGED)
@@ -142,37 +143,11 @@
 
 /obj/item/lightreplacer/attack_self(mob/user)
 	for(var/obj/machinery/light/target in user.loc)
-		replace_light(target, user)
+		ReplaceLight(target, user)
 	to_chat(user, status_string())
 
-/obj/item/lightreplacer/afterattack(atom/target, mob/user, proximity)
-	. = ..()
-	if(!can_use(user))
-		balloon_alert(user, "no more lights!")
-		return
-
-	if(!proximity && !bluespace_toggle)
-		return
-
-	if(!isturf(target))
-		if(istype(target, /obj/machinery/light))
-			if(!proximity && bluespace_toggle)
-				if(replace_light(target, user))
-					user.Beam(target, icon_state = "rped_upgrade", time = 1 SECONDS)
-					playsound(src, 'sound/items/pshoom.ogg', 40, 1)
-		return
-
-	for(var/atom/target_atom in target)
-		if(!can_use(user)) //We check inside the loop in case we're filling multiple lights with one click
-			balloon_alert(user, "no more lights!")
-			return
-		replace_light(target_atom, user)
-		if(bluespace_toggle)
-			user.Beam(target, icon_state = "rped_upgrade", time = 1 SECONDS)
-			playsound(src, 'sound/items/pshoom.ogg', 40, 1)
-
 /obj/item/lightreplacer/update_icon_state()
-	icon_state = "[initial(icon_state)][(obj_flags & EMAGGED ? "-emagged" : "")]"
+	icon_state = "[initial(icon_state)][(obj_flags & EMAGGED ? 1 : 0)]"
 	return ..()
 
 /obj/item/lightreplacer/proc/status_string()
@@ -180,19 +155,19 @@
 
 /obj/item/lightreplacer/proc/Use(mob/user)
 	playsound(src.loc, 'sound/machines/click.ogg', 50, TRUE)
-	add_uses(-1)
-	return TRUE
+	AddUses(-1)
+	return 1
 
 // Negative numbers will subtract
-/obj/item/lightreplacer/proc/add_uses(amount = 1)
+/obj/item/lightreplacer/proc/AddUses(amount = 1)
 	uses = clamp(uses + amount, 0, max_uses)
 
-/obj/item/lightreplacer/proc/add_shards(amount = 1, user)
+/obj/item/lightreplacer/proc/AddShards(amount = 1, user)
 	bulb_shards += amount
-	var/new_bulbs = round(bulb_shards / BULB_SHARDS_REQUIRED)
+	var/new_bulbs = round(bulb_shards / shards_required)
 	if(new_bulbs > 0)
-		add_uses(new_bulbs)
-	bulb_shards = bulb_shards % BULB_SHARDS_REQUIRED
+		AddUses(new_bulbs)
+	bulb_shards = bulb_shards % shards_required
 	if(new_bulbs != 0)
 		to_chat(user, span_notice("\The [src] fabricates a new bulb from the broken glass it has stored. It now has [uses] uses."))
 		playsound(src.loc, 'sound/machines/ding.ogg', 50, TRUE)
@@ -201,22 +176,19 @@
 /obj/item/lightreplacer/proc/Charge(mob/user)
 	charge += 1
 	if(charge > 3)
-		add_uses(1)
+		AddUses(1)
 		charge = 1
 
-/obj/item/lightreplacer/proc/replace_light(obj/machinery/light/target, mob/living/user)
-
-	if(!istype(target)) //Confirm that it's a light we're testing, because afterattack runs this for everything on a given turf and will runtime
-		return
+/obj/item/lightreplacer/proc/ReplaceLight(obj/machinery/light/target, mob/living/U)
 
 	if(target.status != LIGHT_OK)
-		if(can_use(user))
-			if(!Use(user))
-				return FALSE
-			to_chat(user, span_notice("You replace \the [target.fitting] with \the [src]."))
+		if(CanUse(U))
+			if(!Use(U))
+				return
+			to_chat(U, span_notice("You replace \the [target.fitting] with \the [src]."))
 
 			if(target.status != LIGHT_EMPTY)
-				add_shards(1, user)
+				AddShards(1, U)
 				target.status = LIGHT_EMPTY
 				target.update()
 
@@ -231,14 +203,14 @@
 			target.on = target.has_power()
 			target.update()
 			qdel(L2)
-			return TRUE
+			return
 
 		else
-			to_chat(user, span_warning("\The [src]'s refill light blinks red."))
-			return FALSE
+			to_chat(U, span_warning("\The [src]'s refill light blinks red."))
+			return
 	else
-		to_chat(user, span_warning("There is a working [target.fitting] already inserted!"))
-		return FALSE
+		to_chat(U, span_warning("There is a working [target.fitting] already inserted!"))
+		return
 
 /obj/item/lightreplacer/proc/Emag()
 	obj_flags ^= EMAGGED
@@ -249,12 +221,33 @@
 		name = initial(name)
 	update_appearance()
 
-/obj/item/lightreplacer/proc/can_use(mob/living/user)
+/obj/item/lightreplacer/proc/CanUse(mob/living/user)
 	src.add_fingerprint(user)
 	if(uses > 0)
-		return TRUE
+		return 1
 	else
-		return FALSE
+		return 0
+
+/obj/item/lightreplacer/afterattack(atom/T, mob/U, proximity)
+	. = ..()
+	if(!proximity && !bluespace_toggle)
+		return
+	if(!isturf(T))
+		return
+
+	var/used = FALSE
+	for(var/atom/A in T)
+		if(!CanUse(U))
+			break
+		used = TRUE
+		if(istype(A, /obj/machinery/light))
+			if(!proximity && bluespace_toggle)
+				U.Beam(A, icon_state = "rped_upgrade", time = 1 SECONDS)
+				playsound(src, 'sound/items/pshoom.ogg', 40, 1)
+			ReplaceLight(A, U)
+
+	if(!used)
+		to_chat(U, span_warning("\The [src]'s refill light blinks red."))
 
 /obj/item/lightreplacer/cyborg/Initialize(mapload)
 	. = ..()
@@ -263,12 +256,8 @@
 /obj/item/lightreplacer/blue
 	name = "bluespace light replacer"
 	desc = "A modified light replacer that zaps lights into place. Refill with broken or working lightbulbs, or sheets of glass."
-	icon_state = "lightreplacer_blue"
+	icon_state = "lightreplacer_blue0"
 	bluespace_toggle = TRUE
 
 /obj/item/lightreplacer/blue/emag_act()
 	return  // balancing against longrange explosions
-
-#undef GLASS_SHEET_USES
-#undef LIGHTBULB_COST
-#undef BULB_SHARDS_REQUIRED

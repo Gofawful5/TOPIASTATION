@@ -9,11 +9,6 @@
 	var/list/stored_items = list()
 	var/obj/machinery/gulag_teleporter/linked_teleporter = null
 
-/obj/machinery/gulag_item_reclaimer/handle_atom_del(atom/deleting_atom)
-	for(var/person in stored_items)
-		stored_items[person] -= deleting_atom
-	return ..()
-
 /obj/machinery/gulag_item_reclaimer/Destroy()
 	for(var/i in contents)
 		var/obj/item/I = i

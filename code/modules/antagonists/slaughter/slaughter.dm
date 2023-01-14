@@ -235,4 +235,4 @@
 
 /mob/living/simple_animal/hostile/imp/slaughter/engine_demon
 	name = "engine demon"
-	faction = list("hell", FACTION_NEUTRAL)
+	faction = list("hell", "neutral")

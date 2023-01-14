@@ -6,14 +6,11 @@
 	var/magboot_state = "magboots"
 	var/magpulse = FALSE
 	var/slowdown_active = 2
-	armor_type = /datum/armor/shoes_magboots
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 90, FIRE = 0, ACID = 0)
 	actions_types = list(/datum/action/item_action/toggle)
 	strip_delay = 70
 	equip_delay_other = 70
 	resistance_flags = FIRE_PROOF
-
-/datum/armor/shoes_magboots
-	bio = 90
 
 /obj/item/clothing/shoes/magboots/equipped(mob/user, slot)
 	. = ..()
@@ -48,7 +45,7 @@
 	user.update_worn_shoes() //so our mob-overlays update
 	user.update_gravity(user.has_gravity())
 	user.update_equipment_speed_mods() //we want to update our speed so we arent running at max speed in regular magboots
-	update_item_action_buttons()
+	update_action_buttons()
 
 /obj/item/clothing/shoes/magboots/examine(mob/user)
 	. = ..()

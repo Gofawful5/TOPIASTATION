@@ -25,8 +25,6 @@
 	var/timer = 0
 	///Is this loop running or not
 	var/running = FALSE
-	///Track if we're currently paused
-	var/paused = FALSE
 
 /datum/move_loop/New(datum/movement_packet/owner, datum/controller/subsystem/movement/controller, atom/moving, priority, flags, datum/extra_info)
 	src.owner = owner
@@ -53,8 +51,7 @@
 		return TRUE
 	return FALSE
 
-///Called when a loop is starting by a movement subsystem
-/datum/move_loop/proc/loop_started()
+/datum/move_loop/proc/start_loop()
 	SHOULD_CALL_PARENT(TRUE)
 	SEND_SIGNAL(src, COMSIG_MOVELOOP_START)
 	running = TRUE
@@ -65,8 +62,7 @@
 		return
 	timer = world.time + delay
 
-///Called when a loop is stopped, doesn't stop the loop itself
-/datum/move_loop/proc/loop_stopped()
+/datum/move_loop/proc/stop_loop()
 	SHOULD_CALL_PARENT(TRUE)
 	running = FALSE
 	SEND_SIGNAL(src, COMSIG_MOVELOOP_STOP)
@@ -130,25 +126,6 @@
 /datum/move_loop/proc/move()
 	return FALSE
 
-
-///Pause our loop untill restarted with resume_loop()
-/datum/move_loop/proc/pause_loop()
-	if(!controller || !running || paused) //we dead
-		return
-
-	//Dequeue us from our current bucket
-	controller.dequeue_loop(src)
-	paused = TRUE
-
-///Resume our loop after being paused by pause_loop()
-/datum/move_loop/proc/resume_loop()
-	if(!controller || !running || !paused)
-		return
-
-	controller.queue_loop(src)
-	timer = world.time
-	paused = FALSE
-
 ///Removes the atom from some movement subsystem. Defaults to SSmovement
 /datum/controller/subsystem/move_manager/proc/stop_looping(atom/movable/moving, datum/controller/subsystem/movement/subsystem = SSmovement)
 	var/datum/movement_packet/our_info = moving.move_packet
@@ -191,7 +168,7 @@
 
 /datum/move_loop/move/move()
 	var/atom/old_loc = moving.loc
-	moving.Move(get_step(moving, direction), direction, FALSE, !(flags & MOVEMENT_LOOP_NO_DIR_UPDATE))
+	moving.Move(get_step(moving, direction), direction)
 	// We cannot rely on the return value of Move(), we care about teleports and it doesn't
 	// Moving also can be null on occasion, if the move deleted it and therefor us
 	return old_loc != moving?.loc
@@ -399,7 +376,7 @@
 		return TRUE
 	return FALSE
 
-/datum/move_loop/has_target/jps/loop_started()
+/datum/move_loop/has_target/jps/start_loop()
 	. = ..()
 	INVOKE_ASYNC(src, PROC_REF(recalculate_path))
 

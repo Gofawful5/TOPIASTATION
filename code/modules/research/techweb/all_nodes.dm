@@ -111,6 +111,7 @@
 		"status_display_frame",
 		"sticky_tape",
 		"syrup_bottle",
+		"tablet",
 		"tape",
 		"tech_disk",
 		"timer",
@@ -450,6 +451,7 @@
 		"dish_drive",
 		"fat_sucker",
 		"gibber",
+		"gibber",
 		"griddle",
 		"microwave",
 		"monkey_recycler",
@@ -609,7 +611,6 @@
 		"rcd_loaded",
 		"rcd_ammo",
 		"rpd_loaded",
-		"rtd_loaded",
 		"sheetifier",
 		"weldingmask",
 	)
@@ -865,7 +866,6 @@
 	prereq_ids = list("base")
 	design_ids = list(
 		"paicard",
-		"mecha_camera"
 	)
 	research_costs = list(TECHWEB_POINT_TYPE_GENERIC = 2500)
 

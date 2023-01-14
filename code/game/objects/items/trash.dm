@@ -102,14 +102,9 @@
 	resistance_flags = NONE
 
 /obj/item/trash/candle
-	name = "melted candle"
+	name = "candle"
 	icon = 'icons/obj/candle.dmi'
 	icon_state = "candle4"
-
-/obj/item/trash/flare
-	name = "burnt flare"
-	icon = 'icons/obj/lighting.dmi'
-	icon_state = "flare-empty"
 
 /obj/item/trash/can
 	name = "crushed can"

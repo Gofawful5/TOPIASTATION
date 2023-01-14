@@ -149,7 +149,7 @@
 	)
 	result = /obj/item/food/hotcrossbun
 
-	category = CAT_BREAD
+	subcategory = CAT_BREAD
 
 /datum/crafting_recipe/food/briochecake
 	name = "Brioche cake"
@@ -158,7 +158,7 @@
 		/datum/reagent/consumable/sugar = 2
 	)
 	result = /obj/item/food/cake/brioche
-	category = CAT_MISCFOOD
+	subcategory = CAT_MISCFOOD
 
 /obj/item/food/scotchegg
 	name = "scotch egg"
@@ -177,7 +177,7 @@
 		/obj/item/food/meatball = 1
 	)
 	result = /obj/item/food/scotchegg
-	category = CAT_EGG
+	subcategory = CAT_EGG
 
 /datum/crafting_recipe/food/mammi
 	name = "Mammi"
@@ -187,7 +187,7 @@
 		/datum/reagent/consumable/milk = 5
 	)
 	result = /obj/item/food/soup/mammi
-	category = CAT_MISCFOOD
+	subcategory = CAT_MISCFOOD
 
 /obj/item/food/chocolatebunny
 	name = "chocolate bunny"
@@ -202,4 +202,4 @@
 		/obj/item/food/chocolatebar = 1
 	)
 	result = /obj/item/food/chocolatebunny
-	category = CAT_MISCFOOD
+	subcategory = CAT_MISCFOOD

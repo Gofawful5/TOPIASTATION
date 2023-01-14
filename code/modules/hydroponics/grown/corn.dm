@@ -29,10 +29,10 @@
 	tastes = list("corn" = 1)
 	distill_reagent = /datum/reagent/consumable/ethanol/whiskey
 
-/obj/item/food/grown/corn/make_bakeable()
+/obj/item/food/grown/corn/MakeBakeable()
 	AddComponent(/datum/component/bakeable, /obj/item/food/oven_baked_corn, rand(15 SECONDS, 25 SECONDS), TRUE, TRUE)
 
-/obj/item/food/grown/corn/make_microwaveable()
+/obj/item/food/grown/corn/make_microwavable()
 	AddElement(/datum/element/microwavable, /obj/item/food/popcorn)
 
 /obj/item/grown/corncob

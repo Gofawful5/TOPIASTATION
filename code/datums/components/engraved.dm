@@ -27,8 +27,6 @@
 
 	var/beauty_value
 	switch(story_value)
-		if(STORY_VALUE_KEY)
-			beauty_value = 0 // what is this
 		if(STORY_VALUE_SHIT)
 			beauty_value = rand(-50, 50) //Ugly or mediocre at best
 		if(STORY_VALUE_NONE)
@@ -93,3 +91,4 @@
 	saved_data["story_value"] = story_value
 
 	return list(saved_data)
+

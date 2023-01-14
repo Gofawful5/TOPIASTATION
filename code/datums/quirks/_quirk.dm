@@ -1,29 +1,20 @@
 //every quirk in this folder should be coded around being applied on spawn
 //these are NOT "mob quirks" like GOTTAGOFAST, but exist as a medium to apply them and other different effects
 /datum/quirk
-	/// The name of the quirk
 	var/name = "Test Quirk"
-	/// The description of the quirk
 	var/desc = "This is a test quirk."
-	/// What the quirk is worth in preferences, zero = neutral / free
 	var/value = 0
-	/// Flags related to this quirk.
-	var/quirk_flags = QUIRK_HUMAN_ONLY
-	/// Reference to the mob currently tied to this quirk datum. Quirks are not singletons.
-	var/mob/living/quirk_holder
-	/// Text displayed when this quirk is assigned to a mob (and not transferred)
+	var/human_only = TRUE
 	var/gain_text
-	/// Text displayed when this quirk is removed from a mob (and not transferred)
 	var/lose_text
-	///This text will appear on medical records for the trait.
-	var/medical_record_text
-	/// if applicable, apply and remove this mob trait
-	var/mob_trait
-	/// Amount of points this trait is worth towards the hardcore character mode.
-	/// Minus points implies a positive quirk, positive means its hard.
-	/// This is used to pick the quirks assigned to a hardcore character.
-	//// 0 means its not available to hardcore draws.
+	var/medical_record_text //This text will appear on medical records for the trait. Not yet implemented
+	var/mood_quirk = FALSE //if true, this quirk affects mood and is unavailable if moodlets are disabled
+	var/mob_trait //if applicable, apply and remove this mob trait
+	/// Amount of points this trait is worth towards the hardcore character mode; minus points implies a positive quirk, positive means its hard. This is used to pick the quirks assigned to a hardcore character. 0 means its not available to hardcore draws.
 	var/hardcore_value = 0
+	var/mob/living/quirk_holder
+	/// This quirk should START_PROCESSING when added and STOP_PROCESSING when removed.
+	var/processing_quirk = FALSE
 	/// When making an abstract quirk (in OOP terms), don't forget to set this var to the type path for that abstract quirk.
 	var/abstract_parent_type = /datum/quirk
 	/// The icon to show in the preferences menu.
@@ -54,11 +45,11 @@
  * * new_holder - The mob to add this quirk to.
  * * quirk_transfer - If this is being added to the holder as part of a quirk transfer. Quirks can use this to decide not to spawn new items or apply any other one-time effects.
  */
-/datum/quirk/proc/add_to_holder(mob/living/new_holder, quirk_transfer = FALSE, client/client_source)
+/datum/quirk/proc/add_to_holder(mob/living/new_holder, quirk_transfer = FALSE)
 	if(!new_holder)
 		CRASH("Quirk attempted to be added to null mob.")
 
-	if((quirk_flags & QUIRK_HUMAN_ONLY) && !ishuman(new_holder))
+	if(human_only && !ishuman(new_holder))
 		CRASH("Human only quirk attempted to be added to non-human mob.")
 
 	if(new_holder.has_quirk(type))
@@ -69,21 +60,19 @@
 
 	quirk_holder = new_holder
 	quirk_holder.quirks += src
-	// If we weren't passed a client source try to use a present one
-	client_source ||= quirk_holder.client
 
 	if(mob_trait)
 		ADD_TRAIT(quirk_holder, mob_trait, QUIRK_TRAIT)
 
-	add(client_source)
+	add()
 
-	if(quirk_flags & QUIRK_PROCESSES)
+	if(processing_quirk)
 		START_PROCESSING(SSquirks, src)
 
 	if(!quirk_transfer)
 		if(gain_text)
 			to_chat(quirk_holder, gain_text)
-		add_unique(client_source)
+		add_unique()
 
 		if(quirk_holder.client)
 			post_add()
@@ -109,7 +98,7 @@
 	if(mob_trait)
 		REMOVE_TRAIT(quirk_holder, mob_trait, QUIRK_TRAIT)
 
-	if(quirk_flags & QUIRK_PROCESSES)
+	if(processing_quirk)
 		STOP_PROCESSING(SSquirks, src)
 
 	remove()
@@ -130,23 +119,13 @@
 		post_add()
 
 /// Any effect that should be applied every single time the quirk is added to any mob, even when transferred.
-/datum/quirk/proc/add(client/client_source)
-	return
-
-/// Any effects from the proc that should not be done multiple times if the quirk is transferred between mobs.
-/// Put stuff like spawning items in here.
-/datum/quirk/proc/add_unique(client/client_source)
-	return
-
+/datum/quirk/proc/add()
+/// Any effects from the proc that should not be done multiple times if the quirk is transferred between mobs. Put stuff like spawning items in here.
+/datum/quirk/proc/add_unique()
 /// Removal of any reversible effects added by the quirk.
 /datum/quirk/proc/remove()
-	return
-
-/// Any special effects or chat messages which should be applied.
-/// This proc is guaranteed to run if the mob has a client when the quirk is added.
-/// Otherwise, it runs once on the next COMSIG_MOB_LOGIN.
+/// Any special effects or chat messages which should be applied. This proc is guaranteed to run if the mob has a client when the quirk is added. Otherwise, it runs once on the next COMSIG_MOB_LOGIN.
 /datum/quirk/proc/post_add()
-	return
 
 /// Subtype quirk that has some bonus logic to spawn items for the player.
 /datum/quirk/item_quirk
@@ -229,13 +208,12 @@
 		return medical ? "No issues have been declared." : "None"
 	return medical ?  dat.Join("<br>") : dat.Join(", ")
 
-/mob/living/proc/cleanse_quirk_datums() //removes all trait datums
-	QDEL_LIST(quirks)
+/mob/living/proc/cleanse_trait_datums() //removes all trait datums
+	for(var/V in quirks)
+		var/datum/quirk/T = V
+		qdel(T)
 
-/mob/living/proc/transfer_quirk_datums(mob/living/to_mob)
-	// We could be done before the client was moved or after the client was moved
-	var/datum/preferences/to_pass = client || to_mob.client
-
+/mob/living/proc/transfer_trait_datums(mob/living/to_mob)
 	for(var/datum/quirk/quirk as anything in quirks)
 		quirk.remove_from_current_holder(quirk_transfer = TRUE)
-		quirk.add_to_holder(to_mob, quirk_transfer = TRUE, client_source = to_pass)
+		quirk.add_to_holder(to_mob, quirk_transfer = TRUE)

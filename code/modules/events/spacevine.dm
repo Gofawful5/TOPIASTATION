@@ -1,8 +1,5 @@
 /// Determines brightness of the light emitted by kudzu with the light mutation
 #define LIGHT_MUTATION_BRIGHTNESS 4
-/// Kudzu light states
-#define PASS_LIGHT 0
-#define BLOCK_LIGHT 1
 /// Determines the probability that the toxicity mutation will harm someone who passes through it
 #define TOXICITY_MUTATION_PROB 10
 /// Determines the impact radius of kudzu's explosive mutation
@@ -293,7 +290,7 @@
 	severity = SEVERITY_TRIVIAL
 
 /datum/spacevine_mutation/transparency/on_grow(obj/structure/spacevine/holder)
-	holder.light_state = PASS_LIGHT
+	holder.set_opacity(0)
 	holder.alpha = 125
 
 /datum/spacevine_mutation/oxy_eater
@@ -400,8 +397,7 @@
 
 //This specific mutation only covers floors instead of structures, items, mobs and cant tangle mobs
 /datum/spacevine_mutation/timid/on_birth(obj/structure/spacevine/holder)
-	SET_PLANE_IMPLICIT(holder, FLOOR_PLANE)
-	holder.light_state = PASS_LIGHT
+	holder.plane = FLOOR_PLANE
 	holder.can_tangle = FALSE
 	return ..()
 
@@ -444,8 +440,6 @@
 	var/trait_flags = 0
 	/// Should atmos always process this tile
 	var/always_atmos_process = FALSE
-	/// The kudzu blocks light on default once it grows
-	var/light_state = BLOCK_LIGHT
 
 /obj/structure/spacevine/Initialize(mapload)
 	. = ..()
@@ -475,7 +469,7 @@
 	if(master)
 		master.VineDestroyed(src)
 	mutations = list()
-	set_opacity(PASS_LIGHT)
+	set_opacity(0)
 	if(has_buckled_mobs())
 		unbuckle_all_mobs(force=1)
 	return ..()
@@ -684,7 +678,7 @@
 	if(!energy)
 		src.icon_state = pick("Med1", "Med2", "Med3")
 		energy = 1
-		set_opacity(light_state)
+		set_opacity(1)
 	else
 		src.icon_state = pick("Hvy1", "Hvy2", "Hvy3")
 		energy = 2
@@ -767,8 +761,6 @@
 	return FALSE
 
 #undef LIGHT_MUTATION_BRIGHTNESS
-#undef PASS_LIGHT
-#undef BLOCK_LIGHT
 #undef TOXICITY_MUTATION_PROB
 #undef EXPLOSION_MUTATION_IMPACT_RADIUS
 #undef GAS_MUTATION_REMOVAL_MULTIPLIER

@@ -34,8 +34,22 @@
 	qdel(src)
 
 /obj/effect/baseturf_helper/proc/replace_baseturf(turf/thing)
-	thing.remove_baseturfs_from_typecache(baseturf_to_replace)
-	thing.PlaceOnBottom(fake_turf_type = baseturf)
+	if(length(thing.baseturfs))
+		var/list/baseturf_cache = thing.baseturfs.Copy()
+		for(var/i in baseturf_cache)
+			if(baseturf_to_replace[i])
+				baseturf_cache -= i
+		thing.baseturfs = baseturfs_string_list(baseturf_cache, thing)
+		if(!baseturf_cache.len)
+			thing.assemble_baseturfs(baseturf)
+		else
+			thing.PlaceOnBottom(null, baseturf)
+	else if(baseturf_to_replace[thing.baseturfs])
+		thing.assemble_baseturfs(baseturf)
+	else
+		thing.PlaceOnBottom(null, baseturf)
+
+
 
 /obj/effect/baseturf_helper/space
 	name = "space baseturf editor"
@@ -72,23 +86,6 @@
 /obj/effect/baseturf_helper/lava_land/surface
 	name = "lavaland baseturf editor"
 	baseturf = /turf/open/lava/smooth/lava_land_surface
-
-/obj/effect/baseturf_helper/reinforced_plating
-	name = "reinforced plating baseturf editor"
-	baseturf = /turf/open/floor/plating/reinforced
-	baseturf_to_replace = list(/turf/open/floor/plating,/turf/open/space,/turf/baseturf_bottom)
-
-//This applies the reinforced plating to the above Z level for every tile in the area where this is placed
-/obj/effect/baseturf_helper/reinforced_plating/ceiling
-	name = "reinforced ceiling plating baseturf editor"
-
-/obj/effect/baseturf_helper/reinforced_plating/ceiling/replace_baseturf(turf/thing)
-	var/turf/ceiling = get_step_multiz(thing, UP)
-	if(isnull(ceiling))
-		CRASH("baseturf helper is attempting to modify the Z level above but there is no Z level above above it.")
-	if(isspaceturf(ceiling) || istype(ceiling, /turf/open/openspace))
-		return
-	return ..(ceiling)
 
 
 /obj/effect/mapping_helpers
@@ -147,12 +144,12 @@
 			if(16 to 23)
 				airlock.welded = TRUE
 			if(24 to 30)
-				airlock.set_panel_open(TRUE)
+				airlock.panel_open = TRUE
 	if(airlock.cutAiWire)
 		airlock.wires.cut(WIRE_AI)
 	if(airlock.autoname)
 		airlock.name = get_area_name(src, TRUE)
-	airlock.update_appearance()
+	update_appearance()
 	qdel(src)
 
 /obj/effect/mapping_helpers/airlock/proc/payload(obj/machinery/door/airlock/payload)

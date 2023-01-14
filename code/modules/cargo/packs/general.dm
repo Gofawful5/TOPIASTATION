@@ -256,12 +256,11 @@
 /datum/supply_pack/misc/syndicate
 	name = "Assorted Syndicate Gear"
 	desc = "Contains a random assortment of syndicate gear."
-	special = TRUE //Cannot be ordered via cargo
+	special = TRUE ///Cannot be ordered via cargo
 	contains = list()
 	crate_name = "syndicate gear crate"
 	crate_type = /obj/structure/closet/crate
-	///Total TC worth of contained uplink items
-	var/crate_value = 30
+	var/crate_value = 30 ///Total TC worth of contained uplink items
 	var/uplink_flag = UPLINK_TRAITORS
 
 ///Generate assorted uplink items, taking into account the same surplus modifiers used for surplus crates
@@ -275,8 +274,6 @@
 	while(crate_value)
 		var/datum/uplink_item/uplink_item = pick(uplink_items)
 		if(!uplink_item.surplus || prob(100 - uplink_item.surplus))
-			continue
-		if(length(uplink_item.restricted_roles) || length(uplink_item.restricted_species))
 			continue
 		if(crate_value < uplink_item.cost)
 			continue

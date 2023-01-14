@@ -11,13 +11,12 @@
 	heavyfootstep = FOOTSTEP_GENERIC_HEAVY
 	flags_1 = NO_SCREENTIPS_1
 	turf_flags = CAN_BE_DIRTY_1 | IS_SOLID
-	smoothing_groups = SMOOTH_GROUP_TURF_OPEN + SMOOTH_GROUP_OPEN_FLOOR
-	canSmoothWith = SMOOTH_GROUP_TURF_OPEN + SMOOTH_GROUP_OPEN_FLOOR
+	smoothing_groups = list(SMOOTH_GROUP_TURF_OPEN, SMOOTH_GROUP_OPEN_FLOOR)
+	canSmoothWith = list(SMOOTH_GROUP_TURF_OPEN, SMOOTH_GROUP_OPEN_FLOOR)
 
 	thermal_conductivity = 0.04
 	heat_capacity = 10000
 	tiled_dirt = TRUE
-
 
 	overfloor_placed = TRUE
 
@@ -27,39 +26,35 @@
 	var/burnt = FALSE
 	/// Path of the tile that this floor drops
 	var/floor_tile = null
-	/// Determines if you can deconstruct this with a RCD
-	var/rcd_proof = FALSE
+	var/list/broken_states
+	var/list/burnt_states
 
 /turf/open/floor/Initialize(mapload)
 	. = ..()
-
-	if (PERFORM_ALL_TESTS(focus_only/valid_turf_states))
-		var/static/list/previous_errors = list()
-
-		if (!(type in previous_errors))
-			if (broken != (icon_state in broken_states()))
-				stack_trace("[icon_state] (from [type]), which should be [broken ? "NOT broken, IS" : "broken, IS NOT"]")
-				previous_errors[type] = TRUE
-
-			if (burnt != (icon_state in burnt_states()))
-				stack_trace("[icon_state] (from [type]), which should be [burnt ? "NOT burnt, IS" : "burnt, IS NOT"]")
-				previous_errors[type] = TRUE
-
+	if (broken_states)
+		stack_trace("broken_states defined at the object level for [type], move it to setup_broken_states()")
+	else
+		broken_states = string_list(setup_broken_states())
+	if (burnt_states)
+		stack_trace("burnt_states defined at the object level for [type], move it to setup_burnt_states()")
+	else
+		var/list/new_burnt_states = setup_burnt_states()
+		if(new_burnt_states)
+			burnt_states = string_list(new_burnt_states)
+	if(!broken && broken_states && (icon_state in broken_states))
+		broken = TRUE
+	if(!burnt && burnt_states && (icon_state in burnt_states))
+		burnt = TRUE
 	if(mapload && prob(33))
 		MakeDirty()
-
 	if(is_station_level(z))
 		GLOB.station_turfs += src
 
-/// Returns a list of every turf state considered "broken".
-/// Will be randomly chosen if a turf breaks at runtime.
-/turf/open/floor/proc/broken_states()
+/turf/open/floor/proc/setup_broken_states()
 	return list("damaged1", "damaged2", "damaged3", "damaged4", "damaged5")
 
-/// Returns a list of every turf state considered "burnt".
-/// Will be randomly chosen if a turf is burnt at runtime.
-/turf/open/floor/proc/burnt_states()
-	return list()
+/turf/open/floor/proc/setup_burnt_states()
+	return
 
 /turf/open/floor/Destroy()
 	if(is_station_level(z))
@@ -84,8 +79,9 @@
 		if(EXPLODE_HEAVY)
 			switch(rand(1, 3))
 				if(1)
-					if (!ispath(baseturf_at_depth(2), /turf/open/floor))
-						attempt_lattice_replacement()
+					if(!length(baseturfs) || !ispath(baseturfs[baseturfs.len-1], /turf/open/floor))
+						ScrapeAway(flags = CHANGETURF_INHERIT_AIR)
+						ReplaceWithLattice()
 					else
 						ScrapeAway(2, flags = CHANGETURF_INHERIT_AIR)
 					if(prob(33))
@@ -143,13 +139,12 @@
 /turf/open/floor/update_overlays()
 	. = ..()
 	if(broken)
-		. += mutable_appearance(damaged_dmi, pick(broken_states()))
+		. += mutable_appearance(damaged_dmi, pick(broken_states))
 	else if(burnt)
-		var/list/burnt_states = burnt_states()
-		if(burnt_states.len)
+		if(LAZYLEN(burnt_states))
 			. += mutable_appearance(damaged_dmi, pick(burnt_states))
 		else
-			. += mutable_appearance(damaged_dmi, pick(broken_states()))
+			. += mutable_appearance(damaged_dmi, pick(broken_states))
 
 /// Things seem to rely on this actually returning plating. Override it if you have other baseturfs.
 /turf/open/floor/proc/make_plating(force = FALSE)
@@ -237,6 +232,8 @@
 		if(STAGE_FIVE to INFINITY)
 			if(prob(70))
 				sheer = TRUE
+			else if(prob(50) && (/turf/open/space in baseturfs))
+				ReplaceWithLattice()
 	if(sheer)
 		if(has_tile())
 			remove_tile(null, TRUE, TRUE, TRUE)
@@ -317,7 +314,6 @@
 				new_airlock.electronics.unres_sides = the_rcd.airlock_electronics.unres_sides
 				new_airlock.electronics.passed_name = the_rcd.airlock_electronics.passed_name
 				new_airlock.electronics.passed_cycle_id = the_rcd.airlock_electronics.passed_cycle_id
-				new_airlock.electronics.shell = the_rcd.airlock_electronics.shell
 			if(new_airlock.electronics.one_access)
 				new_airlock.req_one_access = new_airlock.electronics.accesses
 			else
@@ -334,15 +330,11 @@
 			new_airlock.update_appearance()
 			return TRUE
 		if(RCD_DECONSTRUCT)
-			if(rcd_proof)
-				balloon_alert(user, "it's too thick!")
+			var/old_turf_name = name
+			if(!ScrapeAway(flags = CHANGETURF_INHERIT_AIR))
 				return FALSE
-			else
-				var/old_turf_name = name
-				if(!ScrapeAway(flags = CHANGETURF_INHERIT_AIR))
-					return FALSE
-				to_chat(user, span_notice("You deconstruct the [old_turf_name]."))
-				return TRUE
+			to_chat(user, span_notice("You deconstruct the [old_turf_name]."))
+			return TRUE
 		if(RCD_WINDOWGRILLE)
 			if(locate(/obj/structure/grille) in src)
 				return FALSE

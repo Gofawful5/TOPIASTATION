@@ -30,7 +30,7 @@
 	response_help_continuous = "pats"
 	response_help_simple = "pat"
 
-	faction = list(FACTION_NEUTRAL)
+	faction = list("neutral")
 
 	ai_controller = /datum/ai_controller/basic_controller/mothroach
 

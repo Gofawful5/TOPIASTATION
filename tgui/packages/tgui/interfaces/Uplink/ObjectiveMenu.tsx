@@ -291,7 +291,6 @@ const ObjectiveFunction = (
       progressionReward={objective.progression_reward}
       objectiveState={objective.objective_state}
       originalProgression={objective.original_progression}
-      hideTcRep={objective.final_objective}
       finalObjective={objective.final_objective}
       canAbort={
         !!handleAbort &&
@@ -339,19 +338,18 @@ type ObjectiveElementProps = {
   telecrystalReward: number;
   progressionReward: number;
   uiButtons?: JSX.Element;
-  objectiveState?: ObjectiveState;
+  objectiveState: ObjectiveState;
   originalProgression: number;
   telecrystalPenalty: number;
   grow: boolean;
-  hideTcRep: BooleanLike;
   finalObjective: BooleanLike;
   canAbort: BooleanLike;
 
-  handleCompletion?: (event: MouseEvent) => void;
-  handleAbort?: (event: MouseEvent) => void;
+  handleCompletion: (event: MouseEvent) => void;
+  handleAbort: (event: MouseEvent) => void;
 };
 
-export const ObjectiveElement = (props: ObjectiveElementProps, context) => {
+const ObjectiveElement = (props: ObjectiveElementProps, context) => {
   const {
     name,
     reputation,
@@ -365,7 +363,6 @@ export const ObjectiveElement = (props: ObjectiveElementProps, context) => {
     handleAbort,
     canAbort,
     originalProgression,
-    hideTcRep,
     grow,
     finalObjective,
     ...rest
@@ -424,7 +421,7 @@ export const ObjectiveElement = (props: ObjectiveElementProps, context) => {
       <Flex.Item grow={grow} basis="content">
         <Box className="UplinkObjective__Content" height="100%">
           <Box>{description}</Box>
-          {!hideTcRep && (
+          {!finalObjective && (
             <Box mt={1}>
               Failing this objective will deduct {telecrystalPenalty} TC.
             </Box>
@@ -441,105 +438,102 @@ export const ObjectiveElement = (props: ObjectiveElementProps, context) => {
       <Flex.Item>
         <Box className="UplinkObjective__Footer">
           <Stack vertical>
-            {!hideTcRep && (
-              <Stack.Item>
-                <Stack align="center" justify="center">
-                  <Box
-                    style={{
-                      'border': '2px solid rgba(0, 0, 0, 0.5)',
-                      'border-left': 'none',
-                      'border-right': 'none',
-                      'border-bottom': objectiveFinished ? 'none' : undefined,
-                    }}
-                    className={reputation.gradient}
-                    py={0.5}
-                    width="100%"
-                    textAlign="center">
-                    {telecrystalReward} TC,
-                    <Box ml={1} as="span">
-                      {calculateProgression(progressionReward)} Reputation
-                      {Math.abs(progressionDiff) > 10 && (
-                        <Tooltip
-                          content={
-                            <Box>
-                              You will get
-                              <Box
-                                mr={1}
-                                ml={1}
-                                color={
-                                  progressionDiff > 0
-                                    ? progressionDiff > 25
-                                      ? 'red'
-                                      : 'orange'
-                                    : 'green'
-                                }
-                                as="span">
-                                {Math.abs(progressionDiff)}%
-                              </Box>
-                              {progressionDiff > 0 ? 'less' : 'more'} reputation
-                              from this objective. This is because your
-                              reputation is{' '}
-                              {progressionDiff > 0 ? 'ahead ' : 'behind '}
-                              where it normally should be at.
+            <Stack.Item>
+              <Stack align="center" justify="center">
+                <Box
+                  style={{
+                    'border': '2px solid rgba(0, 0, 0, 0.5)',
+                    'border-left': 'none',
+                    'border-right': 'none',
+                    'border-bottom': objectiveFinished ? 'none' : undefined,
+                  }}
+                  className={reputation.gradient}
+                  py={0.5}
+                  width="100%"
+                  textAlign="center">
+                  {telecrystalReward} TC,
+                  <Box ml={1} as="span">
+                    {calculateProgression(progressionReward)} Reputation
+                    {Math.abs(progressionDiff) > 10 && (
+                      <Tooltip
+                        content={
+                          <Box>
+                            You will get
+                            <Box
+                              mr={1}
+                              ml={1}
+                              color={
+                                progressionDiff > 0
+                                  ? progressionDiff > 25
+                                    ? 'red'
+                                    : 'orange'
+                                  : 'green'
+                              }
+                              as="span">
+                              {Math.abs(progressionDiff)}%
                             </Box>
-                          }>
-                          <Box
-                            ml={1}
-                            color={
-                              progressionDiff > 0
-                                ? progressionDiff > 35
-                                  ? 'red'
-                                  : 'orange'
-                                : 'green'
-                            }
-                            as="span">
-                            ({progressionDiff > 0 ? '-' : '+'}
-                            {Math.abs(progressionDiff)}%)
+                            {progressionDiff > 0 ? 'less' : 'more'} reputation
+                            from this objective. This is because your reputation
+                            is {progressionDiff > 0 ? 'ahead ' : 'behind '}
+                            where it normally should be at.
                           </Box>
-                        </Tooltip>
-                      )}
-                    </Box>
+                        }>
+                        <Box
+                          ml={1}
+                          color={
+                            progressionDiff > 0
+                              ? progressionDiff > 35
+                                ? 'red'
+                                : 'orange'
+                              : 'green'
+                          }
+                          as="span">
+                          ({progressionDiff > 0 ? '-' : '+'}
+                          {Math.abs(progressionDiff)}%)
+                        </Box>
+                      </Tooltip>
+                    )}
                   </Box>
-                </Stack>
-                {objectiveFinished ? (
+                </Box>
+              </Stack>
+              {objectiveFinished ? (
+                <Box
+                  inline
+                  className={reputation.gradient}
+                  style={{
+                    'border-radius': '0',
+                    'border': '2px solid rgba(0, 0, 0, 0.5)',
+                    'border-left': 'none',
+                    'border-right': 'none',
+                  }}
+                  position="relative"
+                  width="100%"
+                  textAlign="center"
+                  bold>
                   <Box
-                    inline
-                    className={reputation.gradient}
-                    style={{
-                      'border-radius': '0',
-                      'border': '2px solid rgba(0, 0, 0, 0.5)',
-                      'border-left': 'none',
-                      'border-right': 'none',
-                    }}
-                    position="relative"
                     width="100%"
-                    textAlign="center"
-                    bold>
-                    <Box
-                      width="100%"
-                      height="100%"
-                      backgroundColor={
-                        objectiveFailed
-                          ? 'rgba(255, 0, 0, 0.1)'
-                          : 'rgba(0, 255, 0, 0.1)'
-                      }
-                      position="absolute"
-                      left={0}
-                      top={0}
-                    />
-                    <Button
-                      onClick={handleCompletion}
-                      color={objectiveFailed ? 'bad' : 'good'}
-                      style={{
-                        'border': '1px solid rgba(0, 0, 0, 0.65)',
-                      }}
-                      my={1}>
-                      TURN IN
-                    </Button>
-                  </Box>
-                ) : null}
-              </Stack.Item>
-            )}
+                    height="100%"
+                    backgroundColor={
+                      objectiveFailed
+                        ? 'rgba(255, 0, 0, 0.1)'
+                        : 'rgba(0, 255, 0, 0.1)'
+                    }
+                    position="absolute"
+                    left={0}
+                    top={0}
+                  />
+                  <Button
+                    onClick={handleCompletion}
+                    color={objectiveFailed ? 'bad' : 'good'}
+                    style={{
+                      'border': '1px solid rgba(0, 0, 0, 0.65)',
+                    }}
+                    my={1}>
+                    TURN IN
+                  </Button>
+                </Box>
+              ) : null}
+            </Stack.Item>
             {!!uiButtons && !objectiveFinished && (
               <Stack.Item>{uiButtons}</Stack.Item>
             )}

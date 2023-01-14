@@ -1,10 +1,7 @@
 /obj/item/clothing/under/rank/medical
 	icon = 'icons/obj/clothing/under/medical.dmi'
 	worn_icon = 'icons/mob/clothing/under/medical.dmi'
-	armor_type = /datum/armor/rank_medical
-
-/datum/armor/rank_medical
-	bio = 50
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 50, FIRE = 0, ACID = 0)
 
 /obj/item/clothing/under/rank/medical/doctor
 	desc = "It's made of a special fiber that provides minor protection against biohazards. It has a cross on the chest denoting that the wearer is trained medical personnel."
@@ -81,6 +78,7 @@
 
 /obj/item/clothing/under/rank/medical/scrubs
 	name = "medical scrubs"
+	can_adjust = FALSE
 
 /obj/item/clothing/under/rank/medical/scrubs/blue
 	desc = "It's made of a special fiber that provides minor protection against biohazards. This one is in baby blue."
@@ -99,12 +97,7 @@
 	name = "chemist's jumpsuit"
 	icon_state = "chemistry"
 	inhand_icon_state = "w_suit"
-	armor_type = /datum/armor/medical_chemist
-
-/datum/armor/medical_chemist
-	bio = 10
-	fire = 50
-	acid = 65
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 10, FIRE = 50, ACID = 65)
 
 /obj/item/clothing/under/rank/medical/chemist/skirt
 	name = "chemist's jumpskirt"
@@ -121,6 +114,7 @@
 	name = "paramedic jumpsuit"
 	icon_state = "paramedic"
 	inhand_icon_state = "w_suit"
+	alt_covers_chest = TRUE
 
 /obj/item/clothing/under/rank/medical/paramedic/skirt
 	name = "paramedic jumpskirt"

@@ -4,10 +4,8 @@
 /obj/vehicle/ridden/lavaboat
 	name = "lava boat"
 	desc = "A boat used for traversing lava."
-	icon = 'icons/obj/lavaland/dragonboat.dmi'
 	icon_state = "goliath_boat"
-	icon_preview = 'icons/obj/previews.dmi'
-	icon_state_preview = "boat"
+	icon = 'icons/obj/lavaland/dragonboat.dmi'
 	resistance_flags = LAVA_PROOF | FIRE_PROOF
 	can_buckle = TRUE
 	key_type = /obj/item/oar
@@ -34,20 +32,20 @@
 	result = /obj/item/oar
 	reqs = list(/obj/item/stack/sheet/bone = 2)
 	time = 15
-	category = CAT_TOOLS
+	category = CAT_PRIMAL
 
 /datum/crafting_recipe/boat
 	name = "Goliath Hide Boat"
 	result = /obj/vehicle/ridden/lavaboat
 	reqs = list(/obj/item/stack/sheet/animalhide/goliath_hide = 3)
 	time = 50
-	category = CAT_TOOLS
+	category = CAT_PRIMAL
 
 /obj/vehicle/ridden/lavaboat/plasma
 	name = "plasma boat"
 	desc = "A boat used for traversing the streams of plasma without turning into an icecube."
-	icon = 'icons/obj/lavaland/dragonboat.dmi'
 	icon_state = "goliath_boat"
+	icon = 'icons/obj/lavaland/dragonboat.dmi'
 	resistance_flags = FREEZE_PROOF
 	can_buckle = TRUE
 

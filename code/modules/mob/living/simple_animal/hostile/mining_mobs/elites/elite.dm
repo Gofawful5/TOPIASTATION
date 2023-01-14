@@ -69,43 +69,42 @@ While using this makes the system rely on OnFire, it still gives options for tim
 
 /datum/action/innate/elite_attack
 	name = "Elite Attack"
-	button_icon = 'icons/mob/actions/actions_elites.dmi'
+	icon_icon = 'icons/mob/actions/actions_elites.dmi'
 	button_icon_state = ""
 	background_icon_state = "bg_default"
-	overlay_icon_state = "bg_default_border"
 	///The displayed message into chat when this attack is selected
 	var/chosen_message
 	///The internal attack ID for the elite's OpenFire() proc to use
 	var/chosen_attack_num = 0
 
-/datum/action/innate/elite_attack/create_button()
+/datum/action/innate/elite_attack/CreateButton()
 	var/atom/movable/screen/movable/action_button/button = ..()
 	button.maptext = ""
-	button.maptext_x = 6
-	button.maptext_y = 2
+	button.maptext_x = 8
+	button.maptext_y = 0
 	button.maptext_width = 24
 	button.maptext_height = 12
 	return button
 
 /datum/action/innate/elite_attack/process()
-	if(isnull(owner))
+	if(owner == null)
 		STOP_PROCESSING(SSfastprocess, src)
 		qdel(src)
 		return
+	UpdateButtons()
 
-	build_all_button_icons(UPDATE_BUTTON_STATUS)
-
-/datum/action/innate/elite_attack/update_button_status(atom/movable/screen/movable/action_button/button, force = FALSE)
-	var/mob/living/simple_animal/hostile/asteroid/elite/elite_owner = owner
-	if(!istype(owner))
-		button.maptext = ""
+/datum/action/innate/elite_attack/UpdateButton(atom/movable/screen/movable/action_button/button, status_only = FALSE, force = FALSE)
+	. = ..()
+	if(!.)
 		return
-
+	if(status_only)
+		return
+	var/mob/living/simple_animal/hostile/asteroid/elite/elite_owner = owner
 	var/timeleft = max(elite_owner.ranged_cooldown - world.time, 0)
 	if(timeleft == 0)
 		button.maptext = ""
 	else
-		button.maptext = MAPTEXT("<b>[round(timeleft/10, 0.1)]</b>")
+		button.maptext = "<b class='maptext'>[round(timeleft/10, 0.1)]</b>"
 
 /datum/action/innate/elite_attack/Grant(mob/living/L)
 	if(istype(L, /mob/living/simple_animal/hostile/asteroid/elite))
@@ -123,7 +122,7 @@ While using this makes the system rely on OnFire, it still gives options for tim
 /obj/structure/elite_tumor
 	name = "pulsing tumor"
 	desc = "An odd, pulsing tumor sticking out of the ground.  You feel compelled to reach out and touch it..."
-	armor_type = /datum/armor/structure_elite_tumor
+	armor = list(MELEE = 100, BULLET = 100, LASER = 100, ENERGY = 100, BOMB = 100, BIO = 100, FIRE = 100, ACID = 100)
 	resistance_flags = INDESTRUCTIBLE
 	icon = 'icons/obj/lavaland/tumor.dmi'
 	icon_state = "tumor"
@@ -145,16 +144,6 @@ While using this makes the system rely on OnFire, it still gives options for tim
 		/mob/living/simple_animal/hostile/asteroid/elite/legionnaire,
 		/mob/living/simple_animal/hostile/asteroid/elite/herald,
 	)
-
-/datum/armor/structure_elite_tumor
-	melee = 100
-	bullet = 100
-	laser = 100
-	energy = 100
-	bomb = 100
-	bio = 100
-	fire = 100
-	acid = 100
 
 /obj/structure/elite_tumor/attack_hand(mob/user, list/modifiers)
 	. = ..()
@@ -390,8 +379,8 @@ While using this makes the system rely on OnFire, it still gives options for tim
 	icon_state = "hierophant_wall_temp-0"
 	base_icon_state = "hierophant_wall_temp"
 	smoothing_flags = SMOOTH_BITMASK
-	smoothing_groups = SMOOTH_GROUP_HIERO_WALL
-	canSmoothWith = SMOOTH_GROUP_HIERO_WALL
+	smoothing_groups = list(SMOOTH_GROUP_HIERO_WALL)
+	canSmoothWith = list(SMOOTH_GROUP_HIERO_WALL)
 	duration = 50
 	layer = BELOW_MOB_LAYER
 	plane = GAME_PLANE

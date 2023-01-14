@@ -31,10 +31,16 @@
 	if(HAS_TRAIT(controller.pawn, TRAIT_HANDS_BLOCKED) || living_pawn.stat != CONSCIOUS)
 		return
 
+	// We're targeting something else for another reason
+	var/datum/weakref/target_weakref = controller.blackboard[BB_BASIC_MOB_CURRENT_TARGET]
+	var/atom/target = target_weakref?.resolve()
+	if(!QDELETED(target))
+		return
+
 	var/datum/weakref/hunting_weakref = controller.blackboard[target_key]
 	var/atom/hunted = hunting_weakref?.resolve()
 	// We're not hunting anything, look around for something
-	if(isnull(hunted))
+	if(QDELETED(hunted))
 		controller.queue_behavior(finding_behavior, target_key, hunt_targets, hunt_range)
 
 	// We ARE hunting something, execute the hunt.
@@ -75,16 +81,11 @@
 	behavior_flags = AI_BEHAVIOR_REQUIRE_MOVEMENT
 	/// How long do we have to wait after a successful hunt?
 	var/hunt_cooldown = 5 SECONDS
-	/// Do we reset the target after attacking something, so we can check for status changes.
-	var/always_reset_target = FALSE
 
 /datum/ai_behavior/hunt_target/setup(datum/ai_controller/controller, hunting_target_key, hunting_cooldown_key)
 	. = ..()
 	var/datum/weakref/hunting_weakref = controller.blackboard[hunting_target_key]
-	var/atom/hunt_target = hunting_weakref?.resolve()
-	if (isnull(hunt_target))
-		return FALSE
-	set_movement_target(controller, hunt_target)
+	controller.current_movement_target = hunting_weakref?.resolve()
 
 /datum/ai_behavior/hunt_target/perform(delta_time, datum/ai_controller/controller, hunting_target_key, hunting_cooldown_key)
 	. = ..()
@@ -92,7 +93,7 @@
 	var/datum/weakref/hunting_weakref = controller.blackboard[hunting_target_key]
 	var/atom/hunted = hunting_weakref?.resolve()
 
-	if(isnull(hunted))
+	if(QDELETED(hunted))
 		//Target is gone for some reason. forget about this task!
 		controller[hunting_target_key] = null
 		finish_action(controller, FALSE, hunting_target_key)
@@ -119,8 +120,6 @@
 	if(succeeded)
 		controller.blackboard[hunting_cooldown_key] = world.time + hunt_cooldown
 	else if(hunting_target_key)
-		controller.blackboard[hunting_target_key] = null
-	if(always_reset_target && hunting_target_key)
 		controller.blackboard[hunting_target_key] = null
 
 /datum/ai_behavior/hunt_target/unarmed_attack_target

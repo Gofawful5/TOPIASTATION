@@ -26,7 +26,6 @@
 	desc = "<i>'Special delivery!'</i>"
 	icon_state = "mailman"
 	inhand_icon_state = "b_suit"
-	clothing_traits = list(TRAIT_HATED_BY_DOGS)
 
 /obj/item/clothing/under/misc/psyche
 	name = "psychedelic jumpsuit"
@@ -49,23 +48,13 @@
 	worn_icon = 'icons/mob/clothing/under/syndicate.dmi'
 	desc = "A cybernetically enhanced jumpsuit used for administrative duties."
 	body_parts_covered = CHEST|GROIN|LEGS|FEET|ARMS|HANDS
-	armor_type = /datum/armor/misc_adminsuit
+	armor = list(MELEE = 100, BULLET = 100, LASER = 100,ENERGY = 100, BOMB = 100, BIO = 100, FIRE = 100, ACID = 100)
 	cold_protection = CHEST | GROIN | LEGS | FEET | ARMS | HANDS
 	min_cold_protection_temperature = SPACE_SUIT_MIN_TEMP_PROTECT
 	heat_protection = CHEST|GROIN|LEGS|FEET|ARMS|HANDS
 	max_heat_protection_temperature = SPACE_SUIT_MAX_TEMP_PROTECT
 	can_adjust = FALSE
 	resistance_flags = FIRE_PROOF | ACID_PROOF
-
-/datum/armor/misc_adminsuit
-	melee = 100
-	bullet = 100
-	laser = 100
-	energy = 100
-	bomb = 100
-	bio = 100
-	fire = 100
-	acid = 100
 
 /obj/item/clothing/under/misc/burial
 	name = "burial garments"
@@ -96,15 +85,7 @@
 	icon_state = "durathread"
 	inhand_icon_state = null
 	can_adjust = FALSE
-	armor_type = /datum/armor/misc_durathread
-
-/datum/armor/misc_durathread
-	melee = 10
-	laser = 10
-	fire = 40
-	acid = 10
-	bomb = 5
-	bio = 10
+	armor = list(MELEE = 10, LASER = 10, FIRE = 40, ACID = 10, BOMB = 5, BIO = 10, FIRE = 0, ACID = 0)
 
 /obj/item/clothing/under/misc/bouncer
 	name = "bouncer uniform"
@@ -112,13 +93,7 @@
 	icon_state = "bouncer"
 	inhand_icon_state = null
 	can_adjust = FALSE
-	armor_type = /datum/armor/misc_bouncer
-
-/datum/armor/misc_bouncer
-	melee = 5
-	bio = 10
-	fire = 30
-	acid = 30
+	armor = list(MELEE = 5, BULLET = 0, LASER = 0,ENERGY = 0, BOMB = 0, BIO = 10, FIRE = 30, ACID = 30)
 
 /obj/item/clothing/under/misc/coordinator
 	name = "coordinator jumpsuit"

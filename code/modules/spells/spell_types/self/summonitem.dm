@@ -114,14 +114,13 @@
 					item_to_retrieve = null
 					break
 
-				SEND_SIGNAL(holding_mark, COMSIG_MAGIC_RECALL, caster, item_to_retrieve)
 				holding_mark.dropItemToGround(item_to_retrieve)
 
 			else if(isobj(item_to_retrieve.loc))
 				var/obj/retrieved_item = item_to_retrieve.loc
 				// Can't bring anchored things
 				if(retrieved_item.anchored)
-					break
+					return
 				// Edge cases for moving certain machinery...
 				if(istype(retrieved_item, /obj/machinery/portable_atmospherics))
 					var/obj/machinery/portable_atmospherics/atmos_item = retrieved_item

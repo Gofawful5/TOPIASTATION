@@ -9,7 +9,7 @@
 		/obj/item/food/meat/steak/plain/human = 2
 	)
 	result = /obj/item/food/kebab/human
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/kebab
 	name = "Kebab"
@@ -18,7 +18,7 @@
 		/obj/item/food/meat/steak = 2
 	)
 	result = /obj/item/food/kebab/monkey
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/tofukebab
 	name = "Tofu kebab"
@@ -27,7 +27,7 @@
 		/obj/item/food/tofu = 2
 	)
 	result = /obj/item/food/kebab/tofu
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/tailkebab
 	name = "Lizard tail kebab"
@@ -36,7 +36,7 @@
 		/obj/item/organ/external/tail/lizard = 1
 	)
 	result = /obj/item/food/kebab/tail
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/fiestaskewer
 	name = "Fiesta Skewer"
@@ -48,7 +48,7 @@
 		/obj/item/food/grown/tomato = 1
 	)
 	result = /obj/item/food/kebab/fiesta
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 ////////////////////////////////////////////////MR SPIDER////////////////////////////////////////////////
 
@@ -60,7 +60,7 @@
 		/obj/item/food/meat/cutlet/spider = 2
 	)
 	result = /obj/item/food/spidereggsham
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 ////////////////////////////////////////////////MISC RECIPE's////////////////////////////////////////////////
 
@@ -71,7 +71,7 @@
 		/obj/item/seeds/plump = 1
 	)
 	result = /obj/item/food/tempehstarter
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/cornedbeef
 	name = "Corned beef"
@@ -81,7 +81,7 @@
 		/obj/item/food/grown/cabbage = 2
 	)
 	result = /obj/item/food/cornedbeef
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/bearsteak
 	name = "Filet migrawr"
@@ -91,7 +91,7 @@
 	)
 	tool_paths = list(/obj/item/lighter)
 	result = /obj/item/food/bearsteak
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/stewedsoymeat
 	name = "Stewed soymeat"
@@ -101,7 +101,7 @@
 		/obj/item/food/grown/tomato = 1
 	)
 	result = /obj/item/food/stewedsoymeat
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/sausage
 	name = "Raw sausage"
@@ -110,7 +110,7 @@
 		/obj/item/food/meat/rawcutlet = 2
 	)
 	result = /obj/item/food/raw_sausage
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/nugget
 	name = "Chicken nugget"
@@ -118,7 +118,7 @@
 		/obj/item/food/meat/cutlet = 1
 	)
 	result = /obj/item/food/nugget
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/rawkhinkali
 	name = "Raw Khinkali"
@@ -128,7 +128,7 @@
 		/obj/item/food/meatball = 1
 	)
 	result = /obj/item/food/rawkhinkali
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/meatbun
 	name = "Meat bun"
@@ -139,7 +139,7 @@
 		/obj/item/food/grown/cabbage = 1
 	)
 	result = /obj/item/food/meatbun
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/pigblanket
 	name = "Pig in a Blanket"
@@ -149,7 +149,7 @@
 		/obj/item/food/meat/cutlet = 1
 	)
 	result = /obj/item/food/pigblanket
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/ratkebab
 	name = "Rat Kebab"
@@ -158,7 +158,7 @@
 		/obj/item/food/deadmouse = 1
 	)
 	result = /obj/item/food/kebab/rat
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/doubleratkebab
 	name = "Double Rat Kebab"
@@ -167,17 +167,16 @@
 		/obj/item/food/deadmouse = 2
 	)
 	result = /obj/item/food/kebab/rat/double
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/ricepork
 	name = "Rice and Pork"
 	reqs = list(
-		/obj/item/reagent_containers/cup/bowl = 1,
-		/obj/item/food/boiledrice = 1,
+		/obj/item/food/salad/boiledrice = 1,
 		/obj/item/food/meat/cutlet = 2
 	)
 	result = /obj/item/food/salad/ricepork
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/ribs
 	name = "BBQ Ribs"
@@ -187,7 +186,7 @@
 		/obj/item/stack/rods = 2
 	)
 	result = /obj/item/food/bbqribs
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/meatclown
 	name = "Meat Clown"
@@ -196,7 +195,7 @@
 		/obj/item/food/grown/banana = 1
 	)
 	result = /obj/item/food/meatclown
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/lasagna
 	name = "Lasagna"
@@ -207,19 +206,18 @@
 		/obj/item/food/spaghetti/raw = 1
 	)
 	result = /obj/item/food/lasagna
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/gumbo
 	name = "Black eyed gumbo"
 	reqs = list(
-		/obj/item/reagent_containers/cup/bowl = 1,
-		/obj/item/food/boiledrice = 1,
+		/obj/item/food/salad/boiledrice = 1,
 		/obj/item/food/grown/peas = 1,
 		/obj/item/food/grown/chili = 1,
 		/obj/item/food/meat/cutlet = 1
 	)
 	result = /obj/item/food/salad/gumbo
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 
 /datum/crafting_recipe/food/fried_chicken
@@ -230,7 +228,7 @@
 		/datum/reagent/consumable/corn_starch = 5,
 	)
 	result = /obj/item/food/fried_chicken
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/beef_stroganoff
 	name = "Beef Stroganoff"
@@ -245,7 +243,7 @@
 		/obj/item/food/meat/steak = 1,
 	)
 	result = /obj/item/food/beef_stroganoff
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/beef_wellington
 	name = "Beef Wellington"
@@ -260,7 +258,7 @@
 		/datum/reagent/consumable/blackpepper = 2
 	)
 	result = /obj/item/food/beef_wellington
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/full_english
 	name = "Full English Breakfast"
@@ -274,7 +272,7 @@
 		/obj/item/food/butteredtoast = 1
 	)
 	result = /obj/item/food/full_english
-	category = CAT_MEAT
+	subcategory = CAT_MEAT
 
 /datum/crafting_recipe/food/envirochow
 	name = "Envirochow"
@@ -283,15 +281,4 @@
 		/datum/reagent/consumable/nutriment/vitamin = 5,
 	)
 	result = /obj/item/food/canned/envirochow
-	category = CAT_MEAT
-
-/datum/crafting_recipe/food/meatloaf
-	name = "Meatloaf"
-	reqs = list(
-		/obj/item/food/meat/slab = 3,
-		/obj/item/food/grown/onion = 1,
-		/obj/item/food/grown/garlic = 1,
-		/datum/reagent/consumable/ketchup = 10,
-	)
-	result = /obj/item/food/raw_meatloaf
-	category = CAT_MEAT
+	subcategory = CAT_MEAT

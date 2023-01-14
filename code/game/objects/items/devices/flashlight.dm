@@ -45,7 +45,7 @@
 
 	return NONE
 
-/obj/item/flashlight/proc/update_brightness()
+/obj/item/flashlight/proc/update_brightness(mob/user)
 	if(on)
 		icon_state = "[initial(icon_state)]-on"
 	else
@@ -54,15 +54,14 @@
 	if(light_system == STATIC_LIGHT)
 		update_light()
 
-/obj/item/flashlight/proc/toggle_light()
+/obj/item/flashlight/proc/toggle_light(mob/user)
 	on = !on
-	playsound(src, on ? sound_on : sound_off, 40, TRUE)
-	update_brightness()
-	update_item_action_buttons()
-	return TRUE
+	playsound(user, on ? sound_on : sound_off, 40, TRUE)
+	update_brightness(user)
+	update_action_buttons()
 
 /obj/item/flashlight/attack_self(mob/user)
-	toggle_light()
+	toggle_light(user)
 
 /obj/item/flashlight/attack_hand_secondary(mob/user, list/modifiers)
 	attack_self(user)
@@ -294,150 +293,61 @@
 	toggle_context = FALSE
 	/// How many seconds of fuel we have left
 	var/fuel = 0
-	/// Do we randomize the fuel when initialized
-	var/randomize_fuel = TRUE
-	/// How much damage it does when turned on
 	var/on_damage = 7
-	/// Type of atom thats spawns after fuel is used up
-	var/trash_type = /obj/item/trash/flare
-	/// If the light source can be extinguished
-	var/can_be_extinguished = FALSE
+	var/produce_heat = 1500
 
 /obj/item/flashlight/flare/Initialize(mapload)
 	. = ..()
-	if(randomize_fuel)
-		fuel = rand(25 MINUTES, 35 MINUTES)
-	if(on)
-		attack_verb_continuous = string_list(list("burns", "singes"))
-		attack_verb_simple = string_list(list("burn", "singe"))
-		hitsound = 'sound/items/welder.ogg'
-		force = on_damage
-		damtype = BURN
-		update_brightness()
-
-/obj/item/flashlight/flare/toggle_light()
-	if(on || !fuel)
-		return FALSE
-
-	name = "lit [initial(name)]"
-	attack_verb_continuous = string_list(list("burns", "singes"))
-	attack_verb_simple = string_list(list("burn", "singe"))
-	hitsound = 'sound/items/welder.ogg'
-	force = on_damage
-	damtype = BURN
-	. = ..()
-
-/obj/item/flashlight/flare/proc/turn_off()
-	on = FALSE
-	name = initial(name)
-	attack_verb_continuous = initial(attack_verb_continuous)
-	attack_verb_simple = initial(attack_verb_simple)
-	hitsound = initial(hitsound)
-	force = initial(force)
-	damtype = initial(damtype)
-	update_brightness()
-
-/obj/item/flashlight/flare/extinguish()
-	if(fuel != INFINITY && can_be_extinguished)
-		turn_off()
-	return ..()
-
-/obj/item/flashlight/flare/update_brightness()
-	..()
-	inhand_icon_state = "[initial(inhand_icon_state)]" + (on ? "-on" : "")
-	update_appearance()
+	fuel = rand(1600, 2000)
 
 /obj/item/flashlight/flare/process(delta_time)
 	open_flame(heat)
-	fuel = max(fuel - delta_time * (1 SECONDS), 0)
-
-	if(!fuel || !on)
+	fuel = max(fuel -= delta_time, 0)
+	if(fuel <= 0 || !on)
 		turn_off()
+		if(!fuel)
+			icon_state = "[initial(icon_state)]-empty"
 		STOP_PROCESSING(SSobj, src)
 
-		if(!fuel && trash_type)
-			new trash_type(loc)
-			qdel(src)
-
 /obj/item/flashlight/flare/ignition_effect(atom/A, mob/user)
-	if(get_temperature())
-		. = span_notice("[user] lights [A] with [src].")
+	. = fuel && on ? span_notice("[user] lights [A] with [src] like a real badass.") : ""
 
-/obj/item/flashlight/flare/proc/ignition(mob/user)
-	if(user && !fuel)
-		to_chat(user, span_warning("[src] is out of fuel!"))
-		return FALSE
-	if(user && on)
-		to_chat(user, span_warning("[src] is already lit!"))
-		return FALSE
-	if(!toggle_light())
-		return FALSE
+/obj/item/flashlight/flare/proc/turn_off()
+	on = FALSE
+	force = initial(src.force)
+	damtype = initial(src.damtype)
+	if(ismob(loc))
+		var/mob/U = loc
+		update_brightness(U)
+	else
+		update_brightness(null)
 
-	if(fuel != INFINITY)
-		START_PROCESSING(SSobj, src)
-
-	return TRUE
-
-/obj/item/flashlight/flare/fire_act(exposed_temperature, exposed_volume)
-	ignition()
-	return ..()
+/obj/item/flashlight/flare/update_brightness(mob/user = null)
+	..()
+	if(on)
+		inhand_icon_state = "[initial(inhand_icon_state)]-on"
+	else
+		inhand_icon_state = "[initial(inhand_icon_state)]"
 
 /obj/item/flashlight/flare/attack_self(mob/user)
-	if(ignition(user))
+	// Usual checks
+	if(fuel <= 0)
+		to_chat(user, span_warning("[src] is out of fuel!"))
+		return
+	if(on)
+		to_chat(user, span_warning("[src] is already on!"))
+		return
+
+	. = ..()
+	// All good, turn it on.
+	if(.)
 		user.visible_message(span_notice("[user] lights \the [src]."), span_notice("You light \the [src]!"))
+		force = on_damage
+		damtype = BURN
+		START_PROCESSING(SSobj, src)
 
 /obj/item/flashlight/flare/get_temperature()
 	return on * heat
-
-/obj/item/flashlight/flare/candle
-	name = "red candle"
-	desc = "In Greek myth, Prometheus stole fire from the Gods and gave it to \
-		humankind. The jewelry he kept for himself."
-	icon = 'icons/obj/candle.dmi'
-	icon_state = "candle1"
-	inhand_icon_state = null
-	w_class = WEIGHT_CLASS_TINY
-	light_color = LIGHT_COLOR_FIRE
-	light_range = 2
-	fuel = 35 MINUTES
-	randomize_fuel = FALSE
-	trash_type = /obj/item/trash/candle
-	can_be_extinguished = TRUE
-
-/obj/item/flashlight/flare/candle/update_icon_state()
-	. = ..()
-	var/wax_level
-	switch(fuel)
-		if(25 MINUTES to INFINITY)
-			wax_level = 1
-		if(15 MINUTES to 25 MINUTES)
-			wax_level = 2
-		if(0 to 15 MINUTES)
-			wax_level = 3
-	icon_state = "candle[wax_level][on ? "_lit" : ""]"
-
-/obj/item/flashlight/flare/candle/attackby(obj/item/fire_starter, mob/user, params)
-	var/success_msg = fire_starter.ignition_effect(src, user)
-	if(success_msg && ignition(user))
-		user.visible_message(success_msg)
-	else
-		return ..()
-
-/obj/item/flashlight/flare/candle/attack_self(mob/user)
-	if(on && fuel != INFINITY && !can_be_extinguished) // can't extinguish eternal candles
-		turn_off()
-		user.visible_message(span_notice("[user] snuffs [src]."))
-
-/obj/item/flashlight/flare/candle/process(delta_time)
-	. = ..()
-	update_appearance()
-
-/obj/item/flashlight/flare/candle/infinite
-	name = "eternal candle"
-	fuel = INFINITY
-	on = TRUE
-	randomize_fuel = FALSE
-	can_be_extinguished = FALSE
 
 /obj/item/flashlight/flare/torch
 	name = "torch"
@@ -451,8 +361,6 @@
 	light_color = LIGHT_COLOR_ORANGE
 	on_damage = 10
 	slot_flags = null
-	trash_type = /obj/effect/decal/cleanable/ash
-	can_be_extinguished = TRUE
 
 /obj/item/flashlight/lantern
 	name = "lantern"
@@ -570,7 +478,7 @@
 	var/fuel = 0
 
 /obj/item/flashlight/glowstick/Initialize(mapload)
-	fuel = rand(50 MINUTES, 60 MINUTES)
+	fuel = rand(3200, 4000)
 	set_light_color(color)
 	return ..()
 
@@ -579,7 +487,7 @@
 	return ..()
 
 /obj/item/flashlight/glowstick/process(delta_time)
-	fuel = max(fuel - delta_time * (1 SECONDS), 0)
+	fuel = max(fuel - delta_time, 0)
 	if(fuel <= 0)
 		turn_off()
 		STOP_PROCESSING(SSobj, src)
@@ -700,7 +608,7 @@
 	///Variable to preserve old lighting behavior in flashlights, to handle darkness.
 	var/dark_light_power = -3
 
-/obj/item/flashlight/flashdark/update_brightness()
+/obj/item/flashlight/flashdark/update_brightness(mob/user)
 	. = ..()
 	if(on)
 		set_light(dark_light_range, dark_light_power)

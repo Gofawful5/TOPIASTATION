@@ -1,4 +1,4 @@
-/obj/vehicle/sealed/mecha/gygax
+/obj/vehicle/sealed/mecha/combat/gygax
 	desc = "A lightweight, security exosuit. Popular among private and corporate security."
 	name = "\improper Gygax"
 	icon_state = "gygax"
@@ -6,13 +6,10 @@
 	allow_diagonal_movement = TRUE
 	movedelay = 3
 	max_integrity = 250
-	internals_req_access = list(ACCESS_MECH_SCIENCE, ACCESS_MECH_SECURITY)
-	armor_type = /datum/armor/mecha_gygax
+	armor = list(MELEE = 25, BULLET = 20, LASER = 30, ENERGY = 15, BOMB = 0, BIO = 0, FIRE = 100, ACID = 100)
 	max_temperature = 25000
 	leg_overload_coeff = 80
 	force = 25
-	destruction_sleep_duration = 40
-	exit_delay = 40
 	wreckage = /obj/structure/mecha_wreckage/gygax
 	mech_type = EXOSUIT_MODULE_GYGAX
 	max_equip_by_category = list(
@@ -22,15 +19,7 @@
 	)
 	step_energy_drain = 3
 
-/datum/armor/mecha_gygax
-	melee = 25
-	bullet = 20
-	laser = 30
-	energy = 15
-	fire = 100
-	acid = 100
-
-/obj/vehicle/sealed/mecha/gygax/generate_actions()
+/obj/vehicle/sealed/mecha/combat/gygax/generate_actions()
 	. = ..()
 	initialize_passenger_action_type(/datum/action/vehicle/sealed/mecha/mech_overload_mode)
 
@@ -56,15 +45,15 @@
 		chassis.movedelay += chassis.speed_mod
 		chassis.step_energy_drain = chassis.normal_step_energy_drain
 		chassis.balloon_alert(owner, "you disable the overload")
-	build_all_button_icons()
+	UpdateButtons()
 
-/obj/vehicle/sealed/mecha/gygax/dark
+/obj/vehicle/sealed/mecha/combat/gygax/dark
 	desc = "A lightweight exosuit, painted in a dark scheme. This model appears to have some modifications."
 	name = "\improper Dark Gygax"
 	icon_state = "darkgygax"
 	base_icon_state = "darkgygax"
 	max_integrity = 300
-	armor_type = /datum/armor/gygax_dark
+	armor = list(MELEE = 40, BULLET = 40, LASER = 50, ENERGY = 35, BOMB = 20, BIO = 0, FIRE = 100, ACID = 100)
 	max_temperature = 35000
 	leg_overload_coeff = 70
 	force = 30
@@ -85,20 +74,11 @@
 	)
 	destruction_sleep_duration = 20
 
-/datum/armor/gygax_dark
-	melee = 40
-	bullet = 40
-	laser = 50
-	energy = 35
-	bomb = 20
-	fire = 100
-	acid = 100
-
-/obj/vehicle/sealed/mecha/gygax/dark/loaded/Initialize(mapload)
+/obj/vehicle/sealed/mecha/combat/gygax/dark/loaded/Initialize(mapload)
 	. = ..()
 	max_ammo()
 
-/obj/vehicle/sealed/mecha/gygax/dark/add_cell(obj/item/stock_parts/cell/C=null)
+/obj/vehicle/sealed/mecha/combat/gygax/dark/add_cell(obj/item/stock_parts/cell/C=null)
 	if(C)
 		C.forceMove(src)
 		cell = C

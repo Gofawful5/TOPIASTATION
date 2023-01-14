@@ -53,7 +53,7 @@
 	return to_spawn
 
 /obj/effect/holodeck_effect/mobspawner
-	var/mobtype = /mob/living/basic/carp/holographic
+	var/mobtype = /mob/living/simple_animal/hostile/carp/holocarp
 	var/mob/our_mob = null
 
 /obj/effect/holodeck_effect/mobspawner/activate(obj/machinery/computer/holodeck/HC)
@@ -88,9 +88,9 @@
 		/mob/living/basic/rabbit,
 	)
 	mobtype += pick(
-		/mob/living/basic/pet/dog/corgi,
-		/mob/living/basic/pet/dog/corgi/puppy,
-		/mob/living/basic/pet/dog/pug,
+		/mob/living/simple_animal/pet/dog/corgi,
+		/mob/living/simple_animal/pet/dog/corgi/puppy,
+		/mob/living/simple_animal/pet/dog/pug,
 	)
 	mobtype += pick(
 		/mob/living/simple_animal/pet/cat,

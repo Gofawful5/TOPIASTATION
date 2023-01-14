@@ -1565,7 +1565,7 @@
 /area/shuttle/escape)
 "YN" = (
 /obj/structure/table/wood,
-/obj/item/flashlight/flare/candle,
+/obj/item/candle,
 /turf/open/floor/wood,
 /area/shuttle/escape)
 "YS" = (

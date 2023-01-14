@@ -1,6 +1,6 @@
 /datum/ai_behavior/basic_melee_attack
 	action_cooldown = 0.6 SECONDS
-	behavior_flags = AI_BEHAVIOR_REQUIRE_MOVEMENT | AI_BEHAVIOR_CAN_PLAN_DURING_EXECUTION
+	behavior_flags = AI_BEHAVIOR_REQUIRE_MOVEMENT
 
 /datum/ai_behavior/basic_melee_attack/setup(datum/ai_controller/controller, target_key, targetting_datum_key, hiding_location_key)
 	. = ..()
@@ -9,10 +9,7 @@
 	var/atom/target = weak_target?.resolve()
 	if(!target)
 		return FALSE
-	var/datum/targetting_datum/targetting_datum = controller.blackboard[targetting_datum_key]
-	if (!targetting_datum)
-		return
-	set_movement_target(controller, target)
+	controller.current_movement_target = target
 
 /datum/ai_behavior/basic_melee_attack/perform(delta_time, datum/ai_controller/controller, target_key, targetting_datum_key, hiding_location_key)
 	. = ..()
@@ -45,10 +42,6 @@
 	action_cooldown = 0.6 SECONDS
 	behavior_flags = AI_BEHAVIOR_REQUIRE_MOVEMENT | AI_BEHAVIOR_MOVE_AND_PERFORM
 	required_distance = 3
-	/// How many shots to fire
-	var/shots = 1
-	/// The interval between individual shots in a burst
-	var/burst_interval = 0.2 SECONDS
 
 /datum/ai_behavior/basic_ranged_attack/setup(datum/ai_controller/controller, target_key, targetting_datum_key, hiding_location_key)
 	. = ..()
@@ -56,7 +49,7 @@
 	var/atom/target = weak_target?.resolve()
 	if(!target)
 		return FALSE
-	set_movement_target(controller, target)
+	controller.current_movement_target = target
 
 /datum/ai_behavior/basic_ranged_attack/perform(delta_time, datum/ai_controller/controller, target_key, targetting_datum_key, hiding_location_key)
 	. = ..()
@@ -74,13 +67,10 @@
 
 	controller.blackboard[hiding_location_key] = WEAKREF(hiding_target)
 
-	if(shots>1)
-		var/atom/burst_target = hiding_target ? hiding_target : target
-		var/datum/callback/callback = CALLBACK(basic_mob, TYPE_PROC_REF(/mob/living/basic,RangedAttack), burst_target)
-		for(var/i in 1 to shots)
-			addtimer(callback, (i - 1) * burst_interval)
+	if(hiding_target) //Shoot it!
+		basic_mob.RangedAttack(hiding_target)
 	else
-		basic_mob.RangedAttack(hiding_target ? hiding_target : target)
+		basic_mob.RangedAttack(target)
 
 /datum/ai_behavior/basic_ranged_attack/finish_action(datum/ai_controller/controller, succeeded, target_key, targetting_datum_key, hiding_location_key)
 	. = ..()

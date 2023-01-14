@@ -39,9 +39,9 @@
 			else
 				wave_type = GLOB.meteors_catastrophic
 		if("meaty")
-			wave_type = GLOB.meateors
+			wave_type = GLOB.meteorsB
 		if("space dust")
-			wave_type = GLOB.meteors_dust
+			wave_type = GLOB.meteorsC
 		if("halloween")
 			wave_type = GLOB.meteorsSPOOKY
 		else

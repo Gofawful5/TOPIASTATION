@@ -52,8 +52,9 @@
 					unset_inhand_var_message += "\n\t[item_path] does not have an inhand_icon_state value[missing_var_message]"
 			continue
 
-		var/match_message
-		if(held_icon_state in possible_icon_states)
+		var/match_message = (held_icon_state in possible_icon_states) ? TRUE : null
+		if(match_message)
+			match_message = null
 			for(var/file_place in possible_icon_states[held_icon_state])
 				match_message += (match_message ? " & '[file_place]'" : " - Matching sprite found in: '[file_place]'")
 

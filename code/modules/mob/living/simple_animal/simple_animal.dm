@@ -200,8 +200,6 @@
 	ADD_TRAIT(src, TRAIT_NOFIRE_SPREAD, ROUNDSTART_TRAIT)
 	for(var/trait in weather_immunities)
 		ADD_TRAIT(src, trait, ROUNDSTART_TRAIT)
-	if (environment_smash >= ENVIRONMENT_SMASH_WALLS)
-		AddElement(/datum/element/wall_smasher, strength_flag = environment_smash)
 
 	if(speak)
 		speak = string_list(speak)
@@ -228,7 +226,6 @@
 		adjustStaminaLoss(-stamina_recovery * delta_time, FALSE, TRUE)
 
 /mob/living/simple_animal/Destroy()
-	QDEL_NULL(access_card)
 	GLOB.simple_animals[AIStatus] -= src
 	SSnpcpool.currentrun -= src
 
@@ -467,8 +464,8 @@
 
 /mob/living/simple_animal/get_status_tab_items()
 	. = ..()
+	. += ""
 	. += "Health: [round((health / maxHealth) * 100)]%"
-	. += "Combat Mode: [combat_mode ? "On" : "Off"]"
 
 /mob/living/simple_animal/proc/drop_loot()
 	if(loot.len)
@@ -637,7 +634,7 @@
 	else
 		mode()
 
-/mob/living/simple_animal/perform_hand_swap(hand_index)
+/mob/living/simple_animal/swap_hand(hand_index)
 	. = ..()
 	if(!.)
 		return

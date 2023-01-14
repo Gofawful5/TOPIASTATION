@@ -13,7 +13,7 @@
 		/obj/item/food/grown/potato = 1
 	)
 	result = /obj/item/food/soup/meatball
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/vegetablesoup
 	name = "Vegetable soup"
@@ -26,7 +26,7 @@
 		/obj/item/food/grown/potato = 1
 	)
 	result = /obj/item/food/soup/vegetable
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/nettlesoup
 	name = "Nettle soup"
@@ -38,7 +38,7 @@
 		/obj/item/food/boiledegg = 1
 	)
 	result = /obj/item/food/soup/nettle
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/wingfangchu
 	name = "Wingfangchu"
@@ -48,7 +48,7 @@
 		/obj/item/food/meat/cutlet/xeno = 2
 	)
 	result = /obj/item/food/soup/wingfangchu
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/wishsoup
 	name = "Wish soup"
@@ -57,7 +57,7 @@
 		/obj/item/reagent_containers/cup/bowl = 1
 	)
 	result= /obj/item/food/soup/wish
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/hotchili
 	name = "Hot chili"
@@ -68,7 +68,7 @@
 		/obj/item/food/grown/tomato = 1
 	)
 	result = /obj/item/food/soup/hotchili
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/coldchili
 	name = "Cold chili"
@@ -79,7 +79,7 @@
 		/obj/item/food/grown/tomato = 1
 	)
 	result = /obj/item/food/soup/coldchili
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/clownchili
 	name = "Chili con carnival"
@@ -91,7 +91,7 @@
 		/obj/item/clothing/shoes/clown_shoes = 1
 	)
 	result = /obj/item/food/soup/clownchili
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/tomatosoup
 	name = "Tomato soup"
@@ -101,7 +101,7 @@
 		/obj/item/food/grown/tomato = 2
 	)
 	result = /obj/item/food/soup/tomato
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/eyeballsoup
 	name = "Eyeball soup"
@@ -112,7 +112,7 @@
 		/obj/item/organ/internal/eyes = 1
 	)
 	result = /obj/item/food/soup/tomato/eyeball
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 
 /datum/crafting_recipe/food/misosoup
@@ -124,7 +124,7 @@
 		/obj/item/food/tofu = 2
 	)
 	result = /obj/item/food/soup/miso
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/bloodsoup
 	name = "Blood soup"
@@ -134,7 +134,7 @@
 		/obj/item/food/grown/tomato/blood = 2
 	)
 	result = /obj/item/food/soup/blood
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/slimesoup
 	name = "Slime soup"
@@ -144,7 +144,7 @@
 			/obj/item/reagent_containers/cup/bowl = 1
 	)
 	result = /obj/item/food/soup/slime
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/clownstears
 	name = "Clowns tears"
@@ -155,7 +155,7 @@
 		/obj/item/stack/sheet/mineral/bananium = 1
 	)
 	result = /obj/item/food/soup/clownstears
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/mysterysoup
 	name = "Mystery soup"
@@ -168,7 +168,7 @@
 		/obj/item/food/cheese/wedge = 1,
 	)
 	result = /obj/item/food/soup/mystery
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/mushroomsoup
 	name = "Mushroom soup"
@@ -179,7 +179,7 @@
 		/obj/item/food/grown/mushroom/chanterelle = 1
 	)
 	result = /obj/item/food/soup/mushroom
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/beetsoup
 	name = "Beet soup"
@@ -190,7 +190,7 @@
 		/obj/item/food/grown/cabbage = 1,
 	)
 	result = /obj/item/food/soup/beet
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/stew
 	name = "Stew"
@@ -205,7 +205,7 @@
 		/obj/item/food/grown/mushroom = 1
 	)
 	result = /obj/item/food/soup/stew
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/spacylibertyduff
 	name = "Spacy liberty duff"
@@ -215,7 +215,7 @@
 		/obj/item/food/grown/mushroom/libertycap = 3
 	)
 	result = /obj/item/food/soup/spacylibertyduff
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/amanitajelly
 	name = "Amanita jelly"
@@ -225,7 +225,7 @@
 		/obj/item/food/grown/mushroom/amanita = 3
 	)
 	result = /obj/item/food/soup/amanitajelly
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/sweetpotatosoup
 	name = "Sweet potato soup"
@@ -236,7 +236,7 @@
 		/obj/item/food/grown/potato/sweet = 2
 	)
 	result = /obj/item/food/soup/sweetpotato
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/redbeetsoup
 	name = "Red beet soup"
@@ -247,7 +247,7 @@
 		/obj/item/food/grown/cabbage = 1
 	)
 	result = /obj/item/food/soup/beet/red
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/onionsoup
 	name = "French onion soup"
@@ -258,7 +258,7 @@
 		/obj/item/food/cheese/wedge = 1,
 	)
 	result = /obj/item/food/soup/onion
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/bisque
 	name = "Bisque"
@@ -266,10 +266,10 @@
 		/datum/reagent/water = 10,
 		/obj/item/reagent_containers/cup/bowl = 1,
 		/obj/item/food/meat/crab = 1,
-		/obj/item/food/boiledrice = 1
+		/obj/item/food/salad/boiledrice = 1
 	)
 	result = /obj/item/food/soup/bisque
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/bungocurry
 	name = "Bungo Curry"
@@ -281,7 +281,7 @@
 		/obj/item/food/grown/bungofruit = 1
 	)
 	result = /obj/item/food/soup/bungocurry
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/electron
 	name = "Electron Soup"
@@ -292,7 +292,7 @@
 		/obj/item/food/grown/mushroom/jupitercup = 1
 	)
 	result = /obj/item/food/soup/electron
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/peasoup
 	name = "Pea soup"
@@ -304,22 +304,21 @@
 		/obj/item/reagent_containers/cup/bowl = 1
 	)
 	result = /obj/item/food/soup/peasoup
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/indian_curry
 	name = "Indian Chicken Curry"
 	reqs = list(
-		/obj/item/reagent_containers/cup/bowl = 1,
 		/obj/item/food/meat/slab/chicken = 1,
 		/obj/item/food/grown/onion = 2,
 		/obj/item/food/grown/chili = 1,
 		/obj/item/food/grown/garlic = 1,
 		/obj/item/food/butter = 1,
-		/obj/item/food/boiledrice = 1,
+		/obj/item/food/salad/boiledrice = 1,
 		/datum/reagent/consumable/cream = 5
 	)
 	result = /obj/item/food/soup/indian_curry
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/oatmeal
 	name = "Oatmeal"
@@ -329,7 +328,7 @@
 		/obj/item/food/grown/oat = 1
 	)
 	result = /obj/item/food/soup/oatmeal
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/zurek
 	name = "Zurek"
@@ -343,7 +342,7 @@
 		/obj/item/reagent_containers/cup/bowl = 1,
 	)
 	result = /obj/item/food/soup/zurek
-	category = CAT_SOUP
+	subcategory = CAT_SOUP
 
 /datum/crafting_recipe/food/cullen_skink
 	name = "Cullen Skink"
@@ -356,29 +355,4 @@
 		/obj/item/reagent_containers/cup/bowl = 1,
 	)
 	result = /obj/item/food/soup/cullen_skink
-	category = CAT_SOUP
-
-/datum/crafting_recipe/food/chicken_noodle_soup
-	name = "Chicken Noodle Soup"
-	reqs = list(
-		/obj/item/food/meat/slab/chicken = 1,
-		/obj/item/food/spaghetti/boiledspaghetti = 1,
-		/obj/item/food/grown/carrot = 1,
-		/datum/reagent/water = 10,
-		/obj/item/reagent_containers/cup/bowl = 1,
-	)
-	result = /obj/item/food/soup/chicken_noodle_soup
-	category = CAT_SOUP
-
-/datum/crafting_recipe/food/corn_chowder
-	name = "Corn Chowder"
-	reqs = list(
-		/obj/item/food/grown/corn = 1,
-		/obj/item/food/grown/potato = 1,
-		/obj/item/food/grown/carrot = 1,
-		/obj/item/food/meat/bacon = 1,
-		/datum/reagent/consumable/cream = 5,
-		/obj/item/reagent_containers/cup/bowl = 1,
-	)
-	result = /obj/item/food/soup/corn_chowder
-	category = CAT_SOUP
+	subcategory = CAT_SOUP

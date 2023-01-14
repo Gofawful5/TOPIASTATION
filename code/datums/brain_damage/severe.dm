@@ -121,27 +121,24 @@
 	name = "Narcolepsy"
 	desc = "Patient may involuntarily fall asleep during normal activities."
 	scan_desc = "traumatic narcolepsy"
-	gain_text = span_warning("You have a constant feeling of drowsiness...")
-	lose_text = span_notice("You feel awake and aware again.")
+	gain_text = "<span class='warning'>You have a constant feeling of drowsiness...</span>"
+	lose_text = "<span class='notice'>You feel awake and aware again.</span>"
 
 /datum/brain_trauma/severe/narcolepsy/on_life(delta_time, times_fired)
+	..()
 	if(owner.IsSleeping())
 		return
-
 	var/sleep_chance = 1
-	var/drowsy = !!owner.has_status_effect(/datum/status_effect/drowsiness)
 	if(owner.m_intent == MOVE_INTENT_RUN)
 		sleep_chance += 2
-	if(drowsy)
+	if(owner.drowsyness)
 		sleep_chance += 3
-
 	if(DT_PROB(0.5 * sleep_chance, delta_time))
 		to_chat(owner, span_warning("You fall asleep."))
-		owner.Sleeping(6 SECONDS)
-
-	else if(!drowsy && DT_PROB(sleep_chance, delta_time))
+		owner.Sleeping(60)
+	else if(!owner.drowsyness && DT_PROB(sleep_chance, delta_time))
 		to_chat(owner, span_warning("You feel tired..."))
-		owner.adjust_drowsiness(20 SECONDS)
+		owner.adjust_drowsyness(10)
 
 /datum/brain_trauma/severe/monophobia
 	name = "Monophobia"
@@ -173,7 +170,7 @@
 	for(var/mob/M in oview(owner, 7))
 		if(!isliving(M)) //ghosts ain't people
 			continue
-		if(istype(M, /mob/living/simple_animal/pet) || istype(M, /mob/living/basic/pet) || M.ckey)
+		if((istype(M, /mob/living/simple_animal/pet)) || M.ckey)
 			return FALSE
 	return TRUE
 
@@ -289,7 +286,9 @@
 	owner.remove_status_effect(/datum/status_effect/trance)
 
 /datum/brain_trauma/severe/hypnotic_trigger/handle_hearing(datum/source, list/hearing_args)
-	if(!owner.can_hear() || owner == hearing_args[HEARING_SPEAKER])
+	if(!owner.can_hear())
+		return
+	if(owner == hearing_args[HEARING_SPEAKER])
 		return
 
 	var/regex/reg = new("(\\b[REGEX_QUOTE(trigger_phrase)]\\b)","ig")

@@ -69,7 +69,7 @@
 /mob/living/simple_animal/hostile/asteroid/polarbear/lesser
 	name = "magic polar bear"
 	desc = "It seems sentient somehow."
-	faction = list(FACTION_NEUTRAL)
+	faction = list("neutral")
 
 /obj/item/crusher_trophy/bear_paw
 	name = "polar bear paw"

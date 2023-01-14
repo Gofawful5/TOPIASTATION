@@ -5,8 +5,8 @@
 	alert_type = null
 	tick_interval = 2 SECONDS
 	remove_on_fullheal = TRUE
-	/// Biotypes which cannot hallucinate.
-	var/barred_biotypes = NO_HALLUCINATION_BIOTYPES
+	/// Can this hallucination apply to silicons?
+	var/affects_silicons = FALSE
 	/// The lower range of when the next hallucination will trigger after one occurs.
 	var/lower_tick_interval = 10 SECONDS
 	/// The upper range of when the next hallucination will trigger after one occurs.
@@ -14,13 +14,19 @@
 	/// The cooldown for when the next hallucination can occur
 	COOLDOWN_DECLARE(hallucination_cooldown)
 
-/datum/status_effect/hallucination/on_creation(mob/living/new_owner, duration)
+/datum/status_effect/hallucination/on_creation(
+	mob/living/new_owner,
+	duration,
+	affects_silicons = FALSE,
+)
+
 	if(isnum(duration))
 		src.duration = duration
+	src.affects_silicons = affects_silicons
 	return ..()
 
 /datum/status_effect/hallucination/on_apply()
-	if(owner.mob_biotypes & barred_biotypes)
+	if(!affects_silicons && issilicon(owner))
 		return FALSE
 
 	RegisterSignal(owner, COMSIG_LIVING_HEALTHSCAN,  PROC_REF(on_health_scan))

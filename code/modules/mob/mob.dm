@@ -744,14 +744,10 @@
 	set name = "Respawn"
 	set category = "OOC"
 
-	if (CONFIG_GET(flag/norespawn))
-		if (!check_rights_for(usr.client, R_ADMIN))
-			to_chat(usr, span_boldnotice("Respawning is not enabled!"))
-			return
-		else if (tgui_alert(usr, "Respawning is currently disabled, do you want to use your permissions to circumvent it?", "Respawn", list("Yes", "No")) != "Yes")
-			return
+	if (CONFIG_GET(flag/norespawn) && (!check_rights_for(usr.client, R_ADMIN) || tgui_alert(usr, "Respawn configs disabled. Do you want to use your permissions to circumvent it?", "Respawn", list("Yes", "No")) != "Yes"))
+		return
 
-	if (stat != DEAD)
+	if ((stat != DEAD || !( SSticker )))
 		to_chat(usr, span_boldnotice("You must be dead to use this!"))
 		return
 
@@ -831,8 +827,7 @@
 
 /// Adds this list to the output to the stat browser
 /mob/proc/get_status_tab_items()
-	. = list("") //we want to offset unique stuff from standard stuff
-	SEND_SIGNAL(src, COMSIG_MOB_GET_STATUS_TAB_ITEMS, .)
+	. = list()
 
 /**
  * Convert a list of spells into a displyable list for the statpanel
@@ -862,23 +857,11 @@
 
 	return data
 
-/mob/proc/swap_hand(held_index)
-	SHOULD_NOT_OVERRIDE(TRUE) // Override perform_hand_swap instead
-
+/mob/proc/swap_hand()
 	var/obj/item/held_item = get_active_held_item()
-	if(SEND_SIGNAL(src, COMSIG_MOB_SWAPPING_HANDS, held_item) & COMPONENT_BLOCK_SWAP)
+	if(SEND_SIGNAL(src, COMSIG_MOB_SWAP_HANDS, held_item) & COMPONENT_BLOCK_SWAP)
 		to_chat(src, span_warning("Your other hand is too busy holding [held_item]."))
 		return FALSE
-
-	var/result = perform_hand_swap(held_index)
-	if (result)
-		SEND_SIGNAL(src, COMSIG_MOB_SWAP_HANDS)
-
-	return result
-
-/// Performs the actual ritual of swapping hands, such as setting the held index variables
-/mob/proc/perform_hand_swap(held_index)
-	PROTECTED_PROC(TRUE)
 	return TRUE
 
 /mob/proc/activate_hand(selhand)
@@ -1107,8 +1090,8 @@
 					break
 				search_id = 0
 
-		else if( search_pda && istype(A, /obj/item/modular_computer/pda) )
-			var/obj/item/modular_computer/pda/PDA = A
+		else if( search_pda && istype(A, /obj/item/modular_computer/tablet/pda) )
+			var/obj/item/modular_computer/tablet/pda/PDA = A
 			if(PDA.saved_identification == oldname)
 				PDA.saved_identification = newname
 				PDA.UpdateDisplay()
@@ -1136,7 +1119,7 @@
 /mob/proc/sync_lighting_plane_alpha()
 	if(!hud_used)
 		return
-	for(var/atom/movable/screen/plane_master/light_plane as anything in hud_used.get_true_plane_masters(RENDER_PLANE_LIGHTING))
+	for(var/atom/movable/screen/plane_master/rendering_plate/lighting/light_plane in hud_used.get_true_plane_masters(RENDER_PLANE_LIGHTING))
 		light_plane.set_alpha(lighting_alpha)
 
 ///Update the mouse pointer of the attached client in this mob
@@ -1374,6 +1357,9 @@
 			. = TRUE
 		if(NAMEOF(src, eye_blind))
 			set_blindness(var_value)
+			. = TRUE
+		if(NAMEOF(src, eye_blurry))
+			set_blurriness(var_value)
 			. = TRUE
 
 	if(!isnull(.))

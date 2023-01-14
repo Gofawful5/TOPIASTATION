@@ -25,7 +25,6 @@
 	. = ..()
 	if(!check_allowed_items(target, not_inside = TRUE))
 		return
-	. |= AFTERATTACK_PROCESSED_ITEM
 	if(istype(target, /obj/structure/projected_forcefield))
 		var/obj/structure/projected_forcefield/F = target
 		if(F.generator == src)
@@ -105,16 +104,8 @@
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
 	resistance_flags = INDESTRUCTIBLE
 	can_atmos_pass = ATMOS_PASS_DENSITY
-	armor_type = /datum/armor/structure_projected_forcefield
+	armor = list(MELEE = 0, BULLET = 25, LASER = 50, ENERGY = 50, BOMB = 25, BIO = 0, FIRE = 100, ACID = 100)
 	var/obj/item/forcefield_projector/generator
-
-/datum/armor/structure_projected_forcefield
-	bullet = 25
-	laser = 50
-	energy = 50
-	bomb = 25
-	fire = 100
-	acid = 100
 
 /obj/structure/projected_forcefield/Initialize(mapload, obj/item/forcefield_projector/origin)
 	. = ..()

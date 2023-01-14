@@ -47,11 +47,11 @@
 	return ..()
 
 /datum/outfit/hermit
-	name = "Lavaland Hermit"
+	name = "Lavaland hermit"
 	uniform = /obj/item/clothing/under/color/grey/ancient
+	shoes = /obj/item/clothing/shoes/sneakers/black
 	back = /obj/item/storage/backpack
 	mask = /obj/item/clothing/mask/breath
-	shoes = /obj/item/clothing/shoes/sneakers/black
 	l_pocket = /obj/item/tank/internals/emergency_oxygen
 	r_pocket = /obj/item/flashlight/glowstick
 
@@ -93,11 +93,11 @@
 
 /datum/outfit/beachbum
 	name = "Beach Bum"
-	id = /obj/item/card/id/advanced
-	uniform = /obj/item/clothing/under/pants/jeans
 	glasses = /obj/item/clothing/glasses/sunglasses
-	l_pocket = /obj/item/food/pizzaslice/dank
 	r_pocket = /obj/item/storage/wallet/random
+	l_pocket = /obj/item/food/pizzaslice/dank
+	uniform = /obj/item/clothing/under/pants/jeans
+	id = /obj/item/card/id/advanced
 
 /datum/outfit/beachbum/post_equip(mob/living/carbon/human/bum, visualsOnly = FALSE)
 	. = ..()
@@ -107,8 +107,8 @@
 
 /datum/outfit/beachbum/lifeguard
 	name = "Beach Lifeguard"
-	id_trim = /datum/id_trim/lifeguard
 	uniform = /obj/item/clothing/under/shorts/red
+	id_trim = /datum/id_trim/lifeguard
 
 /obj/effect/mob_spawn/ghost_role/human/bartender
 	name = "bartender sleeper"
@@ -122,13 +122,13 @@
 
 /datum/outfit/spacebartender
 	name = "Space Bartender"
+	uniform = /obj/item/clothing/under/rank/civilian/bartender
+	back = /obj/item/storage/backpack
+	shoes = /obj/item/clothing/shoes/sneakers/black
+	suit = /obj/item/clothing/suit/armor/vest
+	glasses = /obj/item/clothing/glasses/sunglasses/reagent
 	id = /obj/item/card/id/advanced
 	id_trim = /datum/id_trim/space_bartender
-	uniform = /obj/item/clothing/under/rank/civilian/bartender
-	suit = /obj/item/clothing/suit/armor/vest
-	back = /obj/item/storage/backpack
-	glasses = /obj/item/clothing/glasses/sunglasses/reagent
-	shoes = /obj/item/clothing/shoes/sneakers/black
 
 /datum/outfit/spacebartender/post_equip(mob/living/carbon/human/bartender, visualsOnly = FALSE)
 	. = ..()
@@ -228,8 +228,7 @@
 /obj/effect/mob_spawn/ghost_role/human/ash_walker/allow_spawn(mob/user, silent = FALSE)
 	if(!(user.key in team.players_spawned))//one per person unless you get a bonus spawn
 		return TRUE
-	if(!silent)
-		to_chat(user, span_warning("You have exhausted your usefulness to the Necropolis."))
+	to_chat(user, span_warning("<b>You have exhausted your usefulness to the Necropolis</b>."))
 	return FALSE
 
 /obj/effect/mob_spawn/ghost_role/human/ash_walker/special(mob/living/carbon/human/spawned_human)
@@ -286,27 +285,26 @@
 
 /datum/outfit/lavaland_syndicate
 	name = "Lavaland Syndicate Agent"
-	id = /obj/item/card/id/advanced/chameleon
-	id_trim = /datum/id_trim/chameleon/operative
+	r_hand = /obj/item/gun/ballistic/automatic/sniper_rifle
 	uniform = /obj/item/clothing/under/syndicate
 	suit = /obj/item/clothing/suit/toggle/labcoat
-	back = /obj/item/storage/backpack
+	shoes = /obj/item/clothing/shoes/combat
 	gloves = /obj/item/clothing/gloves/tackler/combat/insulated
 	ears = /obj/item/radio/headset/syndicate/alt
-	shoes = /obj/item/clothing/shoes/combat
+	back = /obj/item/storage/backpack
 	r_pocket = /obj/item/gun/ballistic/automatic/pistol
-	r_hand = /obj/item/gun/ballistic/automatic/sniper_rifle
-
+	id = /obj/item/card/id/advanced/chameleon
 	implants = list(/obj/item/implant/weapons_auth)
+	id_trim = /datum/id_trim/chameleon/operative
 
 /datum/outfit/lavaland_syndicate/post_equip(mob/living/carbon/human/syndicate, visualsOnly = FALSE)
 	syndicate.faction |= ROLE_SYNDICATE
 
 /datum/outfit/lavaland_syndicate/comms
 	name = "Lavaland Syndicate Comms Agent"
-	suit = /obj/item/clothing/suit/armor/vest
-	mask = /obj/item/clothing/mask/chameleon/gps
 	r_hand = /obj/item/melee/energy/sword/saber
+	mask = /obj/item/clothing/mask/chameleon/gps
+	suit = /obj/item/clothing/suit/armor/vest
 
 /obj/item/clothing/mask/chameleon/gps/Initialize(mapload)
 	. = ..()

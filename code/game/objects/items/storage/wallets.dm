@@ -18,7 +18,6 @@
 		/obj/item/holochip,
 		/obj/item/card,
 		/obj/item/clothing/mask/cigarette,
-		/obj/item/coupon,
 		/obj/item/flashlight/pen,
 		/obj/item/seeds,
 		/obj/item/stack/medical,
@@ -151,7 +150,6 @@
 
 /obj/item/storage/wallet/random
 	icon_state = "random_wallet" // for mapping purposes
-	worn_icon_state = "wallet"
 
 /obj/item/storage/wallet/random/Initialize(mapload)
 	. = ..()

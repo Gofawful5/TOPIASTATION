@@ -4,7 +4,7 @@
 	gender = FEMALE //All xenos are girls!!
 	dna = null
 	faction = list(ROLE_ALIEN)
-	sight = SEE_MOBS
+	sight = SEE_MOBS | SEE_BLACKNESS
 	see_in_dark = 4
 	verb_say = "hisses"
 	initial_language_holder = /datum/language_holder/alien
@@ -72,6 +72,10 @@
 
 /mob/living/carbon/alien/reagent_check(datum/reagent/R, delta_time, times_fired) //can metabolize all reagents
 	return FALSE
+
+/mob/living/carbon/alien/get_status_tab_items()
+	. = ..()
+	. += "Combat mode: [combat_mode ? "On" : "Off"]"
 
 /mob/living/carbon/alien/getTrail()
 	if(getBruteLoss() < 200)

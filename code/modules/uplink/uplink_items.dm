@@ -46,8 +46,6 @@
 	var/surplus = 100
 	/// Whether this can be discounted or not
 	var/cant_discount = FALSE
-	/// If this value is changed on two items they will share stock, defaults to not sharing stock with any other item
-	var/stock_key = UPLINK_SHARED_STOCK_UNIQUE
 	/// How many items of this stock can be purchased.
 	var/limited_stock = -1 //Setting this above zero limits how many times this item can be bought by the same traitor in a round, -1 is unlimited
 	/// A bitfield to represent what uplinks can purchase this item.
@@ -67,12 +65,6 @@
 	var/illegal_tech = TRUE
 	// String to be shown instead of the price, e.g for the Random item.
 	var/cost_override_string = ""
-
-/datum/uplink_item/New()
-	. = ..()
-	if(stock_key != UPLINK_SHARED_STOCK_UNIQUE)
-		return
-	stock_key = type
 
 /datum/uplink_category
 	/// Name of the category
@@ -133,6 +125,3 @@
 	..()
 	if(user?.mind?.failed_special_equipment)
 		user.mind.failed_special_equipment -= item
-
-/// Code that enables the ability to have limited stock that is shared by different items
-/datum/shared_uplink_stock

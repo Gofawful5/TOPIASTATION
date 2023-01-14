@@ -14,7 +14,7 @@
 	inhand_icon_state = "bulldog"
 	lefthand_file = 'icons/mob/inhands/weapons/guns_lefthand.dmi'
 	righthand_file = 'icons/mob/inhands/weapons/guns_righthand.dmi'
-	armor_type = /datum/armor/item_pneumatic_cannon
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 0, BIO = 0, FIRE = 60, ACID = 50)
 	var/maxWeightClass = 20 //The max weight of items that can fit into the cannon
 	var/loadedWeightClass = 0 //The weight of items currently in the cannon
 	var/obj/item/tank/internals/tank = null //The gas tank that is drawn from to fire things
@@ -38,10 +38,6 @@
 	trigger_guard = TRIGGER_GUARD_NORMAL
 
 
-/datum/armor/item_pneumatic_cannon
-	fire = 60
-	acid = 50
-
 /obj/item/pneumatic_cannon/Initialize(mapload)
 	. = ..()
 	if(selfcharge)
@@ -51,8 +47,7 @@
 	START_PROCESSING(SSobj, src)
 
 /obj/item/pneumatic_cannon/process()
-	charge_tick++
-	if(charge_tick >= charge_ticks && charge_type)
+	if(++charge_tick >= charge_ticks && charge_type)
 		fill_with_type(charge_type, charge_amount)
 
 /obj/item/pneumatic_cannon/Destroy()
@@ -161,7 +156,6 @@
 	if(!istype(user))
 		return
 	Fire(user, target)
-	return AFTERATTACK_PROCESSED_ITEM
 
 /obj/item/pneumatic_cannon/proc/Fire(mob/living/user, atom/target)
 	if(!istype(user) && !target)

@@ -148,7 +148,7 @@
 	return ..()
 
 
-/obj/item/taperecorder/Hear(message, atom/movable/speaker, message_langs, raw_message, radio_freq, spans, list/message_mods = list(), message_range)
+/obj/item/taperecorder/Hear(message, atom/movable/speaker, message_langs, raw_message, radio_freq, spans, list/message_mods = list())
 	. = ..()
 	if(mytape && recording)
 		mytape.timestamp += mytape.used_capacity
@@ -468,4 +468,4 @@
 	. = ..()
 
 /obj/item/tape/dyed
-	icon_state = "tape_greyscale"
+	icon_state = "greyscale"

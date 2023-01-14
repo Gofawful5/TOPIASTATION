@@ -70,7 +70,10 @@
 	 */
 	var/pixels_per_unit = 24
 
-	SET_BASE_PIXEL(11, 10)
+	pixel_x = 11
+	pixel_y = 10
+	base_pixel_x = 11
+	base_pixel_y = 10
 
 	custom_price = PAYCHECK_CREW
 
@@ -337,7 +340,10 @@
 	icon_state = "19x19"
 	width = 19
 	height = 19
-	SET_BASE_PIXEL(7, 7)
+	pixel_x = 7
+	pixel_y = 7
+	base_pixel_x = 7
+	base_pixel_y = 7
 	framed_offset_x = 7
 	framed_offset_y = 7
 
@@ -346,7 +352,10 @@
 	icon_state = "23x19"
 	width = 23
 	height = 19
-	SET_BASE_PIXEL(5, 7)
+	pixel_x = 5
+	pixel_y = 7
+	base_pixel_x = 5
+	base_pixel_y = 7
 	framed_offset_x = 5
 	framed_offset_y = 7
 
@@ -355,7 +364,10 @@
 	icon_state = "23x23"
 	width = 23
 	height = 23
-	SET_BASE_PIXEL(5, 5)
+	pixel_x = 5
+	pixel_y = 5
+	base_pixel_x = 5
+	base_pixel_y = 5
 	framed_offset_x = 5
 	framed_offset_y = 5
 
@@ -365,7 +377,10 @@
 	icon_state = "24x24"
 	width = 24
 	height = 24
-	SET_BASE_PIXEL(4, 4)
+	pixel_x = 4
+	pixel_y = 4
+	base_pixel_x = 4
+	base_pixel_y = 4
 	framed_offset_x = 4
 	framed_offset_y = 4
 
@@ -375,7 +390,10 @@
 	icon_state = "24x24" //The vending spritesheet needs the icons to be 32x32. We'll set the actual icon on Initialize.
 	width = 36
 	height = 24
-	SET_BASE_PIXEL(-4, 4)
+	pixel_x = -4
+	pixel_y = 4
+	base_pixel_x = -4
+	base_pixel_y = 4
 	framed_offset_x = 14
 	framed_offset_y = 4
 	pixels_per_unit = 20
@@ -395,7 +413,10 @@
 	icon_state = "24x24" //Ditto
 	width = 45
 	height = 27
-	SET_BASE_PIXEL(-8, 2)
+	pixel_x = -8
+	pixel_y = 2
+	base_pixel_x = -8
+	base_pixel_y = 2
 	framed_offset_x = 9
 	framed_offset_y = 4
 	pixels_per_unit = 18

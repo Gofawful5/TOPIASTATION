@@ -83,9 +83,6 @@
 
 	var/datum/weakref/modeswitch_action_ref
 
-	/// If true shows the contents of the storage in open_storage
-	var/display_contents = TRUE
-
 /datum/storage/New(atom/parent, max_slots, max_specific_storage, max_total_storage, numerical_stacking, allow_quick_gather, allow_quick_empty, collection_mode, attack_hand_interact)
 	boxes = new(null, src)
 	closer = new(null, src)
@@ -952,8 +949,7 @@ GLOBAL_LIST_EMPTY(cached_storage_typecaches)
 		return FALSE
 
 	if(!quickdraw || to_show.get_active_held_item())
-		if(display_contents)
-			show_contents(to_show)
+		show_contents(to_show)
 
 		if(animated)
 			animate_parent()
@@ -1107,6 +1103,5 @@ GLOBAL_LIST_EMPTY(cached_storage_typecaches)
 	if(!resolve_parent)
 		return
 
-	var/matrix/old_matrix = resolve_parent.transform
-	animate(resolve_parent, time = 1.5, loop = 0, transform = resolve_parent.transform.Scale(1.07, 0.9))
-	animate(time = 2, transform = old_matrix)
+	animate(resolve_parent, time = 1.5, loop = 0, transform = matrix().Scale(1.07, 0.9))
+	animate(time = 2, transform = null)
