@@ -3,8 +3,8 @@
  * The file also contain the guicode of the machine
  */
 /obj/machinery/atmospherics/components/unary/hypertorus
-	icon = 'icons/obj/atmospherics/components/hypertorus.dmi'
-	icon_state = "core"
+	icon = 'icons/obj/machines/atmospherics/hypertorus.dmi'
+	icon_state = "core_off"
 
 	name = "thermomachine"
 	desc = "Heats or cools gas in connected pipes."
@@ -49,9 +49,9 @@
 		return FALSE
 	if(user.combat_mode)
 		return FALSE
-	balloon_alert(user, "You start repairing the crack...")
-	if(tool.use_tool(src, user, 10 SECONDS, volume=30, amount=5))
-		balloon_alert(user, "You repaired the crack.")
+	balloon_alert(user, "repairing...")
+	if(tool.use_tool(src, user, 10 SECONDS, volume=30))
+		balloon_alert(user, "repaired")
 		cracked = FALSE
 		update_appearance()
 
@@ -126,8 +126,8 @@
 /obj/machinery/hypertorus
 	name = "hypertorus_core"
 	desc = "hypertorus_core"
-	icon = 'icons/obj/atmospherics/components/hypertorus.dmi'
-	icon_state = "core"
+	icon = 'icons/obj/machines/atmospherics/hypertorus.dmi'
+	icon_state = "core_off"
 	move_resist = INFINITY
 	anchored = TRUE
 	density = TRUE
@@ -181,7 +181,7 @@
 
 /obj/machinery/hypertorus/interface/multitool_act(mob/living/user, obj/item/I)
 	. = ..()
-	var/turf/T = get_step(src,turn(dir,180))
+	var/turf/T = get_step(src,REVERSE_DIR(dir))
 	var/obj/machinery/atmospherics/components/unary/hypertorus/core/centre = locate() in T
 
 	if(!centre || !centre.check_part_connectivity())
@@ -436,8 +436,8 @@
 /obj/item/hfr_box
 	name = "HFR box"
 	desc = "If you see this, call the police."
-	icon = 'icons/obj/atmospherics/components/hypertorus.dmi'
-	icon_state = "box"
+	icon = 'icons/obj/machines/atmospherics/hypertorus.dmi'
+	icon_state = "error"
 	///What kind of box are we handling?
 	var/box_type = "impossible"
 	///What's the path of the machine we making

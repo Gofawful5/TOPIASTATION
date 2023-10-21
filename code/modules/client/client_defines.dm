@@ -160,8 +160,6 @@
 
 	///Autoclick list of two elements, first being the clicked thing, second being the parameters.
 	var/list/atom/selected_target[2]
-	///Autoclick variable referencing the associated item.
-	var/obj/item/active_mousedown_item = null
 	///Used in MouseDrag to preserve the original mouse click parameters
 	var/mouseParams = ""
 	///Used in MouseDrag to preserve the last mouse-entered location. Weakref
@@ -172,6 +170,10 @@
 	var/middragtime = 0
 	//Middle-mouse-button clicked object control for aimbot exploit detection. Weakref
 	var/datum/weakref/middle_drag_atom_ref
+	//When we started the currently active drag
+	var/drag_start = 0
+	//The params we were passed at the start of the drag, in list form
+	var/list/drag_details
 
 
 	/// Messages currently seen by this client

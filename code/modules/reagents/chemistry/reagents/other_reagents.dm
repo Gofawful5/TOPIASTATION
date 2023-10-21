@@ -5,18 +5,23 @@
 	metabolization_rate = 12.5 * REAGENTS_METABOLISM //fast rate so it disappears fast.
 	taste_description = "iron"
 	taste_mult = 1.3
-	glass_icon_state = "glass_red"
-	glass_name = "glass of tomato juice"
-	glass_desc = "Are you sure this is tomato juice?"
-	shot_glass_icon_state = "shotglassred"
 	penetrates_skin = NONE
 	ph = 7.4
+	default_container = /obj/item/reagent_containers/blood
+
+/datum/glass_style/shot_glass/blood
+	required_drink_type = /datum/reagent/blood
+	icon_state = "shotglassred"
+
+/datum/glass_style/drinking_glass/blood
+	required_drink_type = /datum/reagent/blood
+	name = "glass of tomato juice"
+	desc = "Are you sure this is tomato juice?"
+	icon_state = "glass_red"
 
 	// FEED ME
-/datum/reagent/blood/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	. = ..()
-	if(chems.has_reagent(type, 1))
-		mytray.adjust_pestlevel(rand(2,3))
+/datum/reagent/blood/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_pestlevel(rand(2, 3))
 
 /datum/reagent/blood/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume, show_message=TRUE, touch_protection=0)
 	. = ..()
@@ -27,14 +32,27 @@
 			if((strain.spread_flags & DISEASE_SPREAD_SPECIAL) || (strain.spread_flags & DISEASE_SPREAD_NON_CONTAGIOUS))
 				continue
 
-			if(methods & (INJECT|INGEST|PATCH))
+			if(methods & INGEST)
+				if(!strain.has_required_infectious_organ(exposed_mob, ORGAN_SLOT_STOMACH))
+					continue
+
 				exposed_mob.ForceContractDisease(strain)
-			else if((methods & (TOUCH|VAPOR)) && (strain.spread_flags & DISEASE_SPREAD_CONTACT_FLUIDS))
+			else if(methods & (INJECT|PATCH))
+				if(!strain.has_required_infectious_organ(exposed_mob, ORGAN_SLOT_HEART))
+					continue
+
+				exposed_mob.ForceContractDisease(strain)
+			else if((methods & VAPOR) && (strain.spread_flags & DISEASE_SPREAD_CONTACT_FLUIDS))
+				if(!strain.has_required_infectious_organ(exposed_mob, ORGAN_SLOT_LUNGS))
+					continue
+
+				exposed_mob.ContactContractDisease(strain)
+			else if((methods & TOUCH) && (strain.spread_flags & DISEASE_SPREAD_CONTACT_FLUIDS))
 				exposed_mob.ContactContractDisease(strain)
 
 	if(iscarbon(exposed_mob))
 		var/mob/living/carbon/exposed_carbon = exposed_mob
-		if(exposed_carbon.get_blood_id() == type && ((methods & INJECT) || ((methods & INGEST) && exposed_carbon.dna && exposed_carbon.dna.species && (DRINKSBLOOD in exposed_carbon.dna.species.species_traits))))
+		if(exposed_carbon.get_blood_id() == type && ((methods & INJECT) || ((methods & INGEST) && HAS_TRAIT(exposed_carbon, TRAIT_DRINKS_BLOOD))))
 			if(!data || !(data["blood_type"] in get_safe_blood(exposed_carbon.dna.blood_type)))
 				exposed_carbon.reagents.add_reagent(/datum/reagent/toxin, reac_volume * 0.5)
 			else
@@ -101,19 +119,19 @@
 	if(data["blood_DNA"])
 		bloodsplatter.add_blood_DNA(list(data["blood_DNA"] = data["blood_type"]))
 
-/datum/reagent/blood/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	. = ..()
-	mytray.adjust_pestlevel(rand(2,3))
-
-/datum/reagent/liquidgibs
+/datum/reagent/consumable/liquidgibs
 	name = "Liquid Gibs"
 	color = "#CC4633"
 	description = "You don't even want to think about what's in here."
 	taste_description = "gross iron"
-	shot_glass_icon_state = "shotglassred"
+	nutriment_factor = 2
 	material = /datum/material/meat
 	ph = 7.45
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+
+/datum/glass_style/shot_glass/liquidgibs
+	required_drink_type = /datum/reagent/consumable/liquidgibs
+	icon_state = "shotglassred"
 
 /datum/reagent/bone_dust
 	name = "Bone Dust"
@@ -162,11 +180,18 @@
 	color = "#AAAAAA77" // rgb: 170, 170, 170, 77 (alpha)
 	taste_description = "water"
 	var/cooling_temperature = 2
-	glass_icon_state = "glass_clear"
-	glass_name = "glass of water"
-	glass_desc = "The father of all refreshments."
-	shot_glass_icon_state = "shotglassclear"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_CLEANS
+	default_container = /obj/item/reagent_containers/cup/glass/waterbottle
+
+/datum/glass_style/shot_glass/water
+	required_drink_type = /datum/reagent/water
+	icon_state = "shotglassclear"
+
+/datum/glass_style/drinking_glass/water
+	required_drink_type = /datum/reagent/water
+	name = "glass of water"
+	desc = "The father of all refreshments."
+	icon_state = "glass_clear"
 
 /*
  * Water reaction to turf
@@ -215,108 +240,180 @@
 		new /obj/item/stack/sheet/wethide(get_turf(HH), HH.amount)
 		qdel(HH)
 
-/*
+
+/// How many wet stacks you get per units of water when it's applied by touch.
+#define WATER_TO_WET_STACKS_FACTOR_TOUCH 0.5
+/// How many wet stacks you get per unit of water when it's applied by vapor. Much less effective than by touch, of course.
+#define WATER_TO_WET_STACKS_FACTOR_VAPOR 0.1
+
+
+/**
  * Water reaction to a mob
  */
-
-/datum/reagent/water/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume)//Splashing people with water can help put them out!
+/datum/reagent/water/expose_mob(mob/living/exposed_mob, methods = TOUCH, reac_volume)//Splashing people with water can help put them out!
 	. = ..()
 	if(methods & TOUCH)
 		exposed_mob.extinguish_mob() // extinguish removes all fire stacks
+		exposed_mob.adjust_wet_stacks(reac_volume * WATER_TO_WET_STACKS_FACTOR_TOUCH) // Water makes you wet, at a 50% water-to-wet-stacks ratio. Which, in turn, gives you some mild protection from being set on fire!
+
 	if(methods & VAPOR)
+		exposed_mob.adjust_wet_stacks(reac_volume * WATER_TO_WET_STACKS_FACTOR_VAPOR) // Spraying someone with water with the hope to put them out is just simply too funny to me not to add it.
+
 		if(!isfelinid(exposed_mob))
 			return
+
 		exposed_mob.incapacitate(1) // startles the felinid, canceling any do_after
 		exposed_mob.add_mood_event("watersprayed", /datum/mood_event/watersprayed)
 
 
-/datum/reagent/water/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	. = ..()
-	if(M.blood_volume)
-		M.blood_volume += 0.1 * REM * delta_time // water is good for you!
+#undef WATER_TO_WET_STACKS_FACTOR_TOUCH
+#undef WATER_TO_WET_STACKS_FACTOR_VAPOR
 
-///For weird backwards situations where water manages to get added to trays nutrients, as opposed to being snowflaked away like usual.
-/datum/reagent/water/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_waterlevel(round(chems.get_reagent_amount(src.type) * 1))
-		//You don't belong in this world, monster!
-		chems.remove_reagent(/datum/reagent/water, chems.get_reagent_amount(src.type))
+
+/datum/reagent/water/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(affected_mob.blood_volume)
+		affected_mob.blood_volume += 0.1 * REM * seconds_per_tick // water is good for you!
+	affected_mob.adjust_drunk_effect(-0.25 * REM * seconds_per_tick) // and even sobers you up slowly!!
+
+// For weird backwards situations where water manages to get added to trays nutrients, as opposed to being snowflaked away like usual.
+/datum/reagent/water/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_waterlevel(round(volume))
+	//You don't belong in this world, monster!
+	mytray.reagents.remove_reagent(type, volume)
+
+/datum/reagent/water/salt
+	name = "Saltwater"
+	description = "Water, but salty. Smells like... the station infirmary?"
+	color = "#aaaaaa9d" // rgb: 170, 170, 170, 77 (alpha)
+	taste_description = "the sea"
+	cooling_temperature = 3
+	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_CLEANS
+	default_container = /obj/item/reagent_containers/cup/glass/waterbottle
+
+/datum/glass_style/shot_glass/water/salt
+	required_drink_type = /datum/reagent/water/salt
+	icon_state = "shotglassclear"
+
+/datum/glass_style/drinking_glass/water/salt
+	required_drink_type = /datum/reagent/water/salt
+	name = "glass of saltwater"
+	desc = "If you have a sore throat, gargle some saltwater and watch the pain go away. Can be used as a very improvised topical medicine against wounds."
+	icon_state = "glass_clear"
+
+/datum/reagent/water/salt/expose_mob(mob/living/exposed_mob, methods, reac_volume)
+	. = ..()
+	if(!iscarbon(exposed_mob))
+		return
+	var/mob/living/carbon/carbies = exposed_mob
+	if(!(methods & (PATCH|TOUCH|VAPOR)))
+		return
+	for(var/datum/wound/iter_wound as anything in carbies.all_wounds)
+		iter_wound.on_saltwater(reac_volume, carbies)
+
+// Mixed salt with water! All the help of salt with none of the irritation. Plus increased volume.
+/datum/wound/proc/on_saltwater(reac_volume, mob/living/carbon/carbies)
+	return
+
+/datum/wound/pierce/bleed/on_saltwater(reac_volume, mob/living/carbon/carbies)
+	adjust_blood_flow(-0.06 * reac_volume, initial_flow * 0.6)
+	to_chat(carbies, span_notice("The salt water splashes over [lowertext(src)], soaking up the blood."))
+
+/datum/wound/slash/flesh/on_saltwater(reac_volume, mob/living/carbon/carbies)
+	adjust_blood_flow(-0.1 * reac_volume, initial_flow * 0.5)
+	to_chat(carbies, span_notice("The salt water splashes over [lowertext(src)], soaking up the blood."))
+
+/datum/wound/burn/flesh/on_saltwater(reac_volume)
+	// Similar but better stats from normal salt.
+	sanitization += VALUE_PER(0.6, 30) * reac_volume
+	infestation -= max(VALUE_PER(0.5, 30) * reac_volume, 0)
+	infestation_rate += VALUE_PER(0.07, 30) * reac_volume
+	to_chat(victim, span_notice("The salt water splashes over [lowertext(src)], soaking up the... miscellaneous fluids. It feels somewhat better afterwards."))
+	return
 
 /datum/reagent/water/holywater
 	name = "Holy Water"
 	description = "Water blessed by some deity."
 	color = "#E0E8EF" // rgb: 224, 232, 239
-	glass_icon_state = "glass_clear"
-	glass_name = "glass of holy water"
-	glass_desc = "A glass of holy water."
 	self_consuming = TRUE //divine intervention won't be limited by the lack of a liver
 	ph = 7.5 //God is alkaline
-	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_CLEANS
+	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_CLEANS|REAGENT_UNAFFECTED_BY_METABOLISM // Operates at fixed metabolism for balancing memes.
+	default_container = /obj/item/reagent_containers/cup/glass/bottle/holywater
 
-	// Holy water. Mostly the same as water, it also heals the plant a little with the power of the spirits. Also ALSO increases instability.
-/datum/reagent/water/holywater/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	if(chems.has_reagent(type, 1))
-		mytray.adjust_waterlevel(round(chems.get_reagent_amount(type) * 1))
-		mytray.adjust_plant_health(round(chems.get_reagent_amount(type) * 0.1))
-		if(myseed)
-			myseed.adjust_instability(round(chems.get_reagent_amount(type) * 0.15))
+/datum/glass_style/drinking_glass/holywater
+	required_drink_type = /datum/reagent/water/holywater
+	name = "glass of holy water"
+	desc = "A glass of holy water."
+	icon_state = "glass_clear"
 
-/datum/reagent/water/holywater/on_mob_metabolize(mob/living/L)
-	..()
-	ADD_TRAIT(L, TRAIT_HOLY, type)
+/datum/reagent/water/holywater/on_new(list/data)
+	// Tracks the total amount of deciseconds that the reagent has been metab'd for, for the purpose of deconversion
+	if(isnull(data))
+		data = list("deciseconds_metabolized" = 0)
+	else if(isnull(data["deciseconds_metabolized"]))
+		data["deciseconds_metabolized"] = 0
 
-/datum/reagent/water/holywater/on_mob_add(mob/living/L, amount)
+	return ..()
+
+// Holy water. Unlike water, which is nuked, stays in and heals the plant a little with the power of the spirits. Also ALSO increases instability.
+/datum/reagent/water/holywater/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_waterlevel(round(volume))
+	mytray.adjust_plant_health(round(volume * 0.1))
+	mytray.myseed?.adjust_instability(round(volume * 0.15))
+
+/datum/reagent/water/holywater/on_mob_metabolize(mob/living/affected_mob)
 	. = ..()
-	if(data)
-		data["misc"] = 0
+	ADD_TRAIT(affected_mob, TRAIT_HOLY, type)
 
-/datum/reagent/water/holywater/on_mob_end_metabolize(mob/living/L)
-	REMOVE_TRAIT(L, TRAIT_HOLY, type)
-	..()
-
-/datum/reagent/water/holywater/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume)
+/datum/reagent/water/holywater/on_mob_end_metabolize(mob/living/affected_mob)
 	. = ..()
-	if(IS_CULTIST(exposed_mob))
-		to_chat(exposed_mob, span_userdanger("A vile holiness begins to spread its shining tendrils through your mind, purging the Geometer of Blood's influence!"))
+	REMOVE_TRAIT(affected_mob, TRAIT_HOLY, type)
 
-/datum/reagent/water/holywater/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	if(M.blood_volume)
-		M.blood_volume += 0.1 * REM * delta_time // water is good for you!
-	if(!data)
-		data = list("misc" = 0)
+/datum/reagent/water/holywater/on_mob_add(mob/living/affected_mob, amount)
+	. = ..()
+	if(IS_CULTIST(affected_mob))
+		to_chat(affected_mob, span_userdanger("A vile holiness begins to spread its shining tendrils through your mind, purging the Geometer of Blood's influence!"))
 
-	data["misc"] += delta_time SECONDS * REM
-	M.adjust_jitter_up_to(4 SECONDS * delta_time, 20 SECONDS)
-	if(IS_CULTIST(M))
-		for(var/datum/action/innate/cult/blood_magic/BM in M.actions)
-			to_chat(M, span_cultlarge("Your blood rites falter as holy water scours your body!"))
+/datum/reagent/water/holywater/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+
+	data["deciseconds_metabolized"] += (seconds_per_tick * 1 SECONDS * REM)
+
+	affected_mob.adjust_jitter_up_to(4 SECONDS * REM * seconds_per_tick, 20 SECONDS)
+
+	if(IS_CULTIST(affected_mob))
+		for(var/datum/action/innate/cult/blood_magic/BM in affected_mob.actions)
+			var/removed_any = FALSE
 			for(var/datum/action/innate/cult/blood_spell/BS in BM.spells)
+				removed_any = TRUE
 				qdel(BS)
-	if(data["misc"] >= (25 SECONDS)) // 10 units
-		M.adjust_stutter_up_to(4 SECONDS * delta_time, 20 SECONDS)
-		M.set_dizzy_if_lower(10 SECONDS)
-		if(IS_CULTIST(M) && DT_PROB(10, delta_time))
-			M.say(pick("Av'te Nar'Sie","Pa'lid Mors","INO INO ORA ANA","SAT ANA!","Daim'niodeis Arc'iai Le'eones","R'ge Na'sie","Diabo us Vo'iscum","Eld' Mon Nobis"), forced = "holy water")
+			if(removed_any)
+				to_chat(affected_mob, span_cultlarge("Your blood rites falter as holy water scours your body!"))
+
+	if(data["deciseconds_metabolized"] >= (25 SECONDS)) // 10 units
+		affected_mob.adjust_stutter_up_to(4 SECONDS * REM * seconds_per_tick, 20 SECONDS)
+		affected_mob.set_dizzy_if_lower(10 SECONDS)
+		if(IS_CULTIST(affected_mob) && SPT_PROB(10, seconds_per_tick))
+			affected_mob.say(pick("Av'te Nar'Sie","Pa'lid Mors","INO INO ORA ANA","SAT ANA!","Daim'niodeis Arc'iai Le'eones","R'ge Na'sie","Diabo us Vo'iscum","Eld' Mon Nobis"), forced = "holy water")
 			if(prob(10))
-				M.visible_message(span_danger("[M] starts having a seizure!"), span_userdanger("You have a seizure!"))
-				M.Unconscious(12 SECONDS)
-				to_chat(M, "<span class='cultlarge'>[pick("Your blood is your bond - you are nothing without it", "Do not forget your place", \
-				"All that power, and you still fail?", "If you cannot scour this poison, I shall scour your meager life!")].</span>")
-	if(data["misc"] >= (1 MINUTES)) // 24 units
-		if(IS_CULTIST(M))
-			M.mind.remove_antag_datum(/datum/antagonist/cult)
-			M.Unconscious(100)
-		M.remove_status_effect(/datum/status_effect/jitter)
-		M.remove_status_effect(/datum/status_effect/speech/stutter)
-		holder.remove_reagent(type, volume) // maybe this is a little too perfect and a max() cap on the statuses would be better??
-		return
-	holder.remove_reagent(type, 1 * REAGENTS_METABOLISM * delta_time) //fixed consumption to prevent balancing going out of whack
+				affected_mob.visible_message(span_danger("[affected_mob] starts having a seizure!"), span_userdanger("You have a seizure!"))
+				affected_mob.Unconscious(12 SECONDS)
+				to_chat(affected_mob, span_cultlarge("[pick("Your blood is your bond - you are nothing without it", "Do not forget your place", \
+					"All that power, and you still fail?", "If you cannot scour this poison, I shall scour your meager life!")]."))
+
+	if(data["deciseconds_metabolized"] >= (1 MINUTES)) // 24 units
+		if(IS_CULTIST(affected_mob))
+			affected_mob.mind.remove_antag_datum(/datum/antagonist/cult)
+			affected_mob.Unconscious(10 SECONDS)
+		affected_mob.remove_status_effect(/datum/status_effect/jitter)
+		affected_mob.remove_status_effect(/datum/status_effect/speech/stutter)
+		holder?.remove_reagent(type, volume) // maybe this is a little too perfect and a max() cap on the statuses would be better??
 
 /datum/reagent/water/holywater/expose_turf(turf/exposed_turf, reac_volume)
 	. = ..()
 	if(!istype(exposed_turf))
 		return
-	if(reac_volume>=10)
+	if(reac_volume >= 10)
 		for(var/obj/effect/rune/R in exposed_turf)
 			qdel(R)
 	exposed_turf.Bless()
@@ -334,12 +431,18 @@
 	color = "#AAAAAA77" // rgb: 170, 170, 170, 77 (alpha)
 	taste_description = "burning water"
 	var/cooling_temperature = 2
-	glass_icon_state = "glass_clear"
-	glass_name = "glass of oxygenated water"
-	glass_desc = "The father of all refreshments. Surely it tastes great, right?"
-	shot_glass_icon_state = "shotglassclear"
 	ph = 6.2
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+
+/datum/glass_style/shot_glass/hydrogen_peroxide
+	required_drink_type = /datum/reagent/hydrogen_peroxide
+	icon_state = "shotglassclear"
+
+/datum/glass_style/drinking_glass/hydrogen_peroxide
+	required_drink_type = /datum/reagent/hydrogen_peroxide
+	name = "glass of oxygenated water"
+	desc = "The father of all refreshments. Surely it tastes great, right?"
+	icon_state = "glass_clear"
 
 /*
  * Water reaction to turf
@@ -358,35 +461,59 @@
 /datum/reagent/hydrogen_peroxide/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume)//Splashing people with h2o2 can burn them !
 	. = ..()
 	if(methods & TOUCH)
-		exposed_mob.adjustFireLoss(2, 0) // burns
+		exposed_mob.adjustFireLoss(2)
 
 /datum/reagent/fuel/unholywater //if you somehow managed to extract this from someone, dont splash it on yourself and have a smoke
 	name = "Unholy Water"
 	description = "Something that shouldn't exist on this plane of existence."
 	taste_description = "suffering"
+	self_consuming = TRUE //unholy intervention won't be limited by the lack of a liver
 	metabolization_rate = 2.5 * REAGENTS_METABOLISM  //0.5u/second
 	penetrates_skin = TOUCH|VAPOR
 	ph = 6.5
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/fuel/unholywater/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	if(IS_CULTIST(M))
-		M.adjust_drowsyness(-5 * REM * delta_time)
-		M.AdjustAllImmobility(-40 * REM * delta_time)
-		M.adjustStaminaLoss(-10 * REM * delta_time, 0)
-		M.adjustToxLoss(-2 * REM * delta_time, 0)
-		M.adjustOxyLoss(-2 * REM * delta_time, 0)
-		M.adjustBruteLoss(-2 * REM * delta_time, 0)
-		M.adjustFireLoss(-2 * REM * delta_time, 0)
-		if(ishuman(M) && M.blood_volume < BLOOD_VOLUME_NORMAL)
-			M.blood_volume += 3 * REM * delta_time
+/datum/reagent/fuel/unholywater/on_mob_metabolize(mob/living/affected_mob)
+	. = ..()
+	if(IS_CULTIST(affected_mob))
+		ADD_TRAIT(affected_mob, TRAIT_COAGULATING, type)
+
+/datum/reagent/fuel/unholywater/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	var/need_mob_update = FALSE
+	if(IS_CULTIST(affected_mob))
+		affected_mob.adjust_drowsiness(-10 SECONDS * REM * seconds_per_tick)
+		affected_mob.AdjustAllImmobility(-40 * REM * seconds_per_tick)
+		need_mob_update += affected_mob.adjustStaminaLoss(-10 * REM * seconds_per_tick, updating_stamina = FALSE)
+		need_mob_update += affected_mob.adjustToxLoss(-2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += affected_mob.adjustOxyLoss(-2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += affected_mob.adjustBruteLoss(-2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += affected_mob.adjustFireLoss(-2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update = TRUE
+		if(ishuman(affected_mob) && affected_mob.blood_volume < BLOOD_VOLUME_NORMAL)
+			affected_mob.blood_volume += 3 * REM * seconds_per_tick
+
+			var/datum/wound/bloodiest_wound
+
+			for(var/datum/wound/iter_wound as anything in affected_mob.all_wounds)
+				if(iter_wound.blood_flow && iter_wound.blood_flow > bloodiest_wound?.blood_flow)
+					bloodiest_wound = iter_wound
+
+			if(bloodiest_wound)
+				bloodiest_wound.adjust_blood_flow(-2 * REM * seconds_per_tick)
+
 	else  // Will deal about 90 damage when 50 units are thrown
-		M.adjustOrganLoss(ORGAN_SLOT_BRAIN, 3 * REM * delta_time, 150)
-		M.adjustToxLoss(1 * REM * delta_time, 0)
-		M.adjustFireLoss(1 * REM * delta_time, 0)
-		M.adjustOxyLoss(1 * REM * delta_time, 0)
-		M.adjustBruteLoss(1 * REM * delta_time, 0)
-	..()
+		need_mob_update += affected_mob.adjustOrganLoss(ORGAN_SLOT_BRAIN, 3 * REM * seconds_per_tick, 150)
+		need_mob_update += affected_mob.adjustToxLoss(1 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += affected_mob.adjustFireLoss(1 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += affected_mob.adjustOxyLoss(1 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += affected_mob.adjustBruteLoss(1 * REM * seconds_per_tick, updating_health = FALSE)
+	if(need_mob_update)
+		return UPDATE_MOB_HEALTH
+
+/datum/reagent/fuel/unholywater/on_mob_end_metabolize(mob/living/affected_mob)
+	. = ..()
+	REMOVE_TRAIT(affected_mob, TRAIT_COAGULATING, type) //We don't cult check here because potentially our imbiber may no longer be a cultist for whatever reason! It doesn't purge holy water, after all!
 
 /datum/reagent/hellwater //if someone has this in their system they've really pissed off an eldrich god
 	name = "Hell Water"
@@ -395,13 +522,18 @@
 	ph = 0.1
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_NO_RANDOM_RECIPE
 
-/datum/reagent/hellwater/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.set_fire_stacks(min(M.fire_stacks + (1.5 * delta_time), 5))
-	M.ignite_mob() //Only problem with igniting people is currently the commonly available fire suits make you immune to being on fire
-	M.adjustToxLoss(0.5*delta_time, 0)
-	M.adjustFireLoss(0.5*delta_time, 0) //Hence the other damages... ain't I a bastard?
-	M.adjustOrganLoss(ORGAN_SLOT_BRAIN, 2.5*delta_time, 150)
-	holder.remove_reagent(type, 0.5*delta_time)
+/datum/reagent/hellwater/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	affected_mob.set_fire_stacks(min(affected_mob.fire_stacks + (1.5 * seconds_per_tick), 5))
+	affected_mob.ignite_mob() //Only problem with igniting people is currently the commonly available fire suits make you immune to being on fire
+	var/need_mob_update
+	need_mob_update = affected_mob.adjustToxLoss(0.5*seconds_per_tick, updating_health = FALSE)
+	need_mob_update += affected_mob.adjustFireLoss(0.5*seconds_per_tick, updating_health = FALSE) //Hence the other damages... ain't I a bastard?
+	affected_mob.adjustOrganLoss(ORGAN_SLOT_BRAIN, 2.5*seconds_per_tick, 150)
+	if(holder)
+		holder.remove_reagent(type, 0.5*seconds_per_tick)
+	if(need_mob_update)
+		return UPDATE_MOB_HEALTH
 
 /datum/reagent/medicine/omnizine/godblood
 	name = "Godblood"
@@ -440,6 +572,7 @@
 	overdose_threshold = 11 //Slightly more than one un-nozzled spraybottle.
 	taste_description = "sour oranges"
 	ph = 5
+	fallback_icon = 'icons/obj/drinks/drink_effects.dmi'
 	fallback_icon_state = "spraytan_fallback"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
@@ -448,12 +581,12 @@
 	if(ishuman(exposed_mob))
 		if(methods & (PATCH|VAPOR))
 			var/mob/living/carbon/human/exposed_human = exposed_mob
-			if(exposed_human.dna.species.id == SPECIES_HUMAN)
+			if(HAS_TRAIT(exposed_human, TRAIT_USES_SKINTONES))
 				switch(exposed_human.skin_tone)
 					if("african1")
 						exposed_human.skin_tone = "african2"
 					if("indian")
-						exposed_human.skin_tone = "african1"
+						exposed_human.skin_tone = "mixed2"
 					if("arab")
 						exposed_human.skin_tone = "indian"
 					if("asian2")
@@ -461,7 +594,7 @@
 					if("asian1")
 						exposed_human.skin_tone = "asian2"
 					if("mediterranean")
-						exposed_human.skin_tone = "african1"
+						exposed_human.skin_tone = "mixed1"
 					if("latino")
 						exposed_human.skin_tone = "mediterranean"
 					if("caucasian3")
@@ -470,16 +603,24 @@
 						exposed_human.skin_tone = pick("caucasian3", "latino")
 					if("caucasian1")
 						exposed_human.skin_tone = "caucasian2"
-					if ("albino")
+					if("albino")
 						exposed_human.skin_tone = "caucasian1"
-
-			if(MUTCOLORS in exposed_human.dna.species.species_traits) //take current alien color and darken it slightly
+					if("mixed1")
+						exposed_human.skin_tone = "mixed2"
+					if("mixed2")
+						exposed_human.skin_tone = "mixed3"
+					if("mixed3")
+						exposed_human.skin_tone = "african1"
+					if("mixed4")
+						exposed_human.skin_tone = "mixed3"
+			//take current alien color and darken it slightly
+			else if(HAS_TRAIT(exposed_human, TRAIT_MUTANT_COLORS) && !HAS_TRAIT(exposed_human, TRAIT_FIXED_MUTANT_COLORS))
 				var/newcolor = ""
 				var/string = exposed_human.dna.features["mcolor"]
 				var/len = length(string)
 				var/char = ""
 				var/ascii = 0
-				for(var/i=1, i<=len, i += length(char))
+				for(var/i=1, i <= len, i += length(char))
 					char = string[i]
 					ascii = text2ascii(char)
 					switch(ascii)
@@ -504,37 +645,44 @@
 		if((methods & INGEST) && show_message)
 			to_chat(exposed_mob, span_notice("That tasted horrible."))
 
-
-/datum/reagent/spraytan/overdose_process(mob/living/M, delta_time, times_fired)
+/datum/reagent/spraytan/overdose_process(mob/living/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
 	metabolization_rate = 1 * REAGENTS_METABOLISM
 
-	if(ishuman(M))
-		var/mob/living/carbon/human/N = M
-		if(!HAS_TRAIT(N, TRAIT_BALD))
-			N.hairstyle = "Spiky"
-		N.facial_hairstyle = "Shaved"
-		N.facial_hair_color = "#000000"
-		N.hair_color = "#000000"
-		if(!(HAIR in N.dna.species.species_traits)) //No hair? No problem!
-			N.dna.species.species_traits += HAIR
-		if(N.dna.species.use_skintones)
-			N.skin_tone = "orange"
-		else if(MUTCOLORS in N.dna.species.species_traits) //Aliens with custom colors simply get turned orange
-			N.dna.features["mcolor"] = "#ff8800"
-		N.update_body(is_creating = TRUE)
-		if(DT_PROB(3.5, delta_time))
-			if(N.w_uniform)
-				M.visible_message(pick("<b>[M]</b>'s collar pops up without warning.</span>", "<b>[M]</b> flexes [M.p_their()] arms."))
+	if(ishuman(affected_mob))
+		var/mob/living/carbon/human/affected_human = affected_mob
+		var/obj/item/bodypart/head/head = affected_human.get_bodypart(BODY_ZONE_HEAD)
+		if(head)
+			head.head_flags |= HEAD_HAIR //No hair? No problem!
+		if(!HAS_TRAIT(affected_human, TRAIT_SHAVED))
+			affected_human.set_facial_hairstyle("Shaved", update = FALSE)
+		affected_human.set_facial_haircolor("#000000", update = FALSE)
+		if(!HAS_TRAIT(affected_human, TRAIT_BALD))
+			affected_human.set_hairstyle("Spiky", update = FALSE)
+		affected_human.set_haircolor("#000000", update = FALSE)
+		if(HAS_TRAIT(affected_human, TRAIT_USES_SKINTONES))
+			affected_human.skin_tone = "orange"
+		else if(HAS_TRAIT(affected_human, TRAIT_MUTANT_COLORS) && !HAS_TRAIT(affected_human, TRAIT_FIXED_MUTANT_COLORS)) //Aliens with custom colors simply get turned orange
+			affected_human.dna.features["mcolor"] = "#ff8800"
+		affected_human.update_body(is_creating = TRUE)
+		if(SPT_PROB(3.5, seconds_per_tick))
+			if(affected_human.w_uniform)
+				affected_mob.visible_message(pick("<b>[affected_mob]</b>'s collar pops up without warning.</span>", "<b>[affected_mob]</b> flexes [affected_mob.p_their()] arms."))
 			else
-				M.visible_message("<b>[M]</b> flexes [M.p_their()] arms.")
-	if(DT_PROB(5, delta_time))
-		M.say(pick("Shit was SO cash.", "You are everything bad in the world.", "What sports do you play, other than 'jack off to naked drawn Japanese people?'", "Don???t be a stranger. Just hit me with your best shot.", "My name is John and I hate every single one of you."), forced = /datum/reagent/spraytan)
-	..()
-	return
+				affected_mob.visible_message("<b>[affected_mob]</b> flexes [affected_mob.p_their()] arms.")
+	if(SPT_PROB(5, seconds_per_tick))
+		affected_mob.say(pick("Shit was SO cash.", "You are everything bad in the world.", "What sports do you play, other than 'jack off to naked drawn Japanese people?'", "Don???t be a stranger. Just hit me with your best shot.", "My name is John and I hate every single one of you."), forced = /datum/reagent/spraytan)
 
 #define MUT_MSG_IMMEDIATE 1
 #define MUT_MSG_EXTENDED 2
 #define MUT_MSG_ABOUT2TURN 3
+
+/// the current_cycle threshold / iterations needed before one can transform
+#define CYCLES_TO_TURN 20
+/// the cycle at which 'immediate' mutation text begins displaying
+#define CYCLES_MSG_IMMEDIATE 6
+/// the cycle at which 'extended' mutation text begins displaying
+#define CYCLES_MSG_EXTENDED 16
 
 /datum/reagent/mutationtoxin
 	name = "Stable Mutation Toxin"
@@ -548,21 +696,20 @@
 									"Your limbs begin to take on a different shape." = MUT_MSG_EXTENDED,
 									"Your appendages begin morphing." = MUT_MSG_EXTENDED,
 									"You feel as though you're about to change at any moment!" = MUT_MSG_ABOUT2TURN)
-	var/cycles_to_turn = 20 //the current_cycle threshold / iterations needed before one can transform
 
-/datum/reagent/mutationtoxin/on_mob_life(mob/living/carbon/human/H, delta_time, times_fired)
-	. = TRUE
-	if(!istype(H))
+/datum/reagent/mutationtoxin/on_mob_life(mob/living/carbon/human/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(!istype(affected_mob))
 		return
-	if(!(H.dna?.species) || !(H.mob_biotypes & MOB_ORGANIC))
+	if(!(affected_mob.dna?.species) || !(affected_mob.mob_biotypes & affected_biotype))
 		return
 
-	if(DT_PROB(5, delta_time))
+	if(SPT_PROB(5, seconds_per_tick))
 		var/list/pick_ur_fav = list()
 		var/filter = NONE
-		if(current_cycle <= (cycles_to_turn*0.3))
+		if(current_cycle <= CYCLES_MSG_IMMEDIATE)
 			filter = MUT_MSG_IMMEDIATE
-		else if(current_cycle <= (cycles_to_turn*0.8))
+		else if(current_cycle <= CYCLES_MSG_EXTENDED)
 			filter = MUT_MSG_EXTENDED
 		else
 			filter = MUT_MSG_ABOUT2TURN
@@ -570,15 +717,16 @@
 		for(var/i in mutationtexts)
 			if(mutationtexts[i] == filter)
 				pick_ur_fav += i
-		to_chat(H, span_warning("[pick(pick_ur_fav)]"))
+		to_chat(affected_mob, span_warning("[pick(pick_ur_fav)]"))
 
-	if(current_cycle >= cycles_to_turn)
+	if(current_cycle >= CYCLES_TO_TURN)
 		var/datum/species/species_type = race
-		H.set_species(species_type)
+		affected_mob.set_species(species_type)
 		holder.del_reagent(type)
-		to_chat(H, span_warning("You've become \a [lowertext(initial(species_type.name))]!"))
+		to_chat(affected_mob, span_warning("You've become \a [lowertext(initial(species_type.name))]!"))
 		return
-	..()
+
+	return ..()
 
 /datum/reagent/mutationtoxin/classic //The one from plasma on green slimes
 	name = "Mutation Toxin"
@@ -634,19 +782,19 @@
 	taste_description = "grandma's gelatin"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/mutationtoxin/jelly/on_mob_life(mob/living/carbon/human/H, delta_time, times_fired)
-	if(isjellyperson(H))
-		to_chat(H, span_warning("Your jelly shifts and morphs, turning you into another subspecies!"))
+/datum/reagent/mutationtoxin/jelly/on_mob_life(mob/living/carbon/human/affected_mob, seconds_per_tick, times_fired)
+	if(isjellyperson(affected_mob))
+		to_chat(affected_mob, span_warning("Your jelly shifts and morphs, turning you into another subspecies!"))
 		var/species_type = pick(subtypesof(/datum/species/jelly))
-		H.set_species(species_type)
+		affected_mob.set_species(species_type)
 		holder.del_reagent(type)
-		return TRUE
-	if(current_cycle >= cycles_to_turn) //overwrite since we want subtypes of jelly
+		return UPDATE_MOB_HEALTH
+	if(current_cycle >= CYCLES_TO_TURN) //overwrite since we want subtypes of jelly
 		var/datum/species/species_type = pick(subtypesof(race))
-		H.set_species(species_type)
+		affected_mob.set_species(species_type)
 		holder.del_reagent(type)
-		to_chat(H, span_warning("You've become \a [initial(species_type.name)]!"))
-		return TRUE
+		to_chat(affected_mob, span_warning("You've become \a [initial(species_type.name)]!"))
+		return UPDATE_MOB_HEALTH
 	return ..()
 
 /datum/reagent/mutationtoxin/golem
@@ -656,16 +804,6 @@
 	race = /datum/species/golem
 	taste_description = "rocks"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_NO_RANDOM_RECIPE
-
-/datum/reagent/mutationtoxin/golem/on_mob_metabolize()
-	var/static/list/random_golem_types
-	random_golem_types = subtypesof(/datum/species/golem) - type
-	for(var/i in random_golem_types)
-		var/datum/species/golem/golem = i
-		if(!initial(golem.random_eligible))
-			random_golem_types -= golem
-	race = pick(random_golem_types)
-	..()
 
 /datum/reagent/mutationtoxin/abductor
 	name = "Abductor Mutation Toxin"
@@ -729,6 +867,10 @@
 #undef MUT_MSG_EXTENDED
 #undef MUT_MSG_ABOUT2TURN
 
+#undef CYCLES_TO_TURN
+#undef CYCLES_MSG_IMMEDIATE
+#undef CYCLES_MSG_EXTENDED
+
 /datum/reagent/mulligan
 	name = "Mulligan Toxin"
 	description = "This toxin will rapidly change the DNA of humanoid beings. Commonly used by Syndicate spies and assassins in need of an emergency ID change."
@@ -737,13 +879,13 @@
 	taste_description = "slime"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/mulligan/on_mob_life(mob/living/carbon/human/H, delta_time, times_fired)
-	..()
-	if (!istype(H))
+/datum/reagent/mulligan/on_mob_life(mob/living/carbon/human/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if (!istype(affected_mob))
 		return
-	to_chat(H, span_warning("<b>You grit your teeth in pain as your body rapidly mutates!</b>"))
-	H.visible_message("<b>[H]</b> suddenly transforms!")
-	randomize_human(H)
+	to_chat(affected_mob, span_warning("<b>You grit your teeth in pain as your body rapidly mutates!</b>"))
+	affected_mob.visible_message("<b>[affected_mob]</b> suddenly transforms!")
+	randomize_human(affected_mob)
 
 /datum/reagent/aslimetoxin
 	name = "Advanced Mutation Toxin"
@@ -779,11 +921,11 @@
 	ph = 10
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/serotrotium/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	if(ishuman(M))
-		if(DT_PROB(3.5, delta_time))
-			M.emote(pick("twitch","drool","moan","gasp"))
-	..()
+/datum/reagent/serotrotium/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(ishuman(affected_mob))
+		if(SPT_PROB(3.5, seconds_per_tick))
+			affected_mob.emote(pick("twitch","drool","moan","gasp"))
 
 /datum/reagent/oxygen
 	name = "Oxygen"
@@ -798,8 +940,7 @@
 /datum/reagent/oxygen/expose_turf(turf/open/exposed_turf, reac_volume)
 	. = ..()
 	if(istype(exposed_turf))
-		var/temp = holder ? holder.chem_temp : T20C
-		exposed_turf.atmos_spawn_air("o2=[reac_volume/20];TEMP=[temp]")
+		exposed_turf.atmos_spawn_air("[GAS_O2]=[reac_volume/20];[TURF_TEMPERATURE(holder ? holder.chem_temp : T20C)]")
 	return
 
 /datum/reagent/copper
@@ -816,10 +957,10 @@
 	if(!istype(exposed_obj, /obj/item/stack/sheet/iron))
 		return
 
-	var/obj/item/stack/sheet/iron/M = exposed_obj
-	reac_volume = min(reac_volume, M.amount)
-	new/obj/item/stack/sheet/bronze(get_turf(M), reac_volume)
-	M.use(reac_volume)
+	var/obj/item/stack/sheet/iron/metal = exposed_obj
+	reac_volume = min(reac_volume, metal.amount)
+	new/obj/item/stack/sheet/bronze(get_turf(metal), reac_volume)
+	metal.use(reac_volume)
 
 /datum/reagent/nitrogen
 	name = "Nitrogen"
@@ -831,8 +972,7 @@
 
 /datum/reagent/nitrogen/expose_turf(turf/open/exposed_turf, reac_volume)
 	if(istype(exposed_turf))
-		var/temp = holder ? holder.chem_temp : T20C
-		exposed_turf.atmos_spawn_air("n2=[reac_volume/20];TEMP=[temp]")
+		exposed_turf.atmos_spawn_air("[GAS_N2]=[reac_volume/20];[TURF_TEMPERATURE(holder ? holder.chem_temp : T20C)]")
 	return ..()
 
 /datum/reagent/hydrogen
@@ -859,13 +999,14 @@
 	taste_mult = 0 // apparently tasteless.
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/mercury/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	if(!HAS_TRAIT(src, TRAIT_IMMOBILIZED) && !isspaceturf(M.loc))
-		step(M, pick(GLOB.cardinals))
-	if(DT_PROB(3.5, delta_time))
-		M.emote(pick("twitch","drool","moan"))
-	M.adjustOrganLoss(ORGAN_SLOT_BRAIN, 0.5*delta_time)
-	..()
+/datum/reagent/mercury/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. =	..()
+	if(!HAS_TRAIT(src, TRAIT_IMMOBILIZED) && !isspaceturf(affected_mob.loc))
+		step(affected_mob, pick(GLOB.cardinals))
+	if(SPT_PROB(3.5, seconds_per_tick))
+		affected_mob.emote(pick("twitch","drool","moan"))
+	if(affected_mob.adjustOrganLoss(ORGAN_SLOT_BRAIN, 0.5*seconds_per_tick))
+		return UPDATE_MOB_HEALTH
 
 /datum/reagent/sulfur
 	name = "Sulfur"
@@ -890,9 +1031,7 @@
 	if(isspaceturf(exposed_turf))
 		return
 
-	var/obj/effect/decal/cleanable/dirt/dirt_decal = (locate() in exposed_turf.contents)
-	if(!dirt_decal)
-		dirt_decal = new(exposed_turf)
+	exposed_turf.spawn_unique_cleanable(/obj/effect/decal/cleanable/dirt)
 
 /datum/reagent/chlorine
 	name = "Chlorine"
@@ -905,18 +1044,16 @@
 
 
 // You're an idiot for thinking that one of the most corrosive and deadly gasses would be beneficial
-/datum/reagent/chlorine/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(-round(chems.get_reagent_amount(src.type) * 1))
-		mytray.adjust_toxic(round(chems.get_reagent_amount(src.type) * 1.5))
-		mytray.adjust_waterlevel(-round(chems.get_reagent_amount(src.type) * 0.5))
-		mytray.adjust_weedlevel(-rand(1,3))
-		// White Phosphorous + water -> phosphoric acid. That's not a good thing really.
+/datum/reagent/chlorine/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_plant_health(-round(volume))
+	mytray.adjust_toxic(round(volume * 1.5))
+	mytray.adjust_waterlevel(-round(volume * 0.5))
+	mytray.adjust_weedlevel(-rand(1, 3))
+	// White Phosphorous + water -> phosphoric acid. That's not a good thing really.
 
 
-/datum/reagent/chlorine/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.take_bodypart_damage(0.5*REM*delta_time, 0)
+/datum/reagent/chlorine/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	affected_mob.take_bodypart_damage(0.5*REM*seconds_per_tick, 0)
 	. = TRUE
 	..()
 
@@ -930,18 +1067,16 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 // You're an idiot for thinking that one of the most corrosive and deadly gasses would be beneficial
-/datum/reagent/fluorine/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(-round(chems.get_reagent_amount(src.type) * 2))
-		mytray.adjust_toxic(round(chems.get_reagent_amount(src.type) * 2.5))
-		mytray.adjust_waterlevel(-round(chems.get_reagent_amount(src.type) * 0.5))
-		mytray.adjust_weedlevel(-rand(1,4))
+/datum/reagent/fluorine/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_plant_health(-round(volume * 2))
+	mytray.adjust_toxic(round(volume * 2.5))
+	mytray.adjust_waterlevel(-round(volume * 0.5))
+	mytray.adjust_weedlevel(-rand(1, 4))
 
-/datum/reagent/fluorine/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.adjustToxLoss(0.5*REM*delta_time, 0)
-	. = TRUE
-	..()
+/datum/reagent/fluorine/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(affected_mob.adjustToxLoss(0.5*REM*seconds_per_tick, updating_health = FALSE))
+		. = TRUE
 
 /datum/reagent/sodium
 	name = "Sodium"
@@ -962,12 +1097,10 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 // Phosphoric salts are beneficial though. And even if the plant suffers, in the long run the tray gets some nutrients. The benefit isn't worth that much.
-/datum/reagent/phosphorus/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(-round(chems.get_reagent_amount(src.type) * 0.75))
-		mytray.adjust_waterlevel(-round(chems.get_reagent_amount(src.type) * 0.5))
-		mytray.adjust_weedlevel(-rand(1,2))
+/datum/reagent/phosphorus/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_plant_health(-round(volume * 0.75))
+	mytray.adjust_waterlevel(-round(volume * 0.5))
+	mytray.adjust_weedlevel(-rand(1, 2))
 
 /datum/reagent/lithium
 	name = "Lithium"
@@ -978,12 +1111,12 @@
 	ph = 11.3
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/lithium/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	if(!HAS_TRAIT(M, TRAIT_IMMOBILIZED) && !isspaceturf(M.loc) && isturf(M.loc))
-		step(M, pick(GLOB.cardinals))
-	if(DT_PROB(2.5, delta_time))
-		M.emote(pick("twitch","drool","moan"))
-	..()
+/datum/reagent/lithium/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(!HAS_TRAIT(affected_mob, TRAIT_IMMOBILIZED) && !isspaceturf(affected_mob.loc) && isturf(affected_mob.loc))
+		step(affected_mob, pick(GLOB.cardinals))
+	if(SPT_PROB(2.5, seconds_per_tick))
+		affected_mob.emote(pick("twitch","drool","moan"))
 
 /datum/reagent/glycerol
 	name = "Glycerol"
@@ -999,7 +1132,7 @@
 	color = "#D0EFEE" // space cleaner but lighter
 	taste_description = "bitterness"
 	ph = 10.5
-	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_AFFECTS_WOUNDS
 
 /datum/reagent/space_cleaner/sterilizine/expose_mob(mob/living/carbon/exposed_carbon, methods=TOUCH, reac_volume)
 	. = ..()
@@ -1008,6 +1141,9 @@
 
 	for(var/datum/surgery/surgery as anything in exposed_carbon.surgeries)
 		surgery.speed_modifier = max(0.2, surgery.speed_modifier)
+
+/datum/reagent/space_cleaner/sterilizine/on_burn_wound_processing(datum/wound/burn/flesh/burn_wound)
+	burn_wound.sanitization += 0.9
 
 /datum/reagent/iron
 	name = "Iron"
@@ -1019,10 +1155,10 @@
 	color = "#606060" //pure iron? let's make it violet of course
 	ph = 6
 
-/datum/reagent/iron/on_mob_life(mob/living/carbon/C, delta_time, times_fired)
-	if(C.blood_volume < BLOOD_VOLUME_NORMAL)
-		C.blood_volume += 0.25 * delta_time
-	..()
+/datum/reagent/iron/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(affected_mob.blood_volume < BLOOD_VOLUME_NORMAL)
+		affected_mob.blood_volume += 0.25 * seconds_per_tick
 
 /datum/reagent/gold
 	name = "Gold"
@@ -1043,39 +1179,37 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 /datum/reagent/uranium
-	name ="Uranium"
+	name = "Uranium"
 	description = "A jade-green metallic chemical element in the actinide series, weakly radioactive."
 	reagent_state = SOLID
 	color = "#5E9964" //this used to be silver, but liquid uranium can still be green and it's more easily noticeable as uranium like this so why bother?
 	taste_description = "the inside of a reactor"
-	/// How much tox damage to deal per tick
-	var/tox_damage = 0.5
 	ph = 4
 	material = /datum/material/uranium
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+	default_container = /obj/effect/decal/cleanable/greenglow
+	/// How much tox damage to deal per tick
+	var/tox_damage = 0.5
 
-/datum/reagent/uranium/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.adjustToxLoss(tox_damage * delta_time * REM)
-	..()
+/datum/reagent/uranium/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(affected_mob.adjustToxLoss(tox_damage * seconds_per_tick * REM, updating_health = FALSE))
+		return UPDATE_MOB_HEALTH
 
 /datum/reagent/uranium/expose_turf(turf/exposed_turf, reac_volume)
 	. = ..()
 	if((reac_volume < 3) || isspaceturf(exposed_turf))
 		return
 
-	var/obj/effect/decal/cleanable/greenglow/glow = locate() in exposed_turf.contents
-	if(!glow)
-		glow = new(exposed_turf)
+	var/obj/effect/decal/cleanable/greenglow/glow = exposed_turf.spawn_unique_cleanable(/obj/effect/decal/cleanable/greenglow)
 	if(!QDELETED(glow))
 		glow.reagents.add_reagent(type, reac_volume)
 
 //Mutagenic chem side-effects.
-/datum/reagent/uranium/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
+/datum/reagent/uranium/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
 	mytray.mutation_roll(user)
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(-round(chems.get_reagent_amount(src.type) * 1))
-		mytray.adjust_toxic(round(chems.get_reagent_amount(src.type) * 2))
+	mytray.adjust_plant_health(-round(volume))
+	mytray.adjust_toxic(round(volume / tox_damage)) // more damage = more
 
 /datum/reagent/uranium/radium
 	name = "Radium"
@@ -1083,16 +1217,10 @@
 	reagent_state = SOLID
 	color = "#00CC00" // ditto
 	taste_description = "the colour blue and regret"
-	tox_damage = 1*REM
+	tox_damage = 1
 	material = null
 	ph = 10
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
-
-/datum/reagent/uranium/radium/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(-round(chems.get_reagent_amount(src.type) * 1))
-		mytray.adjust_toxic(round(chems.get_reagent_amount(src.type) * 1))
 
 /datum/reagent/bluespace
 	name = "Bluespace Dust"
@@ -1109,13 +1237,13 @@
 	if(methods & (TOUCH|VAPOR))
 		do_teleport(exposed_mob, get_turf(exposed_mob), (reac_volume / 5), asoundin = 'sound/effects/phasein.ogg', channel = TELEPORT_CHANNEL_BLUESPACE) //4 tiles per crystal
 
-/datum/reagent/bluespace/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	if(current_cycle > 10 && DT_PROB(7.5, delta_time))
-		to_chat(M, span_warning("You feel unstable..."))
-		M.set_jitter_if_lower(2 SECONDS)
+/datum/reagent/bluespace/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(current_cycle > 10 && SPT_PROB(7.5, seconds_per_tick))
+		to_chat(affected_mob, span_warning("You feel unstable..."))
+		affected_mob.set_jitter_if_lower(2 SECONDS)
 		current_cycle = 1
-		addtimer(CALLBACK(M, TYPE_PROC_REF(/mob/living, bluespace_shuffle)), 30)
-	..()
+		addtimer(CALLBACK(affected_mob, TYPE_PROC_REF(/mob/living, bluespace_shuffle)), 30)
 
 /mob/living/proc/bluespace_shuffle()
 	do_teleport(src, get_turf(src), 5, asoundin = 'sound/effects/phasein.ogg', channel = TELEPORT_CHANNEL_BLUESPACE)
@@ -1143,9 +1271,6 @@
 	description = "Required for welders. Flammable."
 	color = "#660000" // rgb: 102, 0, 0
 	taste_description = "gross metal"
-	glass_icon_state = "dr_gibb_glass"
-	glass_name = "glass of welder fuel"
-	glass_desc = "Unless you're an industrial tool, this is probably not safe for consumption."
 	penetrates_skin = NONE
 	ph = 4
 	burning_temperature = 1725 //more refined than oil
@@ -1153,15 +1278,21 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 	addiction_types = list(/datum/addiction/alcohol = 4)
 
+/datum/glass_style/drinking_glass/fuel
+	required_drink_type = /datum/reagent/fuel
+	name = "glass of welder fuel"
+	desc = "Unless you're an industrial tool, this is probably not safe for consumption."
+	icon_state = "dr_gibb_glass"
+
 /datum/reagent/fuel/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume)//Splashing people with welding fuel to make them easy to ignite!
 	. = ..()
 	if(methods & (TOUCH|VAPOR))
 		exposed_mob.adjust_fire_stacks(reac_volume / 10)
 
-/datum/reagent/fuel/on_mob_life(mob/living/carbon/victim, delta_time, times_fired)
-	victim.adjustToxLoss(0.5 * delta_time, 0)
-	..()
-	return TRUE
+/datum/reagent/fuel/on_mob_life(mob/living/carbon/victim, seconds_per_tick, times_fired)
+	. = ..()
+	if(victim.adjustToxLoss(0.5 * seconds_per_tick, updating_health = FALSE, required_biotype = affected_biotype))
+		return UPDATE_MOB_HEALTH
 
 /datum/reagent/fuel/expose_turf(turf/exposed_turf, reac_volume)
 	. = ..()
@@ -1172,18 +1303,20 @@
 	if((reac_volume < 5))
 		return
 
-	new /obj/effect/decal/cleanable/fuel_pool(exposed_turf, round(reac_volume / 5))
+	var/obj/effect/decal/cleanable/fuel_pool/pool = exposed_turf.spawn_unique_cleanable(/obj/effect/decal/cleanable/fuel_pool)
+	if(pool)
+		pool.burn_amount = max(min(round(reac_volume / 5), 10), 1)
 
 /datum/reagent/space_cleaner
 	name = "Space Cleaner"
-	description = "A compound used to clean things. Now with 50% more sodium hypochlorite!"
+	description = "A compound used to clean things. Now with 50% more sodium hypochlorite! Can be used to clean wounds, but it's not really meant for that."
 	color = "#A5F0EE" // rgb: 165, 240, 238
 	taste_description = "sourness"
 	reagent_weight = 0.6 //so it sprays further
-	penetrates_skin = NONE
+	penetrates_skin = VAPOR
 	var/clean_types = CLEAN_WASH
 	ph = 5.5
-	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_CLEANS
+	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_CLEANS|REAGENT_AFFECTS_WOUNDS
 
 /datum/reagent/space_cleaner/expose_obj(obj/exposed_obj, reac_volume)
 	. = ..()
@@ -1209,6 +1342,13 @@
 	if(methods & (TOUCH|VAPOR))
 		exposed_mob.wash(clean_types)
 
+/datum/reagent/space_cleaner/on_burn_wound_processing(datum/wound/burn/flesh/burn_wound)
+	burn_wound.sanitization += 0.3
+	if(prob(5))
+		to_chat(burn_wound.victim, span_notice("Your [burn_wound] stings and burns from the [src] covering it! It does look pretty clean though."))
+		burn_wound.victim.adjustToxLoss(0.5)
+		burn_wound.limb.receive_damage(burn = 0.5, wound_bonus = CANT_WOUND)
+
 /datum/reagent/space_cleaner/ez_clean
 	name = "EZ Clean"
 	description = "A powerful, acidic cleaner sold by Waffle Co. Affects organic matter while leaving other objects unaffected."
@@ -1218,11 +1358,14 @@
 	ph = 2
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/space_cleaner/ez_clean/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.adjustBruteLoss(1.665*delta_time)
-	M.adjustFireLoss(1.665*delta_time)
-	M.adjustToxLoss(1.665*delta_time)
-	..()
+/datum/reagent/space_cleaner/ez_clean/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	var/need_mob_update
+	need_mob_update = affected_mob.adjustBruteLoss(1.665*seconds_per_tick, updating_health = FALSE)
+	need_mob_update += affected_mob.adjustFireLoss(1.665*seconds_per_tick, updating_health = FALSE)
+	need_mob_update += affected_mob.adjustToxLoss(1.665*seconds_per_tick, updating_health = FALSE)
+	if(need_mob_update)
+		return UPDATE_MOB_HEALTH
 
 /datum/reagent/space_cleaner/ez_clean/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume)
 	. = ..()
@@ -1239,19 +1382,18 @@
 	ph = 11.9
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/cryptobiolin/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.set_dizzy_if_lower(2 SECONDS)
+/datum/reagent/cryptobiolin/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	affected_mob.set_dizzy_if_lower(2 SECONDS)
 
 	// Cryptobiolin adjusts the mob's confusion down to 20 seconds if it's higher,
 	// or up to 1 second if it's lower, but will do nothing if it's in between
-	var/confusion_left = M.get_timed_status_effect_duration(/datum/status_effect/confusion)
+	var/confusion_left = affected_mob.get_timed_status_effect_duration(/datum/status_effect/confusion)
 	if(confusion_left < 1 SECONDS)
-		M.set_confusion(1 SECONDS)
+		affected_mob.set_confusion(1 SECONDS)
 
 	else if(confusion_left > 20 SECONDS)
-		M.set_confusion(20 SECONDS)
-
-	..()
+		affected_mob.set_confusion(20 SECONDS)
 
 /datum/reagent/impedrezene
 	name = "Impedrezene"
@@ -1262,15 +1404,17 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 	addiction_types = list(/datum/addiction/opioids = 10)
 
-/datum/reagent/impedrezene/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.adjust_jitter(-5 SECONDS * delta_time)
-	if(DT_PROB(55, delta_time))
-		M.adjustOrganLoss(ORGAN_SLOT_BRAIN, 2)
-	if(DT_PROB(30, delta_time))
-		M.adjust_drowsyness(3)
-	if(DT_PROB(5, delta_time))
-		M.emote("drool")
-	..()
+/datum/reagent/impedrezene/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	affected_mob.adjust_jitter(-5 SECONDS * seconds_per_tick)
+	. = FALSE
+	if(SPT_PROB(55, seconds_per_tick))
+		affected_mob.adjustOrganLoss(ORGAN_SLOT_BRAIN, 2)
+		. = TRUE
+	if(SPT_PROB(30, seconds_per_tick))
+		affected_mob.adjust_drowsiness(6 SECONDS)
+	if(SPT_PROB(5, seconds_per_tick))
+		affected_mob.emote("drool")
 
 /datum/reagent/cyborg_mutation_nanomachines
 	name = "Nanomachines"
@@ -1357,14 +1501,14 @@
 	ph = 11.6
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/ammonia/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
+/datum/reagent/ammonia/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
 	// Ammonia is bad ass.
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(round(chems.get_reagent_amount(src.type) * 0.12))
-		if(myseed && prob(10))
-			myseed.adjust_yield(1)
-			myseed.adjust_instability(1)
+	mytray.adjust_plant_health(round(volume * 0.12))
+
+	var/obj/item/seeds/myseed = mytray.myseed
+	if(!isnull(myseed) && prob(10))
+		myseed.adjust_yield(1)
+		myseed.adjust_instability(1)
 
 /datum/reagent/diethylamine
 	name = "Diethylamine"
@@ -1375,14 +1519,13 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 // This is more bad ass, and pests get hurt by the corrosive nature of it, not the plant. The new trade off is it culls stability.
-/datum/reagent/diethylamine/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(round(chems.get_reagent_amount(src.type) * 1))
-		mytray.adjust_pestlevel(-rand(1,2))
-		if(myseed)
-			myseed.adjust_yield(round(chems.get_reagent_amount(src.type) * 1))
-			myseed.adjust_instability(-round(chems.get_reagent_amount(src.type) * 1))
+/datum/reagent/diethylamine/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_plant_health(round(volume))
+	mytray.adjust_pestlevel(-rand(1,2))
+	var/obj/item/seeds/myseed = mytray.myseed
+	if(!isnull(myseed))
+		myseed.adjust_yield(round(volume))
+		myseed.adjust_instability(-round(volume))
 
 /datum/reagent/carbondioxide
 	name = "Carbon Dioxide"
@@ -1395,13 +1538,13 @@
 
 /datum/reagent/carbondioxide/expose_turf(turf/open/exposed_turf, reac_volume)
 	if(istype(exposed_turf))
-		var/temp = holder ? holder.chem_temp : T20C
-		exposed_turf.atmos_spawn_air("co2=[reac_volume/20];TEMP=[temp]")
+		exposed_turf.atmos_spawn_air("[GAS_CO2]=[reac_volume/20];[TURF_TEMPERATURE(holder ? holder.chem_temp : T20C)]")
 	return ..()
 
 /datum/reagent/nitrous_oxide
 	name = "Nitrous Oxide"
-	description = "A potent oxidizer used as fuel in rockets and as an anaesthetic during surgery."
+	description = "A potent oxidizer used as fuel in rockets and as an anaesthetic during surgery. As it is an anticoagulant, nitrous oxide is best \
+		used alongside sanguirite to allow blood clotting to continue."
 	reagent_state = LIQUID
 	metabolization_rate = 1.5 * REAGENTS_METABOLISM
 	color = "#808080"
@@ -1412,22 +1555,36 @@
 /datum/reagent/nitrous_oxide/expose_turf(turf/open/exposed_turf, reac_volume)
 	. = ..()
 	if(istype(exposed_turf))
-		var/temp = holder ? holder.chem_temp : T20C
-		exposed_turf.atmos_spawn_air("n2o=[reac_volume/20];TEMP=[temp]")
+		exposed_turf.atmos_spawn_air("[GAS_N2O]=[reac_volume/20];[TURF_TEMPERATURE(holder ? holder.chem_temp : T20C)]")
 
 /datum/reagent/nitrous_oxide/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume)
 	. = ..()
 	if(methods & VAPOR)
-		exposed_mob.adjust_drowsyness(max(round(reac_volume, 1), 2))
+		// apply 2 seconds of drowsiness per unit applied, with a min duration of 4 seconds
+		var/drowsiness_to_apply = max(round(reac_volume, 1) * 2 SECONDS, 4 SECONDS)
+		exposed_mob.adjust_drowsiness(drowsiness_to_apply)
 
-/datum/reagent/nitrous_oxide/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.adjust_drowsyness(2 * REM * delta_time)
-	if(ishuman(M))
-		var/mob/living/carbon/human/H = M
-		H.blood_volume = max(H.blood_volume - (10 * REM * delta_time), 0)
-	if(DT_PROB(10, delta_time))
-		M.losebreath += 2
-		M.adjust_confusion_up_to(2 SECONDS, 5 SECONDS)
+/datum/reagent/nitrous_oxide/on_mob_metabolize(mob/living/affected_mob)
+	. = ..()
+	if(!HAS_TRAIT(affected_mob, TRAIT_COAGULATING)) //IF the mob does not have a coagulant in them, we add the blood mess trait to make the bleed quicker
+		ADD_TRAIT(affected_mob, TRAIT_BLOODY_MESS, type)
+
+/datum/reagent/nitrous_oxide/on_mob_end_metabolize(mob/living/affected_mob)
+	. = ..()
+	REMOVE_TRAIT(affected_mob, TRAIT_BLOODY_MESS, type)
+
+/datum/reagent/nitrous_oxide/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	affected_mob.adjust_drowsiness(4 SECONDS * REM * seconds_per_tick)
+
+	if(!HAS_TRAIT(affected_mob, TRAIT_BLOODY_MESS) && !HAS_TRAIT(affected_mob, TRAIT_COAGULATING)) //So long as they do not have a coagulant, if they did not have the bloody mess trait, they do now
+		ADD_TRAIT(affected_mob, TRAIT_BLOODY_MESS, type)
+
+	else if(HAS_TRAIT(affected_mob, TRAIT_COAGULATING)) //if we find they now have a coagulant, we remove the trait
+		REMOVE_TRAIT(affected_mob, TRAIT_BLOODY_MESS, type)
+
+	if(SPT_PROB(10, seconds_per_tick))
+		affected_mob.losebreath += 2
+		affected_mob.adjust_confusion_up_to(2 SECONDS, 5 SECONDS)
 	..()
 
 /////////////////////////Colorful Powder////////////////////////////
@@ -1438,7 +1595,7 @@
 	var/colorname = "none"
 	description = "A powder that is used for coloring things."
 	reagent_state = SOLID
-	color = "#FFFFFF" // rgb: 207, 54, 0
+	color = COLOR_WHITE
 	taste_description = "the back of class"
 
 /datum/reagent/colorful_reagent/powder/New()
@@ -1453,7 +1610,7 @@
 /datum/reagent/colorful_reagent/powder/red
 	name = "Red Powder"
 	colorname = "red"
-	color = "#DA0000" // red
+	color = COLOR_CRAYON_RED
 	random_color_list = list("#FC7474")
 	ph = 0.5
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
@@ -1461,29 +1618,29 @@
 /datum/reagent/colorful_reagent/powder/orange
 	name = "Orange Powder"
 	colorname = "orange"
-	color = "#FF9300" // orange
-	random_color_list = list("#FF9300")
+	color = COLOR_CRAYON_ORANGE
+	random_color_list = list(COLOR_CRAYON_ORANGE)
 	ph = 2
 
 /datum/reagent/colorful_reagent/powder/yellow
 	name = "Yellow Powder"
 	colorname = "yellow"
-	color = "#FFF200" // yellow
-	random_color_list = list("#FFF200")
+	color = COLOR_CRAYON_YELLOW
+	random_color_list = list(COLOR_CRAYON_YELLOW)
 	ph = 5
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 /datum/reagent/colorful_reagent/powder/green
 	name = "Green Powder"
 	colorname = "green"
-	color = "#A8E61D" // green
-	random_color_list = list("#A8E61D")
+	color = COLOR_CRAYON_GREEN
+	random_color_list = list(COLOR_CRAYON_GREEN)
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 /datum/reagent/colorful_reagent/powder/blue
 	name = "Blue Powder"
 	colorname = "blue"
-	color = "#00B7EF" // blue
+	color = COLOR_CRAYON_BLUE
 	random_color_list = list("#71CAE5")
 	ph = 10
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
@@ -1491,7 +1648,7 @@
 /datum/reagent/colorful_reagent/powder/purple
 	name = "Purple Powder"
 	colorname = "purple"
-	color = "#DA00FF" // purple
+	color = COLOR_CRAYON_PURPLE
 	random_color_list = list("#BD8FC4")
 	ph = 13
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
@@ -1500,21 +1657,21 @@
 	name = "Invisible Powder"
 	colorname = "invisible"
 	color = "#FFFFFF00" // white + no alpha
-	random_color_list = list("#FFFFFF") //because using the powder color turns things invisible
+	random_color_list = list(COLOR_WHITE) //because using the powder color turns things invisible
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 /datum/reagent/colorful_reagent/powder/black
 	name = "Black Powder"
 	colorname = "black"
-	color = "#1C1C1C" // not quite black
+	color = COLOR_CRAYON_BLACK
 	random_color_list = list("#8D8D8D") //more grey than black, not enough to hide your true colors
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 /datum/reagent/colorful_reagent/powder/white
 	name = "White Powder"
 	colorname = "white"
-	color = "#FFFFFF" // white
-	random_color_list = list("#FFFFFF") //doesn't actually change appearance at all
+	color = COLOR_WHITE
+	random_color_list = list(COLOR_WHITE) //doesn't actually change appearance at all
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 /* used by crayons, can't color living things but still used for stuff like food recipes */
@@ -1571,11 +1728,11 @@
 	taste_description = "plant food"
 	ph = 3
 
-/datum/reagent/plantnutriment/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	if(DT_PROB(tox_prob, delta_time))
-		M.adjustToxLoss(1, 0)
-		. = TRUE
-	..()
+/datum/reagent/plantnutriment/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(SPT_PROB(tox_prob, seconds_per_tick))
+		if(affected_mob.adjustToxLoss(1, updating_health = FALSE, required_biotype = affected_biotype))
+			return UPDATE_MOB_HEALTH
 
 /datum/reagent/plantnutriment/eznutriment
 	name = "E-Z Nutrient"
@@ -1584,12 +1741,12 @@
 	tox_prob = 5
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/plantnutriment/eznutriment/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	. = ..()
-	if(myseed && chems.has_reagent(src.type, 1))
+/datum/reagent/plantnutriment/eznutriment/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	var/obj/item/seeds/myseed = mytray.myseed
+	if(!isnull(myseed))
 		myseed.adjust_instability(0.2)
-		myseed.adjust_potency(round(chems.get_reagent_amount(src.type) * 0.3))
-		myseed.adjust_yield(round(chems.get_reagent_amount(src.type) * 0.1))
+		myseed.adjust_potency(round(volume * 0.3))
+		myseed.adjust_yield(round(volume * 0.1))
 
 /datum/reagent/plantnutriment/left4zednutriment
 	name = "Left 4 Zed"
@@ -1598,11 +1755,10 @@
 	tox_prob = 13
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/plantnutriment/left4zednutriment/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	. = ..()
-	if(myseed && chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(round(chems.get_reagent_amount(src.type) * 0.1))
-		myseed.adjust_instability(round(chems.get_reagent_amount(src.type) * 0.2))
+/datum/reagent/plantnutriment/left4zednutriment/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+
+	mytray.adjust_plant_health(round(volume * 0.1))
+	mytray.myseed?.adjust_instability(round(volume * 0.2))
 
 /datum/reagent/plantnutriment/robustharvestnutriment
 	name = "Robust Harvest"
@@ -1611,12 +1767,12 @@
 	tox_prob = 8
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/plantnutriment/robustharvestnutriment/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	. = ..()
-	if(myseed && chems.has_reagent(src.type, 1))
+/datum/reagent/plantnutriment/robustharvestnutriment/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	var/obj/item/seeds/myseed = mytray.myseed
+	if(!isnull(myseed))
 		myseed.adjust_instability(-0.25)
-		myseed.adjust_potency(round(chems.get_reagent_amount(src.type) * 0.1))
-		myseed.adjust_yield(round(chems.get_reagent_amount(src.type) * 0.2))
+		myseed.adjust_potency(round(volume * 0.1))
+		myseed.adjust_yield(round(volume * 0.2))
 
 /datum/reagent/plantnutriment/endurogrow
 	name = "Enduro Grow"
@@ -1625,12 +1781,12 @@
 	tox_prob = 8
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/plantnutriment/endurogrow/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	. = ..()
-	if(myseed && chems.has_reagent(src.type, 1))
-		myseed.adjust_potency(-round(chems.get_reagent_amount(src.type) * 0.1))
-		myseed.adjust_yield(-round(chems.get_reagent_amount(src.type) * 0.075))
-		myseed.adjust_endurance(round(chems.get_reagent_amount(src.type) * 0.35))
+/datum/reagent/plantnutriment/endurogrow/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	var/obj/item/seeds/myseed = mytray.myseed
+	if(!isnull(myseed))
+		myseed.adjust_potency(-round(volume * 0.1))
+		myseed.adjust_yield(-round(volume * 0.075))
+		myseed.adjust_endurance(round(volume * 0.35))
 
 /datum/reagent/plantnutriment/liquidearthquake
 	name = "Liquid Earthquake"
@@ -1639,12 +1795,13 @@
 	tox_prob = 13
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/plantnutriment/liquidearthquake/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray)
-	. = ..()
-	if(myseed && chems.has_reagent(src.type, 1))
-		myseed.adjust_weed_rate(round(chems.get_reagent_amount(src.type) * 0.1))
-		myseed.adjust_weed_chance(round(chems.get_reagent_amount(src.type) * 0.3))
-		myseed.adjust_production(-round(chems.get_reagent_amount(src.type) * 0.075))
+/datum/reagent/plantnutriment/liquidearthquake/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+
+	var/obj/item/seeds/myseed = mytray.myseed
+	if(!isnull(myseed))
+		myseed.adjust_weed_rate(round(volume * 0.1))
+		myseed.adjust_weed_chance(round(volume * 0.3))
+		myseed.adjust_production(-round(volume * 0.075))
 
 // GOON OTHERS
 
@@ -1660,6 +1817,7 @@
 	burning_volume = 0.05 //but has a lot of hydrocarbons
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 	addiction_types = null
+	default_container = /obj/effect/decal/cleanable/oil
 
 /datum/reagent/stable_plasma
 	name = "Stable Plasma"
@@ -1671,8 +1829,8 @@
 	ph = 1.5
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/stable_plasma/on_mob_life(mob/living/carbon/C, delta_time, times_fired)
-	C.adjustPlasma(10 * REM * delta_time)
+/datum/reagent/stable_plasma/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	affected_mob.adjustPlasma(10 * REM * seconds_per_tick)
 	..()
 
 /datum/reagent/iodine
@@ -1725,7 +1883,7 @@
 /datum/reagent/carpet/green
 	name = "Green Carpet"
 	description = "For those that need the perfect flourish for green eggs and ham."
-	color = "#A8E61D"
+	color = COLOR_CRAYON_GREEN
 	taste_description = "Green" //the caps is intentional
 	carpet_type = /turf/open/floor/carpet/green
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
@@ -1758,21 +1916,21 @@
 	name = "Royal Carpet?"
 	description = "For those that break the game and need to make an issue report."
 
-/datum/reagent/carpet/royal/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
+/datum/reagent/carpet/royal/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
 	. = ..()
-	var/obj/item/organ/internal/liver/liver = M.getorganslot(ORGAN_SLOT_LIVER)
+	var/obj/item/organ/internal/liver/liver = affected_mob.get_organ_slot(ORGAN_SLOT_LIVER)
 	if(liver)
 		// Heads of staff and the captain have a "royal metabolism"
 		if(HAS_TRAIT(liver, TRAIT_ROYAL_METABOLISM))
-			if(DT_PROB(5, delta_time))
-				to_chat(M, "You feel like royalty.")
-			if(DT_PROB(2.5, delta_time))
-				M.say(pick("Peasants..","This carpet is worth more than your contracts!","I could fire you at any time..."), forced = "royal carpet")
+			if(SPT_PROB(5, seconds_per_tick))
+				to_chat(affected_mob, "You feel like royalty.")
+			if(SPT_PROB(2.5, seconds_per_tick))
+				affected_mob.say(pick("Peasants..","This carpet is worth more than your contracts!","I could fire you at any time..."), forced = "royal carpet")
 
 		// The quartermaster, as a semi-head, has a "pretender royal" metabolism
 		else if(HAS_TRAIT(liver, TRAIT_PRETENDER_ROYAL_METABOLISM))
-			if(DT_PROB(8, delta_time))
-				to_chat(M, "You feel like an impostor...")
+			if(SPT_PROB(8, seconds_per_tick))
+				to_chat(affected_mob, "You feel like an impostor...")
 
 /datum/reagent/carpet/royal/black
 	name = "Royal Black Carpet"
@@ -1936,14 +2094,11 @@
 	taste_description = "acid"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-
 /datum/reagent/acetone_oxide/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume)//Splashing people kills people!
 	. = ..()
 	if(methods & TOUCH)
-		exposed_mob.adjustFireLoss(2, FALSE) // burns,
+		exposed_mob.adjustFireLoss(2)
 		exposed_mob.adjust_fire_stacks((reac_volume / 10))
-
-
 
 /datum/reagent/phenol
 	name = "Phenol"
@@ -1962,13 +2117,12 @@
 	taste_description = "ash"
 	ph = 6.5
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+	default_container = /obj/effect/decal/cleanable/ash
 
 // Ash is also used IRL in gardening, as a fertilizer enhancer and weed killer
-/datum/reagent/ash/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_plant_health(round(chems.get_reagent_amount(src.type) * 1))
-		mytray.adjust_weedlevel(-1)
+/datum/reagent/ash/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_plant_health(round(volume))
+	mytray.adjust_weedlevel(-1)
 
 /datum/reagent/acetone
 	name = "Acetone"
@@ -2003,9 +2157,9 @@
 	color_callback = null
 	color = pick(random_color_list)
 
-/datum/reagent/colorful_reagent/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
+/datum/reagent/colorful_reagent/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
 	if(can_colour_mobs)
-		M.add_atom_colour(pick(random_color_list), WASHABLE_COLOUR_PRIORITY)
+		affected_mob.add_atom_colour(pick(random_color_list), WASHABLE_COLOUR_PRIORITY)
 	return ..()
 
 /// Colors anything it touches a random color.
@@ -2037,8 +2191,8 @@
 		return
 
 	var/mob/living/carbon/human/exposed_human = exposed_mob
-	exposed_human.hair_color = pick(potential_colors)
-	exposed_human.facial_hair_color = pick(potential_colors)
+	exposed_human.set_facial_haircolor(pick(potential_colors), update = FALSE)
+	exposed_human.set_haircolor(pick(potential_colors), update = TRUE)
 	exposed_human.update_body_parts()
 
 /datum/reagent/barbers_aid
@@ -2052,16 +2206,17 @@
 
 /datum/reagent/barbers_aid/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume, show_message=TRUE, touch_protection=FALSE)
 	. = ..()
-	if(!(methods & (TOUCH|VAPOR)) || !ishuman(exposed_mob) || HAS_TRAIT(exposed_mob, TRAIT_BALD) || HAS_TRAIT(exposed_mob, TRAIT_SHAVED))
+	if(!(methods & (TOUCH|VAPOR)) || !ishuman(exposed_mob) || (HAS_TRAIT(exposed_mob, TRAIT_BALD) && HAS_TRAIT(exposed_mob, TRAIT_SHAVED)))
 		return
 
 	var/mob/living/carbon/human/exposed_human = exposed_mob
-	var/datum/sprite_accessory/hair/picked_hair = pick(GLOB.hairstyles_list)
-	var/datum/sprite_accessory/facial_hair/picked_beard = pick(GLOB.facial_hairstyles_list)
-	to_chat(exposed_human, span_notice("Hair starts sprouting from your scalp."))
-	exposed_human.hairstyle = picked_hair
-	exposed_human.facial_hairstyle = picked_beard
-	exposed_human.update_body_parts()
+	if(!HAS_TRAIT(exposed_human, TRAIT_SHAVED))
+		var/datum/sprite_accessory/facial_hair/picked_beard = pick(GLOB.facial_hairstyles_list)
+		exposed_human.set_facial_hairstyle(picked_beard, update = FALSE)
+	if(!HAS_TRAIT(exposed_human, TRAIT_BALD))
+		var/datum/sprite_accessory/hair/picked_hair = pick(GLOB.hairstyles_list)
+		exposed_human.set_hairstyle(picked_hair, update = TRUE)
+	to_chat(exposed_human, span_notice("Hair starts sprouting from your [HAS_TRAIT(exposed_human, TRAIT_BALD) ? "face" : "scalp"]."))
 
 /datum/reagent/concentrated_barbers_aid
 	name = "Concentrated Barber's Aid"
@@ -2074,35 +2229,34 @@
 
 /datum/reagent/concentrated_barbers_aid/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume, show_message=TRUE, touch_protection=FALSE)
 	. = ..()
-	if(!(methods & (TOUCH|VAPOR)) || !ishuman(exposed_mob) || HAS_TRAIT(exposed_mob, TRAIT_BALD) || HAS_TRAIT(exposed_mob, TRAIT_SHAVED))
+	if(!(methods & (TOUCH|VAPOR)) || !ishuman(exposed_mob) || (HAS_TRAIT(exposed_mob, TRAIT_BALD) && HAS_TRAIT(exposed_mob, TRAIT_SHAVED)))
 		return
 
 	var/mob/living/carbon/human/exposed_human = exposed_mob
-	to_chat(exposed_human, span_notice("Your hair starts growing at an incredible speed!"))
-	exposed_human.hairstyle = "Very Long Hair"
-	exposed_human.facial_hairstyle = "Beard (Very Long)"
-	exposed_human.update_body_parts()
+	if(!HAS_TRAIT(exposed_human, TRAIT_SHAVED))
+		exposed_human.set_facial_hairstyle("Beard (Very Long)", update = FALSE)
+	if(!HAS_TRAIT(exposed_human, TRAIT_BALD))
+		exposed_human.set_hairstyle("Very Long Hair", update = TRUE)
+	to_chat(exposed_human, span_notice("Your[HAS_TRAIT(exposed_human, TRAIT_BALD) ? " facial" : ""] hair starts growing at an incredible speed!"))
 
-/datum/reagent/concentrated_barbers_aid/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
+/datum/reagent/concentrated_barbers_aid/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
 	. = ..()
-	if(current_cycle > 20 / creation_purity)
-		if(!ishuman(M))
+	if(current_cycle > 21 / creation_purity)
+		if(!ishuman(affected_mob))
 			return
-		var/mob/living/carbon/human/human_mob = M
+		var/mob/living/carbon/human/human_mob = affected_mob
 		if(creation_purity == 1 && human_mob.has_quirk(/datum/quirk/item_quirk/bald))
 			human_mob.remove_quirk(/datum/quirk/item_quirk/bald)
-		var/datum/species/species_datum = human_mob.dna?.species
-		if(!species_datum)
+		var/obj/item/bodypart/head/head = human_mob.get_bodypart(BODY_ZONE_HEAD)
+		if(!head || (head.head_flags & HEAD_HAIR))
 			return
-		if(species_datum.species_traits.Find(HAIR))
-			return
-		species_datum.species_traits |= HAIR
+		head.head_flags |= HEAD_HAIR
 		var/message
-		if(HAS_TRAIT(M, TRAIT_BALD))
+		if(HAS_TRAIT(affected_mob, TRAIT_BALD))
 			message = span_warning("You feel your scalp mutate, but you are still hopelessly bald.")
 		else
 			message = span_notice("Your scalp mutates, a full head of hair sprouting from it.")
-		to_chat(M, message)
+		to_chat(affected_mob, message)
 		human_mob.update_body_parts()
 
 /datum/reagent/baldium
@@ -2121,9 +2275,8 @@
 
 	var/mob/living/carbon/human/exposed_human = exposed_mob
 	to_chat(exposed_human, span_danger("Your hair is falling out in clumps!"))
-	exposed_human.hairstyle = "Bald"
-	exposed_human.facial_hairstyle = "Shaved"
-	exposed_human.update_body_parts()
+	exposed_human.set_facial_hairstyle("Shaved", update = FALSE)
+	exposed_human.set_hairstyle("Bald", update = TRUE)
 
 /datum/reagent/saltpetre
 	name = "Saltpetre"
@@ -2135,14 +2288,10 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
 // Saltpetre is used for gardening IRL, to simplify highly, it speeds up growth and strengthens plants
-/datum/reagent/saltpetre/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
-	if(chems.has_reagent(src.type, 1))
-		var/salt = chems.get_reagent_amount(src.type)
-		mytray.adjust_plant_health(round(salt * 0.18))
-		if(myseed)
-			myseed.adjust_production(-round(salt/10)-prob(salt%10))
-			myseed.adjust_potency(round(salt*1))
+/datum/reagent/saltpetre/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_plant_health(round(volume * 0.18))
+	mytray.myseed?.adjust_production(-round(volume / 10)-prob(volume % 10))
+	mytray.myseed?.adjust_potency(round(volume))
 
 /datum/reagent/lye
 	name = "Lye"
@@ -2239,10 +2388,10 @@
 	ph = 3
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/royal_bee_jelly/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	if(DT_PROB(1, delta_time))
-		M.say(pick("Bzzz...","BZZ BZZ","Bzzzzzzzzzzz..."), forced = "royal bee jelly")
-	..()
+/datum/reagent/royal_bee_jelly/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if(SPT_PROB(1, seconds_per_tick))
+		affected_mob.say(pick("Bzzz...","BZZ BZZ","Bzzzzzzzzzzz..."), forced = "royal bee jelly")
 
 //Misc reagents
 
@@ -2262,7 +2411,7 @@
 /datum/reagent/romerol/expose_mob(mob/living/carbon/human/exposed_mob, methods=TOUCH, reac_volume)
 	. = ..()
 	// Silently add the zombie infection organ to be activated upon death
-	if(!exposed_mob.getorganslot(ORGAN_SLOT_ZOMBIE))
+	if(!exposed_mob.get_organ_slot(ORGAN_SLOT_ZOMBIE))
 		var/obj/item/organ/internal/zombie_infection/nodamage/ZI = new()
 		ZI.Insert(exposed_mob)
 
@@ -2273,10 +2422,10 @@
 	color = "#00f041"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_NO_RANDOM_RECIPE
 
-/datum/reagent/magillitis/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	..()
-	if((ishuman(M)) && current_cycle >= 10)
-		M.gorillize()
+/datum/reagent/magillitis/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	if((ishuman(affected_mob)) && current_cycle > 10)
+		affected_mob.gorillize()
 
 /datum/reagent/growthserum
 	name = "Growth Serum"
@@ -2286,7 +2435,8 @@
 	taste_description = "bitterness" // apparently what viagra tastes like
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/growthserum/on_mob_life(mob/living/carbon/H, delta_time, times_fired)
+/datum/reagent/growthserum/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
 	var/newsize = current_size
 	switch(volume)
 		if(0 to 19)
@@ -2300,16 +2450,13 @@
 		if(200 to INFINITY)
 			newsize = 3.5*RESIZE_DEFAULT_SIZE
 
-	H.resize = newsize/current_size
+	affected_mob.update_transform(newsize/current_size)
 	current_size = newsize
-	H.update_transform()
-	..()
 
-/datum/reagent/growthserum/on_mob_end_metabolize(mob/living/M)
-	M.resize = RESIZE_DEFAULT_SIZE/current_size
+/datum/reagent/growthserum/on_mob_end_metabolize(mob/living/affected_mob)
+	. = ..()
+	affected_mob.update_transform(RESIZE_DEFAULT_SIZE/current_size)
 	current_size = RESIZE_DEFAULT_SIZE
-	M.update_transform()
-	..()
 
 /datum/reagent/plastic_polymers
 	name = "Plastic Polymers"
@@ -2332,7 +2479,7 @@
 	. = ..()
 	if(!istype(exposed_turf))
 		return
-	new glitter_type(exposed_turf)
+	exposed_turf.spawn_unique_cleanable(glitter_type)
 
 /datum/reagent/glitter/pink
 	name = "Pink Glitter"
@@ -2354,6 +2501,13 @@
 	glitter_type = /obj/effect/decal/cleanable/glitter/blue
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
+/datum/reagent/glitter/confetti
+	name = "Confetti"
+	description = "Tiny plastic flakes that are impossible to sweep up."
+	color = "#7dd87b"
+	glitter_type = /obj/effect/decal/cleanable/confetti
+	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+
 /datum/reagent/pax
 	name = "Pax"
 	description = "A colorless liquid that suppresses violence in its subjects."
@@ -2363,13 +2517,13 @@
 	ph = 15
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/pax/on_mob_metabolize(mob/living/L)
-	..()
-	ADD_TRAIT(L, TRAIT_PACIFISM, type)
+/datum/reagent/pax/on_mob_metabolize(mob/living/affected_mob)
+	. = ..()
+	ADD_TRAIT(affected_mob, TRAIT_PACIFISM, type)
 
-/datum/reagent/pax/on_mob_end_metabolize(mob/living/L)
-	REMOVE_TRAIT(L, TRAIT_PACIFISM, type)
-	..()
+/datum/reagent/pax/on_mob_end_metabolize(mob/living/affected_mob)
+	. = ..()
+	REMOVE_TRAIT(affected_mob, TRAIT_PACIFISM, type)
 
 /datum/reagent/bz_metabolites
 	name = "BZ Metabolites"
@@ -2380,19 +2534,19 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_NO_RANDOM_RECIPE
 
 /datum/reagent/bz_metabolites/on_mob_metabolize(mob/living/ling)
-	..()
+	. = ..()
 	ADD_TRAIT(ling, CHANGELING_HIVEMIND_MUTE, type)
 
 /datum/reagent/bz_metabolites/on_mob_end_metabolize(mob/living/ling)
-	..()
+	. = ..()
 	REMOVE_TRAIT(ling, CHANGELING_HIVEMIND_MUTE, type)
 
-/datum/reagent/bz_metabolites/on_mob_life(mob/living/carbon/target, delta_time, times_fired)
+/datum/reagent/bz_metabolites/on_mob_life(mob/living/carbon/target, seconds_per_tick, times_fired)
+	. = ..()
 	if(target.mind)
 		var/datum/antagonist/changeling/changeling = target.mind.has_antag_datum(/datum/antagonist/changeling)
 		if(changeling)
-			changeling.adjust_chemicals(-2 * REM * delta_time)
-	return ..()
+			changeling.adjust_chemicals(-2 * REM * seconds_per_tick)
 
 /datum/reagent/pax/peaceborg
 	name = "Synthpax"
@@ -2407,12 +2561,12 @@
 	taste_description = "dizziness"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_NO_RANDOM_RECIPE
 
-/datum/reagent/peaceborg/confuse/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	M.adjust_confusion_up_to(3 SECONDS * REM * delta_time, 5 SECONDS)
-	M.adjust_dizzy_up_to(6 SECONDS * REM * delta_time, 12 SECONDS)
+/datum/reagent/peaceborg/confuse/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	affected_mob.adjust_confusion_up_to(3 SECONDS * REM * seconds_per_tick, 5 SECONDS)
+	affected_mob.adjust_dizzy_up_to(6 SECONDS * REM * seconds_per_tick, 12 SECONDS)
 
-	if(DT_PROB(10, delta_time))
-		to_chat(M, "You feel confused and disoriented.")
+	if(SPT_PROB(10, seconds_per_tick))
+		to_chat(affected_mob, "You feel confused and disoriented.")
 	..()
 
 /datum/reagent/peaceborg/tire
@@ -2422,13 +2576,15 @@
 	taste_description = "tiredness"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_NO_RANDOM_RECIPE
 
-/datum/reagent/peaceborg/tire/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
-	var/healthcomp = (100 - M.health) //DOES NOT ACCOUNT FOR ADMINBUS THINGS THAT MAKE YOU HAVE MORE THAN 200/210 HEALTH, OR SOMETHING OTHER THAN A HUMAN PROCESSING THIS.
-	if(M.getStaminaLoss() < (45 - healthcomp)) //At 50 health you would have 200 - 150 health meaning 50 compensation. 60 - 50 = 10, so would only do 10-19 stamina.)
-		M.adjustStaminaLoss(10 * REM * delta_time)
-	if(DT_PROB(16, delta_time))
-		to_chat(M, "You should sit down and take a rest...")
-	..()
+/datum/reagent/peaceborg/tire/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+	var/healthcomp = (100 - affected_mob.health) //DOES NOT ACCOUNT FOR ADMINBUS THINGS THAT MAKE YOU HAVE MORE THAN 200/210 HEALTH, OR SOMETHING OTHER THAN A HUMAN PROCESSING THIS.
+	. = FALSE
+	if(affected_mob.getStaminaLoss() < (45 - healthcomp)) //At 50 health you would have 200 - 150 health meaning 50 compensation. 60 - 50 = 10, so would only do 10-19 stamina.)
+		if(affected_mob.adjustStaminaLoss(10 * REM * seconds_per_tick, updating_stamina = FALSE))
+			. = UPDATE_MOB_HEALTH
+	if(SPT_PROB(16, seconds_per_tick))
+		to_chat(affected_mob, "You should sit down and take a rest...")
 
 /datum/reagent/gondola_mutation_toxin
 	name = "Tranquility"
@@ -2436,11 +2592,12 @@
 	color = "#9A6750" //RGB: 154, 103, 80
 	taste_description = "inner peace"
 	penetrates_skin = NONE
+	var/datum/disease/transformation/gondola_disease = /datum/disease/transformation/gondola
 
 /datum/reagent/gondola_mutation_toxin/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume, show_message = TRUE, touch_protection = 0)
 	. = ..()
 	if((methods & (PATCH|INGEST|INJECT)) || ((methods & VAPOR) && prob(min(reac_volume,100)*(1 - touch_protection))))
-		exposed_mob.ForceContractDisease(new /datum/disease/transformation/gondola(), FALSE, TRUE)
+		exposed_mob.ForceContractDisease(new gondola_disease, FALSE, TRUE)
 
 
 /datum/reagent/spider_extract
@@ -2453,8 +2610,6 @@
 /datum/reagent/yuck
 	name = "Organic Slurry"
 	description = "A mixture of various colors of fluid. Induces vomiting."
-	glass_name = "glass of ...yuck!"
-	glass_desc = "It smells like a carcass, and doesn't look much better."
 	color = "#545000"
 	taste_description = "insides"
 	taste_mult = 4
@@ -2462,35 +2617,44 @@
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 	var/yuck_cycle = 0 //! The `current_cycle` when puking starts.
 
-/datum/reagent/yuck/on_mob_add(mob/living/L)
-	. = ..()
-	if(HAS_TRAIT(L, TRAIT_NOHUNGER)) //they can't puke
+/datum/glass_style/drinking_glass/yuck
+	required_drink_type = /datum/reagent/yuck
+	name = "glass of ...yuck!"
+	desc = "It smells like a carcass, and doesn't look much better."
+
+/datum/reagent/yuck/on_mob_add(mob/living/affected_mob)
+	if(HAS_TRAIT(affected_mob, TRAIT_NOHUNGER)) //they can't puke
 		holder.del_reagent(type)
+	return ..()
 
 #define YUCK_PUKE_CYCLES 3 // every X cycle is a puke
 #define YUCK_PUKES_TO_STUN 3 // hit this amount of pukes in a row to start stunning
-/datum/reagent/yuck/on_mob_life(mob/living/carbon/C, delta_time, times_fired)
+/datum/reagent/yuck/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
 	if(!yuck_cycle)
-		if(DT_PROB(4, delta_time))
+		if(SPT_PROB(4, seconds_per_tick))
 			var/dread = pick("Something is moving in your stomach...", \
 				"A wet growl echoes from your stomach...", \
 				"For a moment you feel like your surroundings are moving, but it's your stomach...")
-			to_chat(C, span_userdanger("[dread]"))
+			to_chat(affected_mob, span_userdanger("[dread]"))
 			yuck_cycle = current_cycle
 	else
 		var/yuck_cycles = current_cycle - yuck_cycle
 		if(yuck_cycles % YUCK_PUKE_CYCLES == 0)
 			if(yuck_cycles >= YUCK_PUKE_CYCLES * YUCK_PUKES_TO_STUN)
-				holder.remove_reagent(type, 5)
-			C.vomit(rand(14, 26), stun = yuck_cycles >= YUCK_PUKE_CYCLES * YUCK_PUKES_TO_STUN)
-	if(holder)
-		return ..()
+				if(holder)
+					holder.remove_reagent(type, 5)
+			var/passable_flags = (MOB_VOMIT_MESSAGE | MOB_VOMIT_HARM)
+			if(yuck_cycles >= (YUCK_PUKE_CYCLES * YUCK_PUKES_TO_STUN))
+				passable_flags |= MOB_VOMIT_STUN
+			affected_mob.vomit(vomit_flags = passable_flags, lost_nutrition = rand(14, 26))
+
 #undef YUCK_PUKE_CYCLES
 #undef YUCK_PUKES_TO_STUN
 
-/datum/reagent/yuck/on_mob_end_metabolize(mob/living/L)
+/datum/reagent/yuck/on_mob_end_metabolize(mob/living/affected_mob)
+	. = ..()
 	yuck_cycle = 0 // reset vomiting
-	return ..()
 
 /datum/reagent/yuck/on_transfer(atom/A, methods=TOUCH, trans_volume)
 	if((methods & INGEST) || !iscarbon(A))
@@ -2537,7 +2701,7 @@
 	description = "A purple metal morphic liquid, said to impose it's metallic properties on whatever it touches."
 	color = "#b000aa"
 	taste_mult = 0 // oderless and tasteless
-	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_NO_RANDOM_RECIPE
+	chemical_flags = REAGENT_NO_RANDOM_RECIPE
 	/// The material flags used to apply the transmuted materials
 	var/applied_material_flags = MATERIAL_EFFECTS | MATERIAL_ADD_PREFIX | MATERIAL_COLOR
 	/// The amount of materials to apply to the transmuted objects if they don't contain materials
@@ -2552,13 +2716,16 @@
 	metal_morph(exposed_turf)
 
 ///turn an object into a special material
-/datum/reagent/metalgen/proc/metal_morph(atom/A)
+/datum/reagent/metalgen/proc/metal_morph(atom/target)
 	var/metal_ref = data["material"]
 	if(!metal_ref)
 		return
 
+	if(is_type_in_typecache(target, GLOB.blacklisted_metalgen_types)) //some stuff can lead to exploits if transmuted
+		return
+
 	var/metal_amount = 0
-	var/list/materials_to_transmute = A.get_material_composition(BREAKDOWN_INCLUDE_ALCHEMY)
+	var/list/materials_to_transmute = target.get_material_composition(BREAKDOWN_INCLUDE_ALCHEMY)
 	for(var/metal_key in materials_to_transmute) //list with what they're made of
 		metal_amount += materials_to_transmute[metal_key]
 
@@ -2566,9 +2733,9 @@
 		metal_amount = default_material_amount //some stuff doesn't have materials at all. To still give them properties, we give them a material. Basically doesn't exist
 
 	var/list/metal_dat = list((metal_ref) = metal_amount)
-	A.material_flags = applied_material_flags
-	A.set_custom_materials(metal_dat)
-	ADD_TRAIT(A, TRAIT_MAT_TRANSMUTED, type)
+	target.material_flags = applied_material_flags
+	target.set_custom_materials(metal_dat)
+	ADD_TRAIT(target, TRAIT_MAT_TRANSMUTED, type)
 
 /datum/reagent/gravitum
 	name = "Gravitum"
@@ -2583,14 +2750,15 @@
 /datum/reagent/gravitum/expose_obj(obj/exposed_obj, volume)
 	. = ..()
 	exposed_obj.AddElement(/datum/element/forced_gravity, 0)
-	addtimer(CALLBACK(exposed_obj, PROC_REF(_RemoveElement), list(/datum/element/forced_gravity, 0)), volume * time_multiplier)
+	addtimer(CALLBACK(exposed_obj, PROC_REF(_RemoveElement), list(/datum/element/forced_gravity, 0)), volume * time_multiplier, TIMER_UNIQUE|TIMER_OVERRIDE)
 
-/datum/reagent/gravitum/on_mob_metabolize(mob/living/L)
-	L.AddElement(/datum/element/forced_gravity, 0) //0 is the gravity, and in this case weightless
-	return ..()
+/datum/reagent/gravitum/on_mob_metabolize(mob/living/affected_mob)
+	. = ..()
+	affected_mob.AddElement(/datum/element/forced_gravity, 0) //0 is the gravity, and in this case weightless
 
-/datum/reagent/gravitum/on_mob_end_metabolize(mob/living/L)
-	L.RemoveElement(/datum/element/forced_gravity, 0)
+/datum/reagent/gravitum/on_mob_end_metabolize(mob/living/affected_mob)
+	. = ..()
+	affected_mob.RemoveElement(/datum/element/forced_gravity, 0)
 
 /datum/reagent/cellulose
 	name = "Cellulose Fibers"
@@ -2612,30 +2780,31 @@
 	/// Whether we've had at least WOUND_DETERMINATION_SEVERE (2.5u) of determination at any given time. No damage slowdown immunity or indication we're having a second wind if it's just a single moderate wound
 	var/significant = FALSE
 
-/datum/reagent/determination/on_mob_end_metabolize(mob/living/carbon/M)
+/datum/reagent/determination/on_mob_end_metabolize(mob/living/carbon/affected_mob)
+	. = ..()
 	if(significant)
 		var/stam_crash = 0
-		for(var/thing in M.all_wounds)
+		for(var/thing in affected_mob.all_wounds)
 			var/datum/wound/W = thing
 			stam_crash += (W.severity + 1) * 3 // spike of 3 stam damage per wound severity (moderate = 6, severe = 9, critical = 12) when the determination wears off if it was a combat rush
-		M.adjustStaminaLoss(stam_crash)
-	M.remove_status_effect(/datum/status_effect/determined)
-	..()
+		affected_mob.adjustStaminaLoss(stam_crash)
+	affected_mob.remove_status_effect(/datum/status_effect/determined)
 
-/datum/reagent/determination/on_mob_life(mob/living/carbon/M, delta_time, times_fired)
+/datum/reagent/determination/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
 	if(!significant && volume >= WOUND_DETERMINATION_SEVERE)
 		significant = TRUE
-		M.apply_status_effect(/datum/status_effect/determined) // in addition to the slight healing, limping cooldowns are divided by 4 during the combat high
+		affected_mob.apply_status_effect(/datum/status_effect/determined) // in addition to the slight healing, limping cooldowns are divided by 4 during the combat high
 
 	volume = min(volume, WOUND_DETERMINATION_MAX)
 
-	for(var/thing in M.all_wounds)
+	for(var/thing in affected_mob.all_wounds)
 		var/datum/wound/W = thing
 		var/obj/item/bodypart/wounded_part = W.limb
 		if(wounded_part)
-			wounded_part.heal_damage(0.25 * REM * delta_time, 0.25 * REM * delta_time)
-		M.adjustStaminaLoss(-0.25 * REM * delta_time) // the more wounds, the more stamina regen
-	..()
+			wounded_part.heal_damage(0.25 * REM * seconds_per_tick, 0.25 * REM * seconds_per_tick)
+		if(affected_mob.adjustStaminaLoss(-0.25 * REM * seconds_per_tick, updating_stamina = FALSE)) // the more wounds, the more stamina regen
+			return UPDATE_MOB_HEALTH
 
 // unholy water, but for heretics.
 // why couldn't they have both just used the same reagent?
@@ -2647,29 +2816,32 @@
 		It re-energizes and heals those who can see beyond this fragile reality, \
 		but is incredibly harmful to the closed-minded. It metabolizes very quickly."
 	taste_description = "Ag'hsj'saje'sh"
+	self_consuming = TRUE //eldritch intervention won't be limited by the lack of a liver
 	color = "#1f8016"
 	metabolization_rate = 2.5 * REAGENTS_METABOLISM  //0.5u/second
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED|REAGENT_NO_RANDOM_RECIPE
 
-/datum/reagent/eldritch/on_mob_life(mob/living/carbon/drinker, delta_time, times_fired)
+/datum/reagent/eldritch/on_mob_life(mob/living/carbon/drinker, seconds_per_tick, times_fired)
+	. = ..()
+	var/need_mob_update = FALSE
 	if(IS_HERETIC(drinker))
-		drinker.adjust_drowsyness(-5 * REM * delta_time)
-		drinker.AdjustAllImmobility(-40 * REM * delta_time)
-		drinker.adjustStaminaLoss(-10 * REM * delta_time, FALSE)
-		drinker.adjustToxLoss(-2 * REM * delta_time, FALSE, forced = TRUE)
-		drinker.adjustOxyLoss(-2 * REM * delta_time, FALSE)
-		drinker.adjustBruteLoss(-2 * REM * delta_time, FALSE)
-		drinker.adjustFireLoss(-2 * REM * delta_time, FALSE)
+		drinker.adjust_drowsiness(-10 * REM * seconds_per_tick)
+		drinker.AdjustAllImmobility(-40 * REM * seconds_per_tick)
+		need_mob_update += drinker.adjustStaminaLoss(-10 * REM * seconds_per_tick, updating_stamina = FALSE)
+		need_mob_update += drinker.adjustToxLoss(-2 * REM * seconds_per_tick, updating_health = FALSE, forced = TRUE)
+		need_mob_update += drinker.adjustOxyLoss(-2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += drinker.adjustBruteLoss(-2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += drinker.adjustFireLoss(-2 * REM * seconds_per_tick, updating_health = FALSE)
 		if(drinker.blood_volume < BLOOD_VOLUME_NORMAL)
-			drinker.blood_volume += 3 * REM * delta_time
+			drinker.blood_volume += 3 * REM * seconds_per_tick
 	else
-		drinker.adjustOrganLoss(ORGAN_SLOT_BRAIN, 3 * REM * delta_time, 150)
-		drinker.adjustToxLoss(2 * REM * delta_time, FALSE)
-		drinker.adjustFireLoss(2 * REM * delta_time, FALSE)
-		drinker.adjustOxyLoss(2 * REM * delta_time, FALSE)
-		drinker.adjustBruteLoss(2 * REM * delta_time, FALSE)
-	..()
-	return TRUE
+		need_mob_update = drinker.adjustOrganLoss(ORGAN_SLOT_BRAIN, 3 * REM * seconds_per_tick, 150)
+		need_mob_update += drinker.adjustToxLoss(2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += drinker.adjustFireLoss(2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += drinker.adjustOxyLoss(2 * REM * seconds_per_tick, updating_health = FALSE)
+		need_mob_update += drinker.adjustBruteLoss(2 * REM * seconds_per_tick, updating_health = FALSE)
+	if(need_mob_update)
+		return UPDATE_MOB_HEALTH
 
 /datum/reagent/universal_indicator
 	name = "Universal Indicator"
@@ -2695,8 +2867,6 @@
 	taste_mult = 1.3
 	taste_description = "tiny legs scuttling down the back of your throat"
 	metabolization_rate = 5 * REAGENTS_METABOLISM //1u per second
-	glass_name = "glass of ants"
-	glass_desc = "Bottoms up...?"
 	ph = 4.6 // Ants contain Formic Acid
 	/// How much damage the ants are going to be doing (rises with each tick the ants are in someone's body)
 	var/ant_damage = 0
@@ -2708,29 +2878,34 @@
 		"GET THEM OUT OF ME!!",
 		"HOLY HELL THEY BURN!!",
 		"MY GOD THEY'RE INSIDE ME!!",
-		"GET THEM OUT!!"
-		)
+		"GET THEM OUT!!",
+	)
 
-/datum/reagent/ants/on_mob_life(mob/living/carbon/victim, delta_time)
+/datum/glass_style/drinking_glass/ants
+	required_drink_type = /datum/reagent/ants
+	name = "glass of ants"
+	desc = "Bottoms up...?"
+
+/datum/reagent/ants/on_mob_life(mob/living/carbon/victim, seconds_per_tick)
+	. = ..()
 	victim.adjustBruteLoss(max(0.1, round((ant_damage * 0.025),0.1))) //Scales with time. Roughly 32 brute with 100u.
 	ant_damage++
 	if(ant_damage < 5) // Makes ant food a little more appetizing, since you won't be screaming as much.
-		return ..()
-	if(DT_PROB(5, delta_time))
-		if(DT_PROB(5, delta_time)) //Super rare statement
+		return
+	if(SPT_PROB(5, seconds_per_tick))
+		if(SPT_PROB(5, seconds_per_tick)) //Super rare statement
 			victim.say("AUGH NO NOT THE ANTS! NOT THE ANTS! AAAAUUGH THEY'RE IN MY EYES! MY EYES! AUUGH!!", forced = /datum/reagent/ants)
 		else
 			victim.say(pick(ant_screams), forced = /datum/reagent/ants)
-	if(DT_PROB(15, delta_time))
+	if(SPT_PROB(15, seconds_per_tick))
 		victim.emote("scream")
-	if(DT_PROB(2, delta_time)) // Stuns, but purges ants.
-		victim.vomit(rand(5,10), FALSE, TRUE, 1, TRUE, FALSE, purge_ratio = 1)
-	return ..()
+	if(SPT_PROB(2, seconds_per_tick)) // Stuns, but purges ants.
+		victim.vomit(VOMIT_CATEGORY_DEFAULT, lost_nutrition = rand(5,10), purge_ratio = 1)
 
 /datum/reagent/ants/on_mob_end_metabolize(mob/living/living_anthill)
+	. = ..()
 	ant_damage = 0
 	to_chat(living_anthill, "<span class='notice'>You feel like the last of the ants are out of your system.</span>")
-	return ..()
 
 /datum/reagent/ants/expose_mob(mob/living/exposed_mob, methods=TOUCH, reac_volume)
 	. = ..()
@@ -2757,9 +2932,10 @@
 	if((reac_volume <= 10)) // Makes sure people don't duplicate ants.
 		return
 
-	var/obj/effect/decal/cleanable/ants/pests = locate() in exposed_turf.contents
+	var/obj/effect/decal/cleanable/ants/pests = exposed_turf.spawn_unique_cleanable(/obj/effect/decal/cleanable/ants)
 	if(!pests)
-		pests = new(exposed_turf)
+		return
+
 	var/spilled_ants = (round(reac_volume,1) - 5) // To account for ant decals giving 3-5 ants on initialize.
 	pests.reagents.add_reagent(/datum/reagent/ants, spilled_ants)
 	pests.update_ant_damage()
@@ -2775,7 +2951,8 @@
 
 /datum/reagent/lead/on_mob_life(mob/living/carbon/victim)
 	. = ..()
-	victim.adjustOrganLoss(ORGAN_SLOT_BRAIN, 0.5)
+	if(victim.adjustOrganLoss(ORGAN_SLOT_BRAIN, 0.5))
+		return UPDATE_MOB_HEALTH
 
 //The main feedstock for kronkaine production, also a shitty stamina healer.
 /datum/reagent/kronkus_extract
@@ -2788,8 +2965,11 @@
 
 /datum/reagent/kronkus_extract/on_mob_life(mob/living/carbon/kronkus_enjoyer)
 	. = ..()
-	kronkus_enjoyer.adjustOrganLoss(ORGAN_SLOT_HEART, 0.1)
-	kronkus_enjoyer.adjustStaminaLoss(-2, FALSE)
+	var/need_mob_update
+	need_mob_update = kronkus_enjoyer.adjustOrganLoss(ORGAN_SLOT_HEART, 0.1)
+	need_mob_update += kronkus_enjoyer.adjustStaminaLoss(-2, updating_stamina = FALSE)
+	if(need_mob_update)
+		return UPDATE_MOB_HEALTH
 
 /datum/reagent/brimdust
 	name = "Brimdust"
@@ -2799,18 +2979,16 @@
 	taste_description = "burning"
 	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
 
-/datum/reagent/brimdust/on_mob_life(mob/living/carbon/carbon, delta_time, times_fired)
+/datum/reagent/brimdust/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
 	. = ..()
-	carbon.adjustFireLoss((ispodperson(carbon) ? -1 : 1) * delta_time)
+	if(affected_mob.adjustFireLoss((ispodperson(affected_mob) ? -1 : 1 * seconds_per_tick), updating_health = FALSE))
+		return UPDATE_MOB_HEALTH
 
-/datum/reagent/brimdust/on_hydroponics_apply(obj/item/seeds/myseed, datum/reagents/chems, obj/machinery/hydroponics/mytray, mob/user)
-	. = ..()
-	if(chems.has_reagent(src.type, 1))
-		mytray.adjust_weedlevel(-1)
-		mytray.adjust_pestlevel(-1)
-		mytray.adjust_plant_health(round(chems.get_reagent_amount(src.type) * 1))
-		if(myseed)
-			myseed.adjust_potency(round(chems.get_reagent_amount(src.type) * 0.5))
+/datum/reagent/brimdust/on_hydroponics_apply(obj/machinery/hydroponics/mytray, mob/user)
+	mytray.adjust_weedlevel(-1)
+	mytray.adjust_pestlevel(-1)
+	mytray.adjust_plant_health(round(volume))
+	mytray.myseed?.adjust_potency(round(volume * 0.5))
 
 // I made this food....with love.
 // Reagent added to food by chef's with a chef's kiss. Makes people happy.
@@ -2832,18 +3010,64 @@
 	. = ..()
 	metabolizer.add_mood_event(name, /datum/mood_event/love_reagent)
 
-/datum/reagent/love/on_mob_delete(mob/living/deleted_from)
+/datum/reagent/love/on_mob_delete(mob/living/affected_mob)
 	. = ..()
 	// When we exit the system we'll leave the moodlet based on the amount we had
 	var/duration_of_moodlet = current_cycle * 20 SECONDS
-	deleted_from.clear_mood_event(name)
-	deleted_from.add_mood_event(name, /datum/mood_event/love_reagent, duration_of_moodlet)
+	affected_mob.clear_mood_event(name)
+	affected_mob.add_mood_event(name, /datum/mood_event/love_reagent, duration_of_moodlet)
 
-/datum/reagent/love/overdose_process(mob/living/metabolizer, delta_time, times_fired)
+/datum/reagent/love/overdose_process(mob/living/metabolizer, seconds_per_tick, times_fired)
+	. = ..()
 	var/mob/living/carbon/carbon_metabolizer = metabolizer
 	if(!istype(carbon_metabolizer) || !carbon_metabolizer.can_heartattack() || carbon_metabolizer.undergoing_cardiac_arrest())
 		metabolizer.reagents.del_reagent(type)
 		return
 
-	if(DT_PROB(10, delta_time))
+	if(SPT_PROB(10, seconds_per_tick))
 		carbon_metabolizer.set_heartattack(TRUE)
+
+/datum/reagent/hauntium
+	name = "Hauntium"
+	color = "#3B3B3BA3"
+	description = "An eerie liquid created by purifying the prescence of ghosts. If it happens to get in your body, it starts hurting your soul." //soul as in mood and heart
+	taste_description = "evil spirits"
+	metabolization_rate = 0.75 * REAGENTS_METABOLISM
+	material = /datum/material/hauntium
+	ph = 10
+	chemical_flags = REAGENT_CAN_BE_SYNTHESIZED
+
+/datum/reagent/hauntium/expose_obj(obj/exposed_obj, volume) //gives 15 seconds of haunting effect for every unit of it that touches an object
+	. = ..()
+	if(HAS_TRAIT_FROM(exposed_obj, TRAIT_HAUNTED, HAUNTIUM_REAGENT_TRAIT))
+		return
+	exposed_obj.make_haunted(HAUNTIUM_REAGENT_TRAIT, "#f8f8ff")
+	addtimer(CALLBACK(exposed_obj, TYPE_PROC_REF(/atom/movable/, remove_haunted), HAUNTIUM_REAGENT_TRAIT), volume * 20 SECONDS)
+
+/datum/reagent/hauntium/on_mob_metabolize(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	to_chat(affected_mob, span_userdanger("You feel an evil presence inside you!"))
+	if(affected_mob.mob_biotypes & MOB_UNDEAD || HAS_MIND_TRAIT(affected_mob, TRAIT_MORBID))
+		affected_mob.add_mood_event("morbid_hauntium", /datum/mood_event/morbid_hauntium, name) //8 minutes of slight mood buff if undead or morbid
+	else
+		affected_mob.add_mood_event("hauntium_spirits", /datum/mood_event/hauntium_spirits, name) //8 minutes of mood debuff
+
+/datum/reagent/hauntium/on_mob_life(mob/living/carbon/affected_mob, seconds_per_tick, times_fired)
+	. = ..()
+
+	if(affected_mob.mob_biotypes & MOB_UNDEAD || HAS_MIND_TRAIT(affected_mob, TRAIT_MORBID)) //if morbid or undead,acts like an addiction-less drug
+		affected_mob.remove_status_effect(/datum/status_effect/jitter)
+		affected_mob.AdjustStun(-50 * REM * seconds_per_tick)
+		affected_mob.AdjustKnockdown(-50 * REM * seconds_per_tick)
+		affected_mob.AdjustUnconscious(-50 * REM * seconds_per_tick)
+		affected_mob.AdjustParalyzed(-50 * REM * seconds_per_tick)
+		affected_mob.AdjustImmobilized(-50 * REM * seconds_per_tick)
+	else
+		if(affected_mob.adjustOrganLoss(ORGAN_SLOT_HEART, REM * seconds_per_tick)) //1 heart damage per tick
+			. = UPDATE_MOB_HEALTH
+		if(SPT_PROB(10, seconds_per_tick))
+			affected_mob.emote(pick("twitch","choke","shiver","gag"))
+
+// The same as gold just with a slower metabolism rate, to make using the Hand of Midas easier.
+/datum/reagent/gold/cursed
+	name = "Cursed Gold"
+	metabolization_rate = 0.2 * REAGENTS_METABOLISM

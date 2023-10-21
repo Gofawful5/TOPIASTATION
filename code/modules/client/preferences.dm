@@ -2,20 +2,26 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 
 /datum/preferences
 	var/client/parent
-	//doohickeys for savefiles
+	/// The path to the general savefile for this datum
 	var/path
-	var/default_slot = 1 //Holder so it doesn't default to slot 1, rather the last one used
+	/// Whether or not we allow saving/loading. Used for guests, if they're enabled
+	var/load_and_save = TRUE
+	/// Ensures that we always load the last used save, QOL
+	var/default_slot = 1
+	/// The maximum number of slots we're allowed to contain
 	var/max_save_slots = 3
 
-	//non-preference stuff
-	var/muted = 0
+	/// Bitflags for communications that are muted
+	var/muted = NONE
+	/// Last IP that this client has connected from
 	var/last_ip
+	/// Last CID that this client has connected from
 	var/last_id
 
-	//game-preferences
-	var/lastchangelog = "" //Saved changlog filesize to detect if there was a change
+	/// Cached changelog size, to detect new changelogs since last join
+	var/lastchangelog = ""
 
-	//Antag preferences
+	/// List of ROLE_X that the client wants to be eligible for
 	var/list/be_special = list() //Special role selection
 
 	/// Custom keybindings. Map of keybind names to keyboard inputs.
@@ -95,13 +101,13 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 		middleware += new middleware_type(src)
 
 	if(IS_CLIENT_OR_MOCK(parent))
-		if(!is_guest_key(parent.key))
-			load_path(parent.ckey)
-			if(!fexists(path))
-				try_savefile_type_migration()
-			unlock_content = !!parent.IsByondMember()
-			if(unlock_content)
-				max_save_slots = 8
+		load_and_save = !is_guest_key(parent.key)
+		load_path(parent.ckey)
+		if(load_and_save && !fexists(path))
+			try_savefile_type_migration()
+		unlock_content = !!parent.IsByondMember()
+		if(unlock_content)
+			max_save_slots = 8
 	else
 		CRASH("attempted to create a preferences datum without a client or mock!")
 	load_savefile()
@@ -433,6 +439,55 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 	if(GetQuirkBalance() < 0)
 		all_quirks = list()
 
+/**
+ * Safely read a given preference datum from a given client.
+ *
+ * Reads the given preference datum from the given client, and guards against null client and null prefs.
+ * The client object is fickle and can go null at times, so use this instead of read_preference() if you
+ * want to ensure no runtimes.
+ *
+ * returns client.prefs.read_preference(prefs_to_read) or FALSE if something went wrong.
+ *
+ * Arguments:
+ * * client/prefs_holder - the client to read the pref from
+ * * datum/preference/pref_to_read - the type of preference datum to read.
+ */
+/proc/safe_read_pref(client/prefs_holder, datum/preference/pref_to_read)
+	if(!prefs_holder)
+		return FALSE
+	if(prefs_holder && !prefs_holder?.prefs)
+		stack_trace("[prefs_holder?.mob] ([prefs_holder?.ckey]) had null prefs, which shouldn't be possible!")
+		return FALSE
+
+	return prefs_holder?.prefs.read_preference(pref_to_read)
+
+/**
+ * Get the given client's chat toggle prefs.
+ *
+ * Getter function for prefs.chat_toggles which guards against null client and null prefs.
+ * The client object is fickle and can go null at times, so use this instead of directly accessing the var
+ * if you want to ensure no runtimes.
+ *
+ * returns client.prefs.chat_toggles or FALSE if something went wrong.
+ *
+ * Arguments:
+ * * client/prefs_holder - the client to get the chat_toggles pref from.
+ */
+/proc/get_chat_toggles(client/target)
+	if(ismob(target))
+		var/mob/target_mob = target
+		target = target_mob.client
+
+	if(isnull(target))
+		return NONE
+
+	var/datum/preferences/preferences = target.prefs
+	if(isnull(preferences))
+		stack_trace("[key_name(target)] preference datum was null")
+		return NONE
+
+	return preferences.chat_toggles
+
 /// Sanitizes the preferences, applies the randomization prefs, and then applies the preference to the human mob.
 /datum/preferences/proc/safe_transfer_prefs_to(mob/living/carbon/human/character, icon_updates = TRUE, is_antag = FALSE)
 	apply_character_randomization_prefs(is_antag)
@@ -454,6 +509,7 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 		character.icon_render_keys = list()
 		character.update_body(is_creating = TRUE)
 
+	SEND_SIGNAL(character, COMSIG_HUMAN_PREFS_APPLIED)
 
 /// Returns whether the parent mob should have the random hardcore settings enabled. Assumes it has a mind.
 /datum/preferences/proc/should_be_random_hardcore(datum/job/job, datum/mind/mind)

@@ -18,6 +18,21 @@
 
 	var/obj/item/cavity_item
 
+	/// Offset to apply to equipment worn as a uniform
+	var/datum/worn_feature_offset/worn_uniform_offset
+	/// Offset to apply to equipment worn on the id slot
+	var/datum/worn_feature_offset/worn_id_offset
+	/// Offset to apply to equipment worn in the suit slot
+	var/datum/worn_feature_offset/worn_suit_storage_offset
+	/// Offset to apply to equipment worn on the hips
+	var/datum/worn_feature_offset/worn_belt_offset
+	/// Offset to apply to overlays placed on the back
+	var/datum/worn_feature_offset/worn_back_offset
+	/// Offset to apply to equipment worn as a suit
+	var/datum/worn_feature_offset/worn_suit_offset
+	/// Offset to apply to equipment worn on the neck
+	var/datum/worn_feature_offset/worn_neck_offset
+
 /obj/item/bodypart/chest/can_dismember(obj/item/item)
 	if(owner.stat < HARD_CRIT || !get_organs())
 		return FALSE
@@ -25,17 +40,27 @@
 
 /obj/item/bodypart/chest/Destroy()
 	QDEL_NULL(cavity_item)
+	QDEL_NULL(worn_uniform_offset)
+	QDEL_NULL(worn_id_offset)
+	QDEL_NULL(worn_suit_storage_offset)
+	QDEL_NULL(worn_belt_offset)
+	QDEL_NULL(worn_back_offset)
+	QDEL_NULL(worn_suit_offset)
+	QDEL_NULL(worn_neck_offset)
 	return ..()
 
 /obj/item/bodypart/chest/drop_organs(mob/user, violent_removal)
 	if(cavity_item)
 		cavity_item.forceMove(drop_location())
 		cavity_item = null
-	..()
+	return ..()
 
 /obj/item/bodypart/chest/monkey
-	icon = 'icons/mob/species/monkey/bodyparts.dmi'
-	icon_static = 'icons/mob/species/monkey/bodyparts.dmi'
+	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_husk = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	husk_type = "monkey"
+	top_offset = -5
 	icon_state = "default_monkey_chest"
 	limb_id = SPECIES_MONKEY
 	should_draw_greyscale = FALSE
@@ -46,25 +71,25 @@
 	dmg_overlay_type = SPECIES_MONKEY
 
 /obj/item/bodypart/chest/alien
-	icon = 'icons/mob/species/alien/bodyparts.dmi'
-	icon_static = 'icons/mob/species/alien/bodyparts.dmi'
+	icon = 'icons/mob/human/species/alien/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/alien/bodyparts.dmi'
 	icon_state = "alien_chest"
 	limb_id = BODYPART_ID_ALIEN
 	bodytype = BODYTYPE_HUMANOID | BODYTYPE_ALIEN | BODYTYPE_ORGANIC
 	is_dimorphic = FALSE
 	should_draw_greyscale = FALSE
-	dismemberable = FALSE
+	bodypart_flags = BODYPART_UNREMOVABLE
 	max_damage = 500
 	acceptable_bodytype = BODYTYPE_HUMANOID
 
 /obj/item/bodypart/chest/larva
-	icon = 'icons/mob/species/alien/bodyparts.dmi'
-	icon_static = 'icons/mob/species/alien/bodyparts.dmi'
+	icon = 'icons/mob/human/species/alien/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/alien/bodyparts.dmi'
 	icon_state = "larva_chest"
 	limb_id = BODYPART_ID_LARVA
 	is_dimorphic = FALSE
 	should_draw_greyscale = FALSE
-	dismemberable = FALSE
+	bodypart_flags = BODYPART_UNREMOVABLE
 	max_damage = 50
 	bodytype = BODYTYPE_LARVA_PLACEHOLDER | BODYTYPE_ORGANIC
 	acceptable_bodytype = BODYTYPE_LARVA_PLACEHOLDER
@@ -76,7 +101,7 @@
 	attack_verb_continuous = list("slaps", "punches")
 	attack_verb_simple = list("slap", "punch")
 	max_damage = 50
-	aux_layer = HANDS_PART_LAYER
+	aux_layer = BODYPARTS_HIGH_LAYER
 	body_damage_coeff = 0.75
 	can_be_disabled = TRUE
 	unarmed_attack_verb = "punch" /// The classic punch, wonderfully classic and completely random
@@ -84,6 +109,19 @@
 	unarmed_damage_high = 10
 	unarmed_stun_threshold = 10
 	body_zone = BODY_ZONE_L_ARM
+	/// Datum describing how to offset things worn on the hands of this arm, note that an x offset won't do anything here
+	var/datum/worn_feature_offset/worn_glove_offset
+	/// Datum describing how to offset things held in the hands of this arm, the x offset IS functional here
+	var/datum/worn_feature_offset/held_hand_offset
+	/// The noun to use when referring to this arm's appendage, e.g. "hand" or "paw"
+	var/appendage_noun = "hand"
+
+	biological_state = BIO_STANDARD_JOINTED
+
+/obj/item/bodypart/arm/Destroy()
+	QDEL_NULL(worn_glove_offset)
+	QDEL_NULL(held_hand_offset)
+	return ..()
 
 /obj/item/bodypart/arm/left
 	name = "left arm"
@@ -148,7 +186,7 @@
 		if(bodypart_disabled)
 			owner.set_usable_hands(owner.usable_hands - 1)
 			if(owner.stat < UNCONSCIOUS)
-				to_chat(owner, span_userdanger("Your lose control of your [name]!"))
+				to_chat(owner, span_userdanger("You lose control of your [name]!"))
 			if(held_index)
 				owner.dropItemToGround(owner.get_item_for_held_index(held_index))
 	else if(!bodypart_disabled)
@@ -160,8 +198,10 @@
 
 
 /obj/item/bodypart/arm/left/monkey
-	icon = 'icons/mob/species/monkey/bodyparts.dmi'
-	icon_static = 'icons/mob/species/monkey/bodyparts.dmi'
+	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_husk = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	husk_type = "monkey"
 	icon_state = "default_monkey_l_arm"
 	limb_id = SPECIES_MONKEY
 	should_draw_greyscale = FALSE
@@ -173,19 +213,21 @@
 	unarmed_damage_low = 1 /// monkey punches must be really weak, considering they bite people instead and their bites are weak as hell.
 	unarmed_damage_high = 2
 	unarmed_stun_threshold = 3
+	appendage_noun = "paw"
 
 /obj/item/bodypart/arm/left/alien
-	icon = 'icons/mob/species/alien/bodyparts.dmi'
-	icon_static = 'icons/mob/species/alien/bodyparts.dmi'
+	icon = 'icons/mob/human/species/alien/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/alien/bodyparts.dmi'
 	icon_state = "alien_l_arm"
 	limb_id = BODYPART_ID_ALIEN
 	bodytype = BODYTYPE_HUMANOID | BODYTYPE_ALIEN | BODYTYPE_ORGANIC
 	px_x = 0
 	px_y = 0
-	dismemberable = FALSE
+	bodypart_flags = BODYPART_UNREMOVABLE
 	can_be_disabled = FALSE
 	max_damage = 100
 	should_draw_greyscale = FALSE
+	appendage_noun = "scythe-like hand"
 
 
 /obj/item/bodypart/arm/right
@@ -197,7 +239,7 @@
 	icon_state = "default_human_r_arm"
 	plaintext_zone = "right arm"
 	aux_zone = BODY_ZONE_PRECISE_R_HAND
-	aux_layer = HANDS_PART_LAYER
+	aux_layer = BODYPARTS_HIGH_LAYER
 	held_index = 2
 	px_x = 6
 	px_y = 0
@@ -249,7 +291,7 @@
 		if(bodypart_disabled)
 			owner.set_usable_hands(owner.usable_hands - 1)
 			if(owner.stat < UNCONSCIOUS)
-				to_chat(owner, span_userdanger("Your lose control of your [name]!"))
+				to_chat(owner, span_userdanger("You lose control of your [name]!"))
 			if(held_index)
 				owner.dropItemToGround(owner.get_item_for_held_index(held_index))
 	else if(!bodypart_disabled)
@@ -261,8 +303,10 @@
 
 
 /obj/item/bodypart/arm/right/monkey
-	icon = 'icons/mob/species/monkey/bodyparts.dmi'
-	icon_static = 'icons/mob/species/monkey/bodyparts.dmi'
+	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_husk = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	husk_type = "monkey"
 	icon_state = "default_monkey_r_arm"
 	limb_id = SPECIES_MONKEY
 	bodytype = BODYTYPE_MONKEY | BODYTYPE_ORGANIC
@@ -274,21 +318,23 @@
 	unarmed_damage_low = 1
 	unarmed_damage_high = 2
 	unarmed_stun_threshold = 3
+	appendage_noun = "paw"
 
 /obj/item/bodypart/arm/right/alien
-	icon = 'icons/mob/species/alien/bodyparts.dmi'
-	icon_static = 'icons/mob/species/alien/bodyparts.dmi'
+	icon = 'icons/mob/human/species/alien/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/alien/bodyparts.dmi'
 	icon_state = "alien_r_arm"
 	limb_id = BODYPART_ID_ALIEN
 	bodytype = BODYTYPE_HUMANOID | BODYTYPE_ALIEN | BODYTYPE_ORGANIC
 	px_x = 0
 	px_y = 0
-	dismemberable = FALSE
+	bodypart_flags = BODYPART_UNREMOVABLE
 	can_be_disabled = FALSE
 	max_damage = 100
 	should_draw_greyscale = FALSE
+	appendage_noun = "scythe-like hand"
 
-/// Parent Type for arms, should not appear in game.
+/// Parent Type for legs, should not appear in game.
 /obj/item/bodypart/leg
 	name = "leg"
 	desc = "This item shouldn't exist. Talk about breaking a leg. Badum-Tss!"
@@ -303,6 +349,14 @@
 	unarmed_damage_low = 2
 	unarmed_damage_high = 15
 	unarmed_stun_threshold = 10
+	/// Datum describing how to offset things worn on the foot of this leg, note that an x offset won't do anything here
+	var/datum/worn_feature_offset/worn_foot_offset
+
+	biological_state = BIO_STANDARD_JOINTED
+
+/obj/item/bodypart/leg/Destroy()
+	QDEL_NULL(worn_foot_offset)
+	return ..()
 
 /obj/item/bodypart/leg/left
 	name = "left leg"
@@ -363,13 +417,16 @@
 		if(bodypart_disabled)
 			owner.set_usable_legs(owner.usable_legs - 1)
 			if(owner.stat < UNCONSCIOUS)
-				to_chat(owner, span_userdanger("Your lose control of your [name]!"))
+				to_chat(owner, span_userdanger("You lose control of your [name]!"))
 	else if(!bodypart_disabled)
 		owner.set_usable_legs(owner.usable_legs + 1)
 
 /obj/item/bodypart/leg/left/monkey
-	icon = 'icons/mob/species/monkey/bodyparts.dmi'
-	icon_static = 'icons/mob/species/monkey/bodyparts.dmi'
+	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_husk = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	husk_type = "monkey"
+	top_offset = -3
 	icon_state = "default_monkey_l_leg"
 	limb_id = SPECIES_MONKEY
 	should_draw_greyscale = FALSE
@@ -382,14 +439,14 @@
 	unarmed_stun_threshold = 4
 
 /obj/item/bodypart/leg/left/alien
-	icon = 'icons/mob/species/alien/bodyparts.dmi'
-	icon_static = 'icons/mob/species/alien/bodyparts.dmi'
+	icon = 'icons/mob/human/species/alien/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/alien/bodyparts.dmi'
 	icon_state = "alien_l_leg"
 	limb_id = BODYPART_ID_ALIEN
 	bodytype = BODYTYPE_HUMANOID | BODYTYPE_ALIEN | BODYTYPE_ORGANIC
 	px_x = 0
 	px_y = 0
-	dismemberable = FALSE
+	bodypart_flags = BODYPART_UNREMOVABLE
 	can_be_disabled = FALSE
 	max_damage = 100
 	should_draw_greyscale = FALSE
@@ -407,13 +464,6 @@
 	px_x = 2
 	px_y = 12
 	bodypart_trait_source = RIGHT_LEG_TRAIT
-	/// We store this here to generate our icon key more easily.
-	var/left_leg_mask_key
-	/// The associated list of all the left leg mask keys associated to their cached left leg masks.
-	/// It's static, so it's shared between all the left legs there is. Be careful.
-	/// Why? Both legs share the same layer for rendering, and since we don't want to do redraws on
-	/// each dir changes, we're doing it with a mask instead, which we cache for efficiency reasons.
-	var/static/list/left_leg_mask_cache = list()
 
 /obj/item/bodypart/leg/right/set_owner(new_owner)
 	. = ..()
@@ -461,13 +511,16 @@
 		if(bodypart_disabled)
 			owner.set_usable_legs(owner.usable_legs - 1)
 			if(owner.stat < UNCONSCIOUS)
-				to_chat(owner, span_userdanger("Your lose control of your [name]!"))
+				to_chat(owner, span_userdanger("You lose control of your [name]!"))
 	else if(!bodypart_disabled)
 		owner.set_usable_legs(owner.usable_legs + 1)
 
 /obj/item/bodypart/leg/right/monkey
-	icon = 'icons/mob/species/monkey/bodyparts.dmi'
-	icon_static = 'icons/mob/species/monkey/bodyparts.dmi'
+	icon = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	icon_husk = 'icons/mob/human/species/monkey/bodyparts.dmi'
+	husk_type = "monkey"
+	top_offset = -3
 	icon_state = "default_monkey_r_leg"
 	limb_id = SPECIES_MONKEY
 	should_draw_greyscale = FALSE
@@ -480,14 +533,26 @@
 	unarmed_stun_threshold = 4
 
 /obj/item/bodypart/leg/right/alien
-	icon = 'icons/mob/species/alien/bodyparts.dmi'
-	icon_static = 'icons/mob/species/alien/bodyparts.dmi'
+	icon = 'icons/mob/human/species/alien/bodyparts.dmi'
+	icon_static = 'icons/mob/human/species/alien/bodyparts.dmi'
 	icon_state = "alien_r_leg"
 	limb_id = BODYPART_ID_ALIEN
 	bodytype = BODYTYPE_HUMANOID | BODYTYPE_ALIEN | BODYTYPE_ORGANIC
 	px_x = 0
 	px_y = 0
-	dismemberable = FALSE
+	bodypart_flags = BODYPART_UNREMOVABLE
 	can_be_disabled = FALSE
 	max_damage = 100
 	should_draw_greyscale = FALSE
+
+/obj/item/bodypart/leg/right/tallboy
+	limb_id = SPECIES_TALLBOY
+	top_offset = 23
+	unarmed_damage_low = 30
+	unarmed_damage_low = 50
+
+/obj/item/bodypart/leg/left/tallboy
+	limb_id = SPECIES_TALLBOY
+	top_offset = 23
+	unarmed_damage_low = 30
+	unarmed_damage_low = 50
