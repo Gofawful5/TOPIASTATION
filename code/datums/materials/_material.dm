@@ -165,7 +165,7 @@ Simple datum which is instanced once per type and is used for every object of sa
 	if(!starlight_color)
 		on.RegisterSignal(SSdcs, COMSIG_STARLIGHT_COLOR_CHANGED, TYPE_PROC_REF(/turf, material_starlight_changed))
 		RegisterSignal(on, COMSIG_QDELETING, PROC_REF(lit_turf_deleted))
-	on.set_light(2, 0.75, starlight_color || GLOB.starlight_color)
+	on.set_light(2, 1, starlight_color || GLOB.starlight_color, l_height = LIGHTING_HEIGHT_SPACE)
 
 /turf/proc/material_starlight_changed(datum/source, old_star, new_star)
 	if(light_color == old_star)
@@ -245,7 +245,7 @@ Simple datum which is instanced once per type and is used for every object of sa
  *
  * Arguments:
  * - amount: The amount of the material to break down.
- * - breakdown_flags: Some flags dictating how exactly this material is being broken down.
  */
-/datum/material/proc/return_composition(amount=1, breakdown_flags=NONE)
-	return list((src) = amount) // Yes we need the parenthesis, without them BYOND stringifies src into "src" and things break.
+/datum/material/proc/return_composition(amount = 1)
+	// Yes we need the parenthesis, without them BYOND stringifies src into "src" and things break.
+	return list((src) = amount)

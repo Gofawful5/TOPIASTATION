@@ -3,6 +3,13 @@
 	access = NONE
 	group = "Goodies"
 	goody = TRUE
+	discountable = SUPPLY_PACK_STD_DISCOUNTABLE
+
+/datum/supply_pack/goody/clear_pda
+	name = "Mint Condition Nanotrasen Clear PDA"
+	desc = "Mint condition, freshly repackaged! A valuable collector's item normally valued at over 2.5 million credits, now available for a steal!"
+	cost = 100000
+	contains = list(/obj/item/modular_computer/pda/clear)
 
 /datum/supply_pack/goody/dumdum38
 	name = ".38 DumDum Speedloader"
@@ -248,6 +255,18 @@
 	cost = PAYCHECK_CREW * 8
 	contains = list(/obj/item/fishing_rod/telescopic)
 
+/datum/supply_pack/goody/fish_analyzer
+	name = "Fish Analyzer"
+	desc = "A single analyzer to monitor fish's status and traits with, in case you don't have the technology to print one."
+	cost = PAYCHECK_CREW * 2.5
+	contains = list(/obj/item/fish_analyzer)
+
+/datum/supply_pack/goody/fish_catalog
+	name = "Fishing Catalog"
+	desc = "A catalog containing all the fishy info you'll ever need."
+	cost = PAYCHECK_LOWER
+	contains = list(/obj/item/book/manual/fish_catalog)
+
 /datum/supply_pack/goody/coffee_mug
 	name = "Coffee Mug"
 	desc = "A bog standard coffee mug, for drinking coffee."
@@ -283,9 +302,3 @@
 	desc = "A less cheap imported climbing hook. Absolutely no use outside of planetary stations."
 	cost = PAYCHECK_CREW * 5
 	contains = list(/obj/item/climbing_hook)
-
-/datum/supply_pack/goody/fish_analyzer
-	name = "Fish Analyzer"
-	desc = "A single analyzer to monitor fish's status and traits with, in case you don't have the technology to print one."
-	cost = CARGO_CRATE_VALUE * 2.5
-	contains = list(/obj/item/fish_analyzer)
